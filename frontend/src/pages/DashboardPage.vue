@@ -61,7 +61,6 @@
     align-items: left;
     height: 240px;
     font-family: Myriad Pro;
-    font-size: 30rem;
     color: #034750;
   }
 
@@ -97,7 +96,7 @@
   .dashboard-description {
     width: 395px;
     height: 71px;
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 400;
     color: #747474;
     margin-bottom: 33px;
@@ -121,9 +120,9 @@
 
   .divider {
     width: 100%;
-    height: 1px;
+    height: 0px;
     margin-top: 68px;
-    background-color: white;
+    border: 1px, solid, #FFFFFF;
   }
 
   .active-enrollments {
