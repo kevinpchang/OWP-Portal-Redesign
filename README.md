@@ -7,3 +7,4 @@ Nicholas Guzman
 Uday Kyama 
 Cristobel Navarro-Miranda
 Vincent Lam
+Heet Shah
