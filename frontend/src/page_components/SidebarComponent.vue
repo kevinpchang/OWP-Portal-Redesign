@@ -6,26 +6,26 @@
 <template>
   <div class="shell">
     <nav class="sidebar">
-      <div class="dashboard-button" :class="{ active: route.name === 'DashboardPage' }">
+      <div class="dashboard-button" :class="{ active: route.name === 'MyAccountPage' }">
         <div class="button-text">Dashboard</div>
       </div>
       <!-- CHANGE active: route.name === "YOURPAGENAME_INSIDE_pages_DIRECTORY" -->
-      <div class="my-tasks-button" :class="{ active: route.name === 'DashboardPage'}">
+      <div class="my-tasks-button" :class="{ active: route.name === 'MyAccountPage'}">
         <div class="button-text">My Tasks</div>
       </div>
-      <div class="slides-button" :class="{ active: route.name === 'DashboardPage'}">
+      <div class="slides-button" :class="{ active: route.name === 'MyAccountPage'}">
         <div class="button-text">Slides</div>
       </div>
-      <div class="courses-button" :class="{ active: route.name === 'DashboardPage' }">
+      <div class="courses-button" :class="{ active: route.name === 'MyAccountPage' }">
         <div class="button-text">Courses</div>
       </div>
-      <div class="operator-numbers-button" :class="{ active: route.name === 'DashboardPage' }">
+      <div class="operator-numbers-button" :class="{ active: route.name === 'MyAccountPage' }">
         <div class="button-text">Operator Numbers</div>
       </div>
-      <div class="certificates-button" :class="{ active: route.name === 'DashboardPage' }">
+      <div class="certificates-button" :class="{ active: route.name === 'MyAccountPage' }">
         <div class="button-text">Certificates</div>
       </div>
-      <div class="purchase-history-button":class="{ active: route.name === 'DashboardPage' }">
+      <div class="purchase-history-button" :class="{ active: route.name === 'MyAccountPage' }">
         <div class="button-text">Purchase History</div>
       </div>
     </nav>
@@ -89,6 +89,11 @@
   }
 
   .dashboard-button.active {
+    background-color: #F2F1F2;
+  }
+
+  /* BROADENED: any .active inside .sidebar gets the gray background */
+  .sidebar .active {
     background-color: #F2F1F2;
   }
 </style>
