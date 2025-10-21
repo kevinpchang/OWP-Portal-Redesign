@@ -9,12 +9,25 @@
       <div class="dashboard-button" :class="{ active: route.name === 'DashboardPage' }">
         <div class="button-text">Dashboard</div>
       </div>
-      <div class="my-tasks-button"></div>
-      <div class="slides-button"></div>
-      <div class="courses-button"></div>
-      <div class="operator-numbers-button"></div>
-      <div class="certificates-button"></div>
-      <div class="purchase-history-button"></div>
+      <!-- CHANGE active: route.name === "YOURPAGENAME_INSIDE_pages_DIRECTORY" -->
+      <div class="my-tasks-button" :class="{ active: route.name === 'DashboardPage'}">
+        <div class="button-text">My Tasks</div>
+      </div>
+      <div class="slides-button" :class="{ active: route.name === 'DashboardPage'}">
+        <div class="button-text">Slides</div>
+      </div>
+      <div class="courses-button" :class="{ active: route.name === 'DashboardPage' }">
+        <div class="button-text">Courses</div>
+      </div>
+      <div class="operator-numbers-button" :class="{ active: route.name === 'DashboardPage' }">
+        <div class="button-text">Operator Numbers</div>
+      </div>
+      <div class="certificates-button" :class="{ active: route.name === 'DashboardPage' }">
+        <div class="button-text">Certificates</div>
+      </div>
+      <div class="purchase-history-button":class="{ active: route.name === 'DashboardPage' }">
+        <div class="button-text">Purchase History</div>
+      </div>
     </nav>
     
     <div class="right-line"></div>
