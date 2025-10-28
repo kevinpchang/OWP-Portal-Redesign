@@ -75,7 +75,7 @@
 .add-button {
   margin-left: 55%;
   background-color: #48773C;
-  padding:1% 1%;
+  padding:15px 15px;
   border:none;
   border-radius: 10px;
   font-family: 'Myriad Pro, Bold', sans-serif;  
@@ -118,7 +118,7 @@
 }
 
 table {
-    margin-top: 1%;
+    margin-top: 30px;
     padding-left: 18px;
     border-collapse: collapse;
     width: 100%;

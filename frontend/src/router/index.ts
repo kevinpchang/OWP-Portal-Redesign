@@ -7,10 +7,10 @@ import CertificatesPage from '@/pages/CertificatesPage.vue'
 
 const routes = [
   //{path: "/", name: 'DashboardPage', component: DashboardPage} //KEVIN'S DASHBOARD
-  {path: "/", name: 'Learning Portal', component: DashboardPage}, // CRISTOBE
-  // L'S MY_ACCOUNT
+  {path: "/", name: 'Learning Portal', component: DashboardPage}, 
+  { path: '/account', name: 'Account', component: MyAccountPage},// CRISTOBEL'S MY_ACCOUNT
   { path: '/courses', name: 'CoursesPage', component: CoursesPage,},
-  { path: '/operatornumbers', name: 'Operator Numbers', component:OPnum,},
+  { path: '/operatornumbers', name: 'Operator Numbers', component:OPnum,}, //RYAN OPERATOR NUMBERS
   { path: '/Certificates', name:'CertificatesPage', component: CertificatesPage,} //UDAY KYAMA
 ]
 
