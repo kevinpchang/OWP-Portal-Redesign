@@ -1,7 +1,7 @@
 <template>
   <div class="courses-page">
     <div class="header-container">
-      <div class="courses-header">Operator Numbers</div>
+      <div class="title">Operator Numbers</div>
       <!--<p class="page-description">Sorry! Currently under construction.</p>-->
     </div>
 
@@ -60,7 +60,7 @@
   gap: 8px; 
 }
 
-.courses-header {
+.title {
   width: 331px;
   height: 28px;
   font-family: 'Myriad Pro, Bold', sans-serif;
@@ -113,11 +113,11 @@
 }
 
 table {
-    margin-top: 75px;
+    margin-top: 4%;
     padding-left: 18px;
     border-collapse: collapse;
     width: 100%;
-    max-width: 1000px;
+    max-width: 65%;
     background-color: #f2f1f2;
     border-radius: 10px;
     overflow: hidden;
