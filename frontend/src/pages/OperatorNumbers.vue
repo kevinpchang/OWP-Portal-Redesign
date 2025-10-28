@@ -5,28 +5,40 @@
       <!--<p class="page-description">Sorry! Currently under construction.</p>-->
     </div>
 
-    <div class="tiles-container">
-        <div class="course-tile">
+    <!--<div class="tiles-container">
+        <div class="table-tile">-->
             <!--<h2 class="tile-header">Table goes here</h2>-->
-            <table class="tile-header">
-                <thead>
-                    <tr>
-                        <th>State/Province</th>
-                        <th>Operator Number</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>California</td>
-                        <td>12345</td>
-                        <td>Edit/Remove</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <table>
+        <thead class="tile-header">
+            <tr>
+                <th>State/Province</th>
+                <th>Operator Number</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody class="table-body">
+            <tr>
+                <td>California</td>
+                <td>12345</td>
+                <td>Edit/Remove</td>
+            </tr>
+            <tr>
+                <td>Colorado</td>
+                <td>67890</td>
+                <td>Edit/Remove</td>
+            </tr>
+            <tr>
+                <td>Washington</td>
+                <td>59746</td>
+                <td>Edit/Remove</td>
+            </tr>
+        </tbody>
+    </table>
+        <!--</div>
+    </div>-->
 
     <div class="content-body">
+      <p>where is this</p>
     </div>
 
   </div>
@@ -73,7 +85,7 @@
     gap: 16px;
 }
 
-.course-tile {
+.table-tile {
     background-color: #f2f1f2;
     border-radius: 14px;
     padding: 24px;
@@ -92,10 +104,55 @@
     margin: 0;
 }
 
-table, th, td {
-  border: 1px solid black;
-  border-collapse: collapse;
+.table-body {
+    font-family: 'Myriad Pro', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #034750;
+    margin: 0;
 }
+
+table {
+    margin-top: 75px;
+    padding-left: 18px;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 1000px;
+    background-color: #f2f1f2;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  }
+
+  th, td {
+    text-align: left;
+    padding: 12px 16px;
+    border-right: 1px solid #ccc;
+  }
+
+  th:last-child,
+  td:last-child {
+      border-right: none;
+  }
+
+  th {
+    background-color: #f2f1f2;
+    color: #004d4d;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  td {
+    border-bottom: 1px solid #ddd;
+  }
 
 .content-body {
   margin-top: 32px;
