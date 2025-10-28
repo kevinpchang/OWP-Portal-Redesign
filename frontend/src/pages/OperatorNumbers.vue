@@ -1,14 +1,15 @@
 <template>
-  <div class="courses-page">
+  <div class="operator-numbers-page">
     <div class="header-container">
       <div class="title">Operator Numbers</div>
-      <!--<p class="page-description">Sorry! Currently under construction.</p>-->
     </div>
 
-    <!--<div class="tiles-container">
-        <div class="table-tile">-->
-            <!--<h2 class="tile-header">Table goes here</h2>-->
-    <table>
+    <div>
+      <button class = add-button type="button">Add Operatorn Number</button>
+    </div>
+
+    <div name="table">
+      <table>
         <thead class="tile-header">
             <tr>
                 <th>State/Province</th>
@@ -33,19 +34,13 @@
                 <td>Edit/Remove</td>
             </tr>
         </tbody>
-    </table>
-        <!--</div>
-    </div>-->
-
-    <div class="content-body">
-      <p>where is this</p>
+      </table>
     </div>
-
   </div>
 </template>
 
 <style scoped>
-.courses-page {
+.operator-numbers-page {
   position: relative;
   height: 100%;
   background-color: #fff;
@@ -75,6 +70,16 @@
   color: #555;
   font-family: 'Myriad Pro', sans-serif;
   margin: 0;
+}
+
+.add-button {
+  margin-left: 55%;
+  background-color: #48773C;
+  padding:1% 1%;
+  border:none;
+  border-radius: 10px;
+  font-family: 'Myriad Pro, Bold', sans-serif;  
+  color:white
 }
 
 .tiles-container {
@@ -113,7 +118,7 @@
 }
 
 table {
-    margin-top: 4%;
+    margin-top: 1%;
     padding-left: 18px;
     border-collapse: collapse;
     width: 100%;
