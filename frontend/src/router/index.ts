@@ -6,7 +6,7 @@ import OPnum from '../pages/OperatorNumbers.vue'
 
 const routes = [
   //{path: "/", name: 'DashboardPage', component: DashboardPage} //KEVIN'S DASHBOARD
-  {path: "/", name: 'Operator Numbers', component: OPnum}, // CRISTOBE
+  {path: "/", name: 'Learning Portal', component: DashboardPage}, // CRISTOBE
   // L'S MY_ACCOUNT
   { path: '/courses', name: 'CoursesPage', component: CoursesPage,},
   { path: '/operatornumbers', name: 'Operator Numbers', component:OPnum,}
