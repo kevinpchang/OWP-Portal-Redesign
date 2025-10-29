@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { createRouter, createWebHistory } from 'vue-router'
 import DashboardPage from '../pages/DashboardPage.vue'
 import MyAccountPage from '../pages/MyAccountPage.vue'
@@ -13,10 +14,23 @@ const routes = [
   { path: '/operatornumbers', name: 'Operator Numbers', component:OPnum,},
   { path: '/Certificates', name:'CertificatesPage', component: CertificatesPage,} //UDAY KYAMA
 ]
+=======
+//tets commit
+import { createRouter, createWebHistory } from 'vue-router';
+import PurchaseHistory from '../pages/PurchaseHistory.vue';
+
+const routes = [
+  {
+    path: '/purchase-history',
+    name: 'purchase-history',
+    component: PurchaseHistory,
+  },
+];
+>>>>>>> vincent-purchasehistory-page
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
