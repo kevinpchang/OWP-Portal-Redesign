@@ -7,13 +7,12 @@ import CertificatesPage from '@/pages/CertificatesPage.vue'
 import PurchaseHistory from '../pages/PurchaseHistory.vue'
 
 const routes = [
-  // { path: "/", name: 'DashboardPage', component: DashboardPage } // KEVIN'S DASHBOARD
-  { path: "/", name: 'Learning Portal', component: DashboardPage }, // CRISTOBE
-  // L'S MY_ACCOUNT
-  { path: '/courses', name: 'CoursesPage', component: CoursesPage },
-  { path: '/operatornumbers', name: 'Operator Numbers', component: OPnum },
-  { path: '/Certificates', name: 'CertificatesPage', component: CertificatesPage }, // UDAY KYAMA
-  { path: '/purchase-history', name: 'PurchaseHistory', component: PurchaseHistory } // VINCENT LAM
+  { path: "/pages", name: 'DashboardPage', component: DashboardPage }, // KEVIN'S DASHBOARD
+  { path: "/", name: 'MyAccountPage', component: MyAccountPage }, // CRISTOBE L'S MY_ACCOUNT
+  { path: '/', name: 'CoursesPage', component: CoursesPage },
+  { path: '/', name: 'Operator Numbers', component: OPnum },
+  { path: '/', name: 'CertificatesPage', component: CertificatesPage }, // UDAY KYAMA
+  { path: '/', name: 'PurchaseHistory', component: PurchaseHistory } // VINCENT LAM
 ]
 
 const router = createRouter({

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import HeaderComponent from './page_components/HeaderComponent.vue';
 import SidebarComponent from './page_components/SidebarComponent.vue';
-import PurchaseHistory from './pages/PurchaseHistory.vue';
+import DashboardPage from './pages/DashboardPage.vue';
 </script>
 
 <template>
@@ -10,7 +10,7 @@ import PurchaseHistory from './pages/PurchaseHistory.vue';
     <SidebarComponent />
     <main class="content">
 
-      <PurchaseHistory />
+      <DashboardPage />
       <router-view />
     </main>
   </div>

@@ -18,19 +18,39 @@
     <div class="dashboard-bottom">
       <div class="dashboard-left">
         <div class="active-enrollments">
+          <div class="header">
+            <div class="icon"></div>
+            <div class="text">Active Enrollments</div>
+          </div>
           <div class="divider"></div>
+          <div class="body"></div>
         </div>
 
         <div class="instructor-slides">
+          <div class="header">
+            <div class="icon"></div>
+            <div class="text">Instructor Slides</div>
+          </div>
           <div class="divider"></div>
+          <div class="body"></div>
         </div>
       </div>
       <div class="dashboard-right">
         <div class="messages">
+          <div class="header">
+            <div class="icon"></div>
+            <div class="text">Active Enrollments</div>
+          </div>
           <div class="divider"></div>
+          <div class="body"></div>
         </div>
         <div class="purchase-history">
+          <div class="header">
+            <div class="icon"></div>
+            <div class="text">Active Enrollments</div>
+          </div>
           <div class="divider"></div>
+          <div class="body"></div>
         </div>
       </div>
     </div>
@@ -121,7 +141,6 @@
   .divider {
     width: 100%;
     height: 0px;
-    margin-top: 68px;
     border: 1px, solid, #FFFFFF;
   }
 
@@ -129,15 +148,72 @@
     height: 450px;
     border-radius: 14rem;
     display: flex;
-    justify-content: center;
+    flex-direction: column; 
+    justify-content: top;
     align-items: top;
     background-color: #F2F1F2;
+  }
+
+  .active-enrollments .header {
+    height: 68px;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+  }
+
+  .active-enrollments .header .icon {
+    width: 26.53px;
+    height: 33.67px;
+    margin-top: 18.53px;
+    margin-left: 23.55px;
+    background-color: red;
+  }
+
+  .active-enrollments .header .text {
+    height: 20px;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 29px;
+    margin-left: 8px;
+    color: #034750;
+  }
+  .active-enrollments .body {
+    height: 382px;
+    display: flex;
   }
 
   .instructor-slides {
     height: 250px;
     border-radius: 14rem;
     background-color: #F2F1F2;
+  }
+
+  .instructor-slides .header {
+    height: 68px;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+  }
+
+  .instructor-slides .header .icon {
+    width: 26.53px;
+    height: 33.67px;
+    margin-top: 18.53px;
+    margin-left: 23.55px;
+    background-color: red;
+  }
+
+  .instructor-slides .header .text {
+    height: 20px;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 29px;
+    margin-left: 8px;
+    color: #034750;
+  }
+  .instructor-slides .body {
+    height: 382px;
+    display: flex;
   }
 
   .dashboard-right {
