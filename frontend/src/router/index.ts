@@ -7,7 +7,7 @@ import CertificatesPage from '@/pages/CertificatesPage.vue'
 import PurchaseHistory from '../pages/PurchaseHistory.vue'
 
 const routes = [
-  // { path: "/", name: 'DashboardPage', component: DashboardPage } // KEVIN'S DASHBOARD
+  { path: "/", name: 'DashboardPage', component: DashboardPage }, // KEVIN'S DASHBOARD
   { path: "/", name: 'Learning Portal', component: DashboardPage }, // CRISTOBE
   // L'S MY_ACCOUNT
   { path: '/courses', name: 'CoursesPage', component: CoursesPage },
