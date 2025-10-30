@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import HeaderComponent from './page_components/HeaderComponent.vue';
 import SidebarComponent from './page_components/SidebarComponent.vue';
-import DashboardPage from './pages/DashboardPage.vue';
 </script>
 
 <template>
