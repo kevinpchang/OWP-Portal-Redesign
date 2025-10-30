@@ -9,7 +9,7 @@ import SidebarComponent from './page_components/SidebarComponent.vue';
     <SidebarComponent />
     <main class="content">
 
-      <PurchaseHistory />
+      <DashboardPage />
       <router-view />
     </main>
   </div>
