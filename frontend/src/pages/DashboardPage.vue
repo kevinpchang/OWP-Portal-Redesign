@@ -36,18 +36,20 @@
         </div>
       </div>
       <div class="dashboard-right">
+
         <div class="messages">
           <div class="header">
             <div class="icon"></div>
-            <div class="text">Active Enrollments</div>
+            <div class="text">Messages</div>
           </div>
           <div class="divider"></div>
           <div class="body"></div>
         </div>
+
         <div class="purchase-history">
           <div class="header">
             <div class="icon"></div>
-            <div class="text">Active Enrollments</div>
+            <div class="text">Purchase History</div>
           </div>
           <div class="divider"></div>
           <div class="body"></div>
@@ -164,9 +166,10 @@
   .active-enrollments .header .icon {
     width: 26.53px;
     height: 33.67px;
+    border-radius: 4rem;
     margin-top: 18.53px;
     margin-left: 23.55px;
-    background-color: red;
+    background-color: #c9c9c9;
   }
 
   .active-enrollments .header .text {
@@ -200,7 +203,7 @@
     height: 33.67px;
     margin-top: 18.53px;
     margin-left: 23.55px;
-    background-color: red;
+    background-color: #c9c9c9;
   }
 
   .instructor-slides .header .text {
@@ -229,9 +232,68 @@
     background-color: #F2F1F2;
   }
 
+  .messages .header {
+    height: 68px;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+  }
+
+  .messages .header .icon {
+    width: 26.53px;
+    height: 33.67px;
+    margin-top: 18.53px;
+    margin-left: 23.55px;
+    background-color: #c9c9c9;
+  }
+
+  .messages .header .text {
+    height: 20px;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 29px;
+    margin-left: 8px;
+    color: #034750;
+  }
+
+  .messages .body {
+    height: 382px;
+    display: flex;
+  }
+
   .purchase-history {
     height: 460px;
     border-radius: 14rem;
     background-color: #F2F1F2;
   }
+
+  .purchase-history .header {
+    height: 68px;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+  }
+
+  .purchase-history .header .icon {
+    width: 26.53px;
+    height: 33.67px;
+    margin-top: 18.53px;
+    margin-left: 23.55px;
+    background-color: #c9c9c9;
+  }
+
+  .purchase-history .header .text {
+    height: 20px;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 29px;
+    margin-left: 8px;
+    color: #034750;
+  }
+  
+  .purchase-history .body {
+    height: 382px;
+    display: flex;
+  }
+
 </style>
