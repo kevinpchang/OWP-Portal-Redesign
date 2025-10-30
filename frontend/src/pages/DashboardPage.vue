@@ -190,7 +190,7 @@
     grid-row: 2;
     display: grid;
     grid-template-columns: 700px 300px;
-    column-gap: 16rem;
+    column-gap: 16px;
     margin-bottom: 48px;
   }
 
