@@ -8,6 +8,12 @@ const route = useRoute()
     <nav class="sidebar">
       <!-- Dashboard -->
       <router-link to="/" class="dashboard-button" :class="{ active: route.name === 'DashboardPage' }">
+        <div class="button-icon dashboard-icon">
+          <div class="square"></div>
+          <div class="square"></div>
+          <div class="square"></div>
+          <div class="square"></div>
+        </div>
         <div class="button-text">Dashboard</div>
       </router-link>
 
@@ -34,17 +40,30 @@ const route = useRoute()
       </div>
 
       <!-- Operator Numbers -->
-      <router-link to="/operator-numbers" class="operator-numbers-button" :class="{ active: route.name === 'OperatorNumbersPage' }">
+      <router-link
+        to="/operatornumbers"
+        class="operator-numbers-button"
+        :class="{ active: route.name === 'Operator Numbers' }"
+      >
+        <div class="button-icon hash-icon">#</div>
         <div class="button-text">Operator Numbers</div>
       </router-link>
 
       <!-- Certificates -->
-      <router-link to="/certificates" class="certificates-button" :class="{ active: route.name === 'CertificatesPage' }">
+      <router-link
+        to="/certificates"
+        class="certificates-button"
+        :class="{ active: route.name === 'CertificatesPage' }"
+      >
         <div class="button-text">Certificates</div>
       </router-link>
 
       <!-- Purchase History -->
-      <router-link to="/purchase-history" class="purchase-history-button" :class="{ active: route.name === 'PurchaseHistoryPage' }">
+      <router-link
+        to="/purchase-history"
+        class="purchase-history-button"
+        :class="{ active: route.name === 'PurchaseHistory' }"
+      >
         <div class="button-text">Purchase History</div>
       </router-link>
 
@@ -118,6 +137,7 @@ const route = useRoute()
   text-decoration: none;
 }
 
+/* ✅ Active background for all buttons */
 .dashboard-button.active,
 .my-tasks-button.active,
 .slides-button.active,
@@ -133,7 +153,33 @@ const route = useRoute()
   background-color: #F2F1F2;
 }
 
-/* CoursesButton Start */
+/* Dashboard Button Icon */
+.dashboard-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 5px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.dashboard-button .dashboard-icon {
+  display: grid;
+  grid-template-columns: repeat(2, 6px);
+  grid-template-rows: repeat(2, 6px);
+  gap: 4px;
+  position: absolute;
+  left: 30px;
+}
+
+.dashboard-button .square {
+  width: 6px;
+  height: 6px;
+  background-color: #034750;
+  border-radius: 2px;
+}
+
+/* Courses Button */
 .courses-button {
   display: flex;
   align-items: center;
@@ -154,7 +200,7 @@ const route = useRoute()
   text-decoration: none;
   color: inherit;
   width: 100%;
-  padding-left: 39.25rem;
+  padding-left: 35px;
 }
 
 .courses-button .button-text {
@@ -172,7 +218,7 @@ const route = useRoute()
   width: 20px;
   height: 16px;
   position: absolute;
-  left: calc(39.25rem - 8px);
+  left: 27px;
 }
 
 .courses-button .button-icon .line {
@@ -194,5 +240,40 @@ const route = useRoute()
   height: 2px;
   background-color: #034750;
 }
-/* CoursesButton end */
+
+/* Operator Numbers Button */
+.operator-numbers-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #034750;
+  width: 250px;
+  height: 47px;
+  border-radius: 8px;
+  margin-top: 21px;
+  position: relative;
+  padding-left: 15px;
+}
+
+.operator-numbers-button.active {
+  background-color: #F2F1F2;
+}
+
+/* # icon styling */
+.hash-icon {
+  position: absolute;
+  left: 20px;
+  font-size: 18px;
+  font-weight: 900;
+  color: #034750;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.operator-numbers-button:hover .hash-icon,
+.operator-numbers-button.active .hash-icon {
+  color: #02383f;
+}
 </style>
