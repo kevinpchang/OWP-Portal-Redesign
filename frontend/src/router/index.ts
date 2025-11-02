@@ -8,8 +8,7 @@ import PurchaseHistory from '../pages/PurchaseHistory.vue'
 
 const routes = [
   { path: "/", name: 'DashboardPage', component: DashboardPage }, // KEVIN'S DASHBOARD
-  { path: "/", name: 'Learning Portal', component: DashboardPage }, // CRISTOBE
-  // L'S MY_ACCOUNT
+  { path: "/MyAccountPage", name: 'MyAccountPage', component: MyAccountPage}, // CRISTOBEL'S MY_ACCOUNT
   { path: '/courses', name: 'CoursesPage', component: CoursesPage },
   { path: '/operatornumbers', name: 'Operator Numbers', component: OPnum },
   { path: '/Certificates', name: 'CertificatesPage', component: CertificatesPage }, // UDAY KYAMA
