@@ -5,7 +5,7 @@
     </div>
 
     <div>
-      <button class = add-button type="button">Add Operatorn Number</button>
+      <button class = add-button type="button">Add Operation Number</button>
     </div>
 
     <div name="table">
