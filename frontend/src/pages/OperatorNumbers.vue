@@ -4,7 +4,7 @@
       <div class="title">Operator Numbers</div>
     </div>
 
-    <div>
+    <div name="button">
       <button class = add-button type="button">Add Operatorn Number</button>
     </div>
 
@@ -159,8 +159,8 @@ table {
     border-bottom: 1px solid #ddd;
   }
 
-.content-body {
-  margin-top: 32px;
-  padding: 0 32px;
+  .content-body {
+    margin-top: 32px;
+    padding: 0 32px;
 }
 </style>
