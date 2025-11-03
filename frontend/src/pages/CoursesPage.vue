@@ -1,15 +1,12 @@
 <template>
   <div class="courses-page">
-    <!-- Page Header -->
     <div class="header-container">
       <div class="courses-header">Courses</div>
       <p class="page-description"> </p>
     </div>
 
-    <!-- Tiles Container -->
     <div class="tiles-container">
 
-      <!-- Active Courses -->
       <div class="course-tile">
         <div class="title-header-row">
           <div class="header-icon"></div>
@@ -20,7 +17,7 @@
             <div class="course-row">
               <div class="course-image"></div>
               <div class="progress-container">
-                <router-link class="course-title" :to="'/courses/${course.id}'"
+                <router-link class="course-title" :to="`/courses/${course.id}`"
                   >{{ course.title }}
                 </router-link>
                 <div class="completion-label">Completion</div>
@@ -35,7 +32,6 @@
         </ul>
       </div>
 
-      <!-- Completed Courses -->
       <div class="course-tile">
           <div class="title-header-row">
             <div class="header-icon completed-icon"></div>
@@ -46,9 +42,7 @@
             <div class="course-row">
               <div class="course-image completed-image"></div>
               <div class="progress-container">
-                <router-link class="course-title" :to="'/courses/${course.id}'">
-                  {{ course.title }}
-                </router-link>
+                <div class="course-title">{{ course.title }}</div>
                 <div class="completion-header">
                   <div class="completion-label">Completion</div>
                   <div
@@ -74,7 +68,6 @@
 
       </div>
 
-      <!-- Recommended Courses -->
       <div class="course-tile">
         <div class="title-header-row">
           <div class="header-icon recommended-icon"></div>
@@ -85,9 +78,7 @@
             <div class="course-row">
               <div class="course-image recommended-image"></div>
               <div class="recommended-info">
-                <router-link class="course-title" :to="`/courses/${course.id}`">
-                  {{ course.title }}
-                </router-link>
+                <div class="course-title">{{ course.title }}</div>
                 <div class="course-description">{{ course.description }}</div>
                 <div class="course-chapters">{{ course.chapters }}</div>
               </div>
@@ -102,46 +93,26 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-
-interface ActiveCourse {
-  id: number;
-  title: string;
-  progress: string;
-}
-
-interface CompletedCourse {
-  id: number;
-  title: string;
-  status: string;
-}
-
-interface RecommendedCourse {
-  id: number;
-  title: string;
-  description: string;
-  chapters: string;
-}
+import {
+  activeCourses,
+  completedCourses,
+  recommendedCourses,
+  ActiveCourse,
+  CompletedCourse,
+  RecommendedCourse
+} from "../data/coursesData";
 
 export default defineComponent({
   name: "CoursesPage",
   data() {
     return {
-      activeCourses: [
-        { id: 1, title: "Operation of Wastewater Treatment Plants, Vol 2", progress: "50%" }
-      ] as ActiveCourse[],
-      completedCourses: [
-        { id: 2, title: "Operation of Wastewater Treatment Plants, Vol 1", status: "Pass" },
-        { id: 4, title: "Operation of Wastewater Treatment Plants, Vol 2", status: "Fail" }
-      ] as CompletedCourse[],
-      recommendedCourses: [
-        { id: 3, title: "Operation of Wastewater Treatment Plants, Vol 3",
-          description: "1st Edtion, 2023",
-          chapters: "5 chapters"        
-        }
-      ] as RecommendedCourse[]
-    };
+    activeCourses,
+    completedCourses,
+    recommendedCourses
+  };
   }
 });
+
 </script>
 
 <style scoped>
