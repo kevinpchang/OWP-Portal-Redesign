@@ -154,8 +154,8 @@
   .image > img {
     width: 100%;
     height: 100%;
-    object-fit: scale-down;            /* fills + crops */
-    object-position: center;      /* change to 'top'/'50% 30%' to shift the crop */
+    object-fit: scale-down;
+    object-position: center;
     display: block;
   }
 
@@ -251,6 +251,7 @@
   .active-enrollments .body .object1 {
     height: 118px;
     display: flex;
+    cursor: pointer;
     flex-direction: row;
   }
 
@@ -272,6 +273,7 @@
   .active-enrollments .body .object1 .right {
     width: 617px;
     display: flex;
+    cursor: pointer;
     flex-direction: column;
   }
 
@@ -344,6 +346,7 @@
   .active-enrollments .body .object2 .left {
     width: 83px;
     display: flex;
+    cursor: pointer;
     align-items: center;
   }
 
@@ -359,6 +362,7 @@
   .active-enrollments .body .object2 .right {
     width: 617px;
     display: flex;
+    cursor: pointer;
     flex-direction: column;
   }
 
@@ -434,6 +438,7 @@
     font-size: 20px;
     font-weight: 400;
     margin-bottom: 12px;
+    cursor: pointer;
     color: #034750;
   }
 
@@ -483,6 +488,7 @@
     font-size: 16px;
     font-weight: 400;
     text-decoration: underline;
+    cursor: pointer;
     color: #007C8A;
   }
 
@@ -498,6 +504,7 @@
     font-size: 20px;
     font-weight: 400;
     margin-bottom: 12px;
+    cursor: pointer;
     color: #034750;
   }
 
@@ -554,6 +561,7 @@
     font-size: 16px;
     font-weight: 400;
     text-decoration: underline;
+    cursor: pointer;
     color: #007C8A;
   }
 
@@ -569,6 +577,7 @@
     font-size: 20px;
     font-weight: 400;
     margin-bottom: 12px;
+    cursor: pointer;
     color: #034750;
   }
 
@@ -619,6 +628,7 @@
     font-size: 16px;
     font-weight: 400;
     text-decoration: underline;
+    cursor: pointer;
     color: #007C8A;
   }
 
@@ -634,6 +644,7 @@
     font-size: 20px;
     font-weight: 400;
     margin-bottom: 12px;
+    cursor: pointer;
     color: #034750;
   }
 
