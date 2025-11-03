@@ -9,6 +9,7 @@ import SidebarComponent from './page_components/SidebarComponent.vue';
     <SidebarComponent />
     <main class="content">
 
+      <!-- <DashboardPage /> CHANGE IF NEEDED ITS MY CHANGE-->  
       <router-view />
     </main>
   </div>

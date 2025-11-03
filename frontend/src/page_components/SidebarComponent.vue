@@ -17,6 +17,17 @@ const route = useRoute()
         <div class="button-text">Dashboard</div>
       </router-link>
 
+      <!-- My Account , one note is the colon is NEEDED for routing to MyAccountPage, YES :to=... | NOT to=... -->
+      <router-link 
+        :to="{ name: 'MyAccountPage' }"
+        class="my-account-button"
+        :class="{ active: route.name === 'MyAccountPage' }"
+      >
+        <div class="button-text">My Account</div>
+      </router-link>
+    
+
+
       <!-- My Tasks -->
       <router-link to="/my-tasks" class="my-tasks-button" :class="{ active: route.name === 'MyTasksPage' }">
         <div class="button-text">My Tasks</div>
@@ -120,6 +131,7 @@ const route = useRoute()
 }
 
 .dashboard-button,
+.my-account-button,
 .my-tasks-button,
 .slides-button,
 .courses-button,
