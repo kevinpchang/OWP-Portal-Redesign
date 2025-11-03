@@ -127,6 +127,7 @@
   .header .right .account_btn .text {
     font-size: 15px;
     font-family: Myriad Pro;
+    font-weight: 600;
     margin-top: 4px;
     margin-left: 8px;
     color: #FFFFFF;
