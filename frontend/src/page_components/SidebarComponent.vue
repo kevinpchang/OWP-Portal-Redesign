@@ -149,7 +149,7 @@ const route = useRoute()
   text-decoration: none;
 }
 
-/* ✅ Active background for all buttons */
+/* Active background for all buttons */
 .dashboard-button.active,
 .my-tasks-button.active,
 .slides-button.active,
