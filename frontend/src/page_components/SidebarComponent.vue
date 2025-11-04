@@ -101,21 +101,21 @@ const route = useRoute()
 }
 
 .right-line {
-  grid-column: 2;
-  grid-row: 1;
-  width: 0px;
-  height: 892rem;
-  border: 1px solid #D9D9D9;
-  margin-top: 4.5px;
+  position: fixed;       /* stays in place */
+  left: 295px;           /* aligns with sidebar’s right edge (sidebar width) */
+  top: 0;
+  height: 100vh;         /* spans full viewport height */
+  border-left: 1px solid #D9D9D9;
+  z-index: 0;          /* below logout but above background */
 }
 
 .bottom-line {
-  grid-column: 1;
-  grid-row: 1;
-  width: 295px;
-  height: 0px;
-  border: 1px solid #D9D9D9;
-  margin-top: 813rem;
+  position: fixed;         /* stays in place */
+  bottom: 80px;            /* adjust to sit above logout button */
+  left: 0;
+  width: 295px;            /* same as sidebar width */
+  border-top: 1px solid #D9D9D9;
+  z-index: 400;
 }
 
 .sidebar {
@@ -155,16 +155,6 @@ const route = useRoute()
 }
 
 /* Active background for all buttons */
-.dashboard-button.active,
-.my-tasks-button.active,
-.slides-button.active,
-.operator-numbers-button.active,
-.certificates-button.active,
-.purchase-history-button.active,
-.courses-button.active {
-  background-color: #F2F1F2;
-}
-
 .sidebar .active {
   background-color: #F2F1F2;
 }
