@@ -1,54 +1,56 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { History, SquareUserRound, ListTodo, BookOpen, ReceiptText,
+  List, Hash, LayoutGrid, LogOut } from 'lucide-vue-next'
 const route = useRoute()
 </script>
 
 <template>
   <div class="shell">
     <nav class="sidebar">
+
       <!-- Dashboard -->
       <router-link to="/" class="dashboard-button" :class="{ active: route.name === 'DashboardPage' }">
-        <div class="button-icon dashboard-icon">
-          <div class="square"></div>
-          <div class="square"></div>
-          <div class="square"></div>
-          <div class="square"></div>
-        </div>
+        <LayoutGrid class="button-icon" color="#034750" size="20" /> <!-- ✅ Using Lucide icon -->
         <div class="button-text">Dashboard</div>
       </router-link>
 
-      <!-- My Account , one note is the colon is NEEDED for routing to MyAccountPage, YES :to=... | NOT to=... -->
+
+      <!-- My Account -->
       <router-link
         :to="{ name: 'MyAccountPage' }"
         class="my-account-button"
         :class="{ active: route.name === 'MyAccountPage' }"
       >
+        <SquareUserRound class="button-icon" color="#034750" size="20" />
         <div class="button-text">My Account</div>
       </router-link>
 
-
-
       <!-- My Tasks -->
-      <router-link to="/my-tasks" class="my-tasks-button" :class="{ active: route.name === 'MyTasksPage' }">
+      <router-link
+        to="/my-tasks"
+        class="my-tasks-button"
+        :class="{ active: route.name === 'MyTasksPage' }"
+      >
+        <ListTodo class="button-icon" color="#034750" size="20" />
         <div class="button-text">My Tasks</div>
       </router-link>
 
       <!-- Slides -->
       <router-link to="/slides" class="slides-button" :class="{ active: route.name === 'SlidesPage' }">
+        <BookOpen class="button-icon" color="#034750" size="20" /> <!-- ✅ Add this icon -->
         <div class="button-text">Slides</div>
       </router-link>
 
       <!-- Courses -->
-      <div class="courses-button" :class="{ active: route.name === 'CoursesPage' }">
-        <router-link to="/courses" class="courses-link">
-          <div class="button-icon">
-            <div class="line"><span class="dot"></span><span class="bar"></span></div>
-            <div class="line"><span class="dot"></span><span class="bar"></span></div>
-            <div class="line"><span class="dot"></span><span class="bar"></span></div>
-          </div>
-          <div class="button-text">Courses</div>
-        </router-link>
-      </div>
+      <router-link
+        to="/courses"
+        class="courses-button"
+        :class="{ active: route.name === 'CoursesPage' }"
+      >
+        <List class="button-icon" color="#034750" size="20" />
+        <div class="button-text">Courses</div>
+      </router-link>
 
       <!-- Operator Numbers -->
       <router-link
@@ -56,9 +58,10 @@ const route = useRoute()
         class="operator-numbers-button"
         :class="{ active: route.name === 'Operator Numbers' }"
       >
-        <div class="button-icon hash-icon">#</div>
+        <Hash class="button-icon" color="#034750" size="20" />
         <div class="button-text">Operator Numbers</div>
       </router-link>
+
 
       <!-- Certificates -->
       <router-link
@@ -66,6 +69,7 @@ const route = useRoute()
         class="certificates-button"
         :class="{ active: route.name === 'CertificatesPage' }"
       >
+        <ReceiptText class="button-icon" color="#034750" size="20" /> <!-- ✅ Added icon -->
         <div class="button-text">Certificates</div>
       </router-link>
 
@@ -75,14 +79,16 @@ const route = useRoute()
         class="purchase-history-button"
         :class="{ active: route.name === 'PurchaseHistory' }"
       >
+        <History class="button-icon" color="#034750" size="20" />
         <div class="button-text">Purchase History</div>
       </router-link>
-
-      <!-- Logout -->
-      <router-link to="/logout" class="logout-button" :class="{ active: route.name === 'LogoutPage' }">
-        <div class="button-text">Logout</div>
-      </router-link>
     </nav>
+
+    <!-- Logout button moved outside sidebar -->
+    <router-link to="/logout" class="logout-button" :class="{ active: route.name === 'LogoutPage' }">
+      <LogOut class="button-icon" color="#034750" size="20" /> <!-- ✅ Added Lucide icon -->
+      <div class="button-text">Logout</div>
+    </router-link>
 
     <div class="right-line"></div>
     <div class="bottom-line"></div>
@@ -119,14 +125,14 @@ const route = useRoute()
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 5px;
 }
 
 .button-text {
   font-family: Myriad Pro;
   font-size: 20px;
   font-weight: 600;
-  margin-left: 39.25rem;
+  margin-left: 20px;
   color: #034750;
 }
 
@@ -137,8 +143,7 @@ const route = useRoute()
 .courses-button,
 .operator-numbers-button,
 .certificates-button,
-.purchase-history-button,
-.logout-button {
+.purchase-history-button {
   grid-column: 1;
   width: 250px;
   height: 47px;
@@ -149,14 +154,13 @@ const route = useRoute()
   text-decoration: none;
 }
 
-/* ✅ Active background for all buttons */
+/* Active background for all buttons */
 .dashboard-button.active,
 .my-tasks-button.active,
 .slides-button.active,
 .operator-numbers-button.active,
 .certificates-button.active,
 .purchase-history-button.active,
-.logout-button.active,
 .courses-button.active {
   background-color: #F2F1F2;
 }
@@ -173,22 +177,6 @@ const route = useRoute()
   padding-left: 5px;
   text-decoration: none;
   color: inherit;
-}
-
-.dashboard-button .dashboard-icon {
-  display: grid;
-  grid-template-columns: repeat(2, 6px);
-  grid-template-rows: repeat(2, 6px);
-  gap: 4px;
-  position: absolute;
-  left: 30px;
-}
-
-.dashboard-button .square {
-  width: 6px;
-  height: 6px;
-  background-color: #034750;
-  border-radius: 2px;
 }
 
 /* Courses Button */
@@ -223,37 +211,6 @@ const route = useRoute()
   margin: 0;
 }
 
-.courses-button .button-icon {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 20px;
-  height: 16px;
-  position: absolute;
-  left: 27px;
-}
-
-.courses-button .button-icon .line {
-  display: flex;
-  align-items: center;
-  height: 4px;
-  gap: 4px;
-}
-
-.courses-button .button-icon .dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background-color: #034750;
-}
-
-.courses-button .button-icon .bar {
-  flex: 1;
-  height: 2px;
-  background-color: #034750;
-}
-
-/* Operator Numbers Button */
 .operator-numbers-button {
   display: flex;
   align-items: center;
@@ -264,28 +221,77 @@ const route = useRoute()
   height: 47px;
   border-radius: 8px;
   margin-top: 10px;
-  position: relative;
-  padding-left: 15px;
+  padding-left: 0;
+  position: static;
 }
+
 
 .operator-numbers-button.active {
   background-color: #F2F1F2;
 }
 
-/* # icon styling */
-.hash-icon {
-  position: absolute;
-  left: 20px;
-  font-size: 18px;
-  font-weight: 900;
-  color: #034750;
+.logout-button {
+  position: fixed;
+  bottom: 20px; /* distance from bottom of screen */
+  left: 10px;   /* adjust to align with sidebar edge */
+  width: 250px;
+  height: 47px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-decoration: none;
+  background-color: white;
+  color: #034750;
+  font-family: Myriad Pro;
+  font-weight: 600;
+  font-size: 20px;
+  z-index: 1000;
 }
 
-.operator-numbers-button:hover .hash-icon,
-.operator-numbers-button.active .hash-icon {
-  color: #02383f;
+.logout-button.active {
+  background-color: #F2F1F2;
+}
+
+.logout-button .button-text {
+  margin-left: 0;
+  /*text-align: center; /* optional - centers text horizontally */
+  width: 100%;
+}
+
+.purchase-history-button .button-text {
+  margin-left: 5px;  /* Move text closer to icon */
+}
+
+.my-account-button .button-text {
+  margin-left: 5px;
+}
+
+.my-tasks-button .button-text {
+  margin-left: 5px;
+}
+
+.slides-button .button-text {
+  margin-left: 5px;  /* Move text closer to icon */
+}
+
+.certificates-button .button-text {
+  margin-left: 5px;
+}
+
+.courses-button .button-text {
+  margin-left: 5px;  /* Move text closer to icon */
+}
+
+.operator-numbers-button .button-text {
+  margin-left: -3px;  /* Move text closer to icon */
+}
+
+.dashboard-button .button-text {
+  margin-left: 0px;  /* Move text closer to icon */
+}
+.sidebar, .logout-button .button-icon {
+  margin-left: 20px;
+  margin-right: 10px;
 }
 </style>
