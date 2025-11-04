@@ -1,20 +1,28 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { History, SquareUserRound, ListTodo, BookOpen, ReceiptText,
-  List, Hash, LayoutGrid, LogOut } from 'lucide-vue-next'
+import {
+  History,
+  SquareUserRound,
+  ListTodo,
+  BookOpen,
+  ReceiptText,
+  List,
+  Hash,
+  LayoutGrid,
+  LogOut
+} from 'lucide-vue-next'
+
 const route = useRoute()
 </script>
 
 <template>
   <div class="shell">
     <nav class="sidebar">
-
       <!-- Dashboard -->
       <router-link to="/" class="dashboard-button" :class="{ active: route.name === 'DashboardPage' }">
-        <LayoutGrid class="button-icon" color="#034750" size="20" /> <!-- ✅ Using Lucide icon -->
+        <LayoutGrid class="button-icon" color="#034750" size="20" />
         <div class="button-text">Dashboard</div>
       </router-link>
-
 
       <!-- My Account -->
       <router-link
@@ -27,27 +35,19 @@ const route = useRoute()
       </router-link>
 
       <!-- My Tasks -->
-      <router-link
-        to="/my-tasks"
-        class="my-tasks-button"
-        :class="{ active: route.name === 'MyTasksPage' }"
-      >
+      <router-link to="/my-tasks" class="my-tasks-button" :class="{ active: route.name === 'MyTasksPage' }">
         <ListTodo class="button-icon" color="#034750" size="20" />
         <div class="button-text">My Tasks</div>
       </router-link>
 
       <!-- Slides -->
       <router-link to="/slides" class="slides-button" :class="{ active: route.name === 'SlidesPage' }">
-        <BookOpen class="button-icon" color="#034750" size="20" /> <!-- ✅ Add this icon -->
+        <BookOpen class="button-icon" color="#034750" size="20" />
         <div class="button-text">Slides</div>
       </router-link>
 
       <!-- Courses -->
-      <router-link
-        to="/courses"
-        class="courses-button"
-        :class="{ active: route.name === 'CoursesPage' }"
-      >
+      <router-link to="/courses" class="courses-button" :class="{ active: route.name === 'CoursesPage' }">
         <List class="button-icon" color="#034750" size="20" />
         <div class="button-text">Courses</div>
       </router-link>
@@ -62,14 +62,9 @@ const route = useRoute()
         <div class="button-text">Operator Numbers</div>
       </router-link>
 
-
       <!-- Certificates -->
-      <router-link
-        to="/certificates"
-        class="certificates-button"
-        :class="{ active: route.name === 'CertificatesPage' }"
-      >
-        <ReceiptText class="button-icon" color="#034750" size="20" /> <!-- ✅ Added icon -->
+      <router-link to="/certificates" class="certificates-button" :class="{ active: route.name === 'CertificatesPage' }">
+        <ReceiptText class="button-icon" color="#034750" size="20" />
         <div class="button-text">Certificates</div>
       </router-link>
 
@@ -86,41 +81,59 @@ const route = useRoute()
 
     <!-- Logout button moved outside sidebar -->
     <router-link to="/logout" class="logout-button" :class="{ active: route.name === 'LogoutPage' }">
-      <LogOut class="button-icon" color="#034750" size="20" /> <!-- ✅ Added Lucide icon -->
+      <LogOut class="button-icon" color="#034750" size="20" />
       <div class="button-text">Logout</div>
     </router-link>
 
+    <!-- Sidebar borders + footer background -->
     <div class="right-line"></div>
     <div class="bottom-line"></div>
+    <div class="sidebar-footer-bg"></div>
   </div>
 </template>
 
 <style scoped>
 .shell {
-  display: grid;
+  display: flex;
 }
 
+/*  Vertical divider */
 .right-line {
-  position: fixed;       /* stays in place */
-  left: 295px;           /* aligns with sidebar’s right edge (sidebar width) */
+  position: fixed;
+  left: 295px; /* aligns with sidebar’s right edge */
   top: 0;
-  height: 100vh;         /* spans full viewport height */
+  height: 100vh; /* full viewport height */
   border-left: 1px solid #D9D9D9;
-  z-index: 0;          /* below logout but above background */
+  z-index: 0; /* below header and logout */
 }
 
+/* Horizontal divider above footer */
 .bottom-line {
-  position: fixed;         /* stays in place */
-  bottom: 80px;            /* adjust to sit above logout button */
+  position: fixed;
+  bottom: 80px; /* sits above logout button */
   left: 0;
-  width: 295px;            /* same as sidebar width */
+  width: 295px; /* match sidebar width */
   border-top: 1px solid #D9D9D9;
   z-index: 400;
 }
 
+/* White background under bottom line */
+.sidebar-footer-bg {
+  .sidebar-footer-bg {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 295px;
+    height: 100px;
+    background-color: white;
+    z-index: 1; /* stays under logout button */
+
+  }
+
+}
+
+/* Sidebar layout */
 .sidebar {
-  grid-column: 1;
-  grid-row: 1;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -128,6 +141,7 @@ const route = useRoute()
   gap: 5px;
 }
 
+/* Button text style */
 .button-text {
   font-family: Myriad Pro;
   font-size: 20px;
@@ -136,6 +150,7 @@ const route = useRoute()
   color: #034750;
 }
 
+/* Sidebar buttons */
 .dashboard-button,
 .my-account-button,
 .my-tasks-button,
@@ -144,7 +159,6 @@ const route = useRoute()
 .operator-numbers-button,
 .certificates-button,
 .purchase-history-button {
-  grid-column: 1;
   width: 250px;
   height: 47px;
   border-radius: 8px;
@@ -154,12 +168,12 @@ const route = useRoute()
   text-decoration: none;
 }
 
-/* Active background for all buttons */
+/* Active background */
 .sidebar .active {
-  background-color: #F2F1F2;
+  background-color: #f2f1f2;
 }
 
-/* Dashboard Button Icon */
+/* Dashboard */
 .dashboard-button {
   display: flex;
   align-items: center;
@@ -169,38 +183,7 @@ const route = useRoute()
   color: inherit;
 }
 
-/* Courses Button */
-.courses-button {
-  display: flex;
-  align-items: center;
-  width: 250px;
-  height: 47px;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-
-.courses-button.active {
-  background-color: #F2F1F2;
-}
-
-.courses-button .courses-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: inherit;
-  width: 100%;
-  padding-left: 35px;
-}
-
-.courses-button .button-text {
-  font-size: 20px;
-  color: #034750;
-  font-family: "Myriad Pro Semibold";
-  font-weight: 600;
-  margin: 0;
-}
-
+/* Operator Numbers */
 .operator-numbers-button {
   display: flex;
   align-items: center;
@@ -215,15 +198,11 @@ const route = useRoute()
   position: static;
 }
 
-
-.operator-numbers-button.active {
-  background-color: #F2F1F2;
-}
-
+/* Logout button (fixed on top of white footer) */
 .logout-button {
   position: fixed;
-  bottom: 20px; /* distance from bottom of screen */
-  left: 10px;   /* adjust to align with sidebar edge */
+  bottom: 20px;
+  left: 10px;
   width: 250px;
   height: 47px;
   border-radius: 8px;
@@ -236,52 +215,40 @@ const route = useRoute()
   font-family: Myriad Pro;
   font-weight: 600;
   font-size: 20px;
-  z-index: 1000;
+  z-index: 1000; /* ensure it’s above footer */
 }
 
 .logout-button.active {
-  background-color: #F2F1F2;
+  background-color: #f2f1f2;
 }
 
 .logout-button .button-text {
   margin-left: 0;
-  /*text-align: center; /* optional - centers text horizontally */
   width: 100%;
 }
 
-.purchase-history-button .button-text {
-  margin-left: 5px;  /* Move text closer to icon */
+/* Icon spacing */
+.sidebar .button-icon,
+.logout-button .button-icon {
+  margin-left: 20px;
+  margin-right: 10px;
 }
 
-.my-account-button .button-text {
-  margin-left: 5px;
-}
-
-.my-tasks-button .button-text {
-  margin-left: 5px;
-}
-
-.slides-button .button-text {
-  margin-left: 5px;  /* Move text closer to icon */
-}
-
-.certificates-button .button-text {
-  margin-left: 5px;
-}
-
+/* Text alignment adjustments per button */
+.purchase-history-button .button-text,
+.my-account-button .button-text,
+.my-tasks-button .button-text,
+.slides-button .button-text,
+.certificates-button .button-text,
 .courses-button .button-text {
-  margin-left: 5px;  /* Move text closer to icon */
+  margin-left: 5px;
 }
 
 .operator-numbers-button .button-text {
-  margin-left: -3px;  /* Move text closer to icon */
+  margin-left: -3px;
 }
 
 .dashboard-button .button-text {
-  margin-left: 0px;  /* Move text closer to icon */
-}
-.sidebar, .logout-button .button-icon {
-  margin-left: 20px;
-  margin-right: 10px;
+  margin-left: 0;
 }
 </style>
