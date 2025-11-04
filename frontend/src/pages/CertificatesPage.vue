@@ -1,7 +1,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { fetchCertificates } from '@/services/certificates.service'
+/*import { fetchCertificates } from '@/services/certificates.service'*/
 
 // Types
 export type CertStatus = 'Completed' | 'In Progress' | 'Pending'

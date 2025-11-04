@@ -18,14 +18,14 @@ const route = useRoute()
       </router-link>
 
       <!-- My Account , one note is the colon is NEEDED for routing to MyAccountPage, YES :to=... | NOT to=... -->
-      <router-link 
+      <router-link
         :to="{ name: 'MyAccountPage' }"
         class="my-account-button"
         :class="{ active: route.name === 'MyAccountPage' }"
       >
         <div class="button-text">My Account</div>
       </router-link>
-    
+
 
 
       <!-- My Tasks -->
@@ -149,7 +149,7 @@ const route = useRoute()
   text-decoration: none;
 }
 
-/* Active background for all buttons */
+/* ✅ Active background for all buttons */
 .dashboard-button.active,
 .my-tasks-button.active,
 .slides-button.active,
