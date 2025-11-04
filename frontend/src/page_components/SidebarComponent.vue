@@ -9,7 +9,7 @@ import {
   List,
   Hash,
   LayoutGrid,
-  LogOut
+  LogOut,
 } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -19,7 +19,11 @@ const route = useRoute()
   <div class="shell">
     <nav class="sidebar">
       <!-- Dashboard -->
-      <router-link to="/" class="dashboard-button" :class="{ active: route.name === 'DashboardPage' }">
+      <router-link
+        to="/"
+        class="dashboard-button"
+        :class="{ active: route.name === 'DashboardPage' }"
+      >
         <LayoutGrid class="button-icon" color="#034750" size="20" />
         <div class="button-text">Dashboard</div>
       </router-link>
@@ -35,19 +39,31 @@ const route = useRoute()
       </router-link>
 
       <!-- My Tasks -->
-      <router-link to="/my-tasks" class="my-tasks-button" :class="{ active: route.name === 'MyTasksPage' }">
+      <router-link
+        to="/my-tasks"
+        class="my-tasks-button"
+        :class="{ active: route.name === 'MyTasksPage' }"
+      >
         <ListTodo class="button-icon" color="#034750" size="20" />
         <div class="button-text">My Tasks</div>
       </router-link>
 
       <!-- Slides -->
-      <router-link to="/slides" class="slides-button" :class="{ active: route.name === 'SlidesPage' }">
+      <router-link
+        to="/slides"
+        class="slides-button"
+        :class="{ active: route.name === 'SlidesPage' }"
+      >
         <BookOpen class="button-icon" color="#034750" size="20" />
         <div class="button-text">Slides</div>
       </router-link>
 
       <!-- Courses -->
-      <router-link to="/courses" class="courses-button" :class="{ active: route.name === 'CoursesPage' }">
+      <router-link
+        to="/courses"
+        class="courses-button"
+        :class="{ active: route.name === 'CoursesPage' }"
+      >
         <List class="button-icon" color="#034750" size="20" />
         <div class="button-text">Courses</div>
       </router-link>
@@ -63,7 +79,11 @@ const route = useRoute()
       </router-link>
 
       <!-- Certificates -->
-      <router-link to="/certificates" class="certificates-button" :class="{ active: route.name === 'CertificatesPage' }">
+      <router-link
+        to="/certificates"
+        class="certificates-button"
+        :class="{ active: route.name === 'CertificatesPage' }"
+      >
         <ReceiptText class="button-icon" color="#034750" size="20" />
         <div class="button-text">Certificates</div>
       </router-link>
@@ -80,7 +100,11 @@ const route = useRoute()
     </nav>
 
     <!-- Logout button moved outside sidebar -->
-    <router-link to="/logout" class="logout-button" :class="{ active: route.name === 'LogoutPage' }">
+    <router-link
+      to="/logout"
+      class="logout-button"
+      :class="{ active: route.name === 'LogoutPage' }"
+    >
       <LogOut class="button-icon" color="#034750" size="20" />
       <div class="button-text">Logout</div>
     </router-link>
@@ -100,7 +124,7 @@ const route = useRoute()
 /*  Vertical divider */
 .right-line {
   position: fixed;
-  left: 295px; /* aligns with sidebar’s right edge */
+  left: 295px;
   top: 0;
   height: 100vh; /* full viewport height */
   border-left: 1px solid #D9D9D9;
@@ -119,7 +143,6 @@ const route = useRoute()
 
 /* White background under bottom line */
 .sidebar-footer-bg {
-  .sidebar-footer-bg {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -127,19 +150,26 @@ const route = useRoute()
     height: 100px;
     background-color: white;
     z-index: 1; /* stays under logout button */
-
   }
-
-}
 
 /* Sidebar layout */
 .sidebar {
-  height: 100vh;
+  position: fixed;
+  top: 120px;
+  left: 0;
+  width: 295px;
+  height: calc(100vh - 220px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 5px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  background-color: white;   /* keep background consistent */
+  z-index: 2;                /* below header, above background */
 }
+
 
 /* Button text style */
 .button-text {
