@@ -10,7 +10,7 @@ const routes = [
   { path: "/", name: 'DashboardPage', component: DashboardPage }, // KEVIN'S DASHBOARD
   { path: "/MyAccountPage", name: 'MyAccountPage', component: MyAccountPage}, // CRISTOBEL'S MY_ACCOUNT
   { path: '/courses', name: 'CoursesPage', component: CoursesPage },
-  { path: '/operatornumbers', name: 'Operator Numbers', component: OPnum },
+  { path: '/operatornumbers', name: 'Operator Numbers', component: OPnum }, // RYAN OPNUM
   { path: '/Certificates', name: 'CertificatesPage', component: CertificatesPage }, // UDAY KYAMA
   { path: '/purchase-history', name: 'PurchaseHistory', component: PurchaseHistory } // VINCENT LAM
 ]
