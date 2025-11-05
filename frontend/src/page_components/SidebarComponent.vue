@@ -24,7 +24,7 @@ const route = useRoute()
         class="dashboard-button"
         :class="{ active: route.name === 'DashboardPage' }"
       >
-        <LayoutGrid class="button-icon" color="#034750" size="20" />
+        <LayoutGrid class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Dashboard</div>
       </router-link>
 
@@ -34,7 +34,7 @@ const route = useRoute()
         class="my-account-button"
         :class="{ active: route.name === 'MyAccountPage' }"
       >
-        <SquareUserRound class="button-icon" color="#034750" size="20" />
+        <SquareUserRound class="button-icon" color="#034750" :size="20" />
         <div class="button-text">My Account</div>
       </router-link>
 
@@ -44,7 +44,7 @@ const route = useRoute()
         class="my-tasks-button"
         :class="{ active: route.name === 'MyTasksPage' }"
       >
-        <ListTodo class="button-icon" color="#034750" size="20" />
+        <ListTodo class="button-icon" color="#034750" :size="20" />
         <div class="button-text">My Tasks</div>
       </router-link>
 
@@ -54,7 +54,7 @@ const route = useRoute()
         class="slides-button"
         :class="{ active: route.name === 'SlidesPage' }"
       >
-        <BookOpen class="button-icon" color="#034750" size="20" />
+        <BookOpen class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Slides</div>
       </router-link>
 
@@ -64,7 +64,7 @@ const route = useRoute()
         class="courses-button"
         :class="{ active: route.name === 'CoursesPage' }"
       >
-        <List class="button-icon" color="#034750" size="20" />
+        <List class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Courses</div>
       </router-link>
 
@@ -74,7 +74,7 @@ const route = useRoute()
         class="operator-numbers-button"
         :class="{ active: route.name === 'Operator Numbers' }"
       >
-        <Hash class="button-icon" color="#034750" size="20" />
+        <Hash class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Operator Numbers</div>
       </router-link>
 
@@ -84,7 +84,7 @@ const route = useRoute()
         class="certificates-button"
         :class="{ active: route.name === 'CertificatesPage' }"
       >
-        <ReceiptText class="button-icon" color="#034750" size="20" />
+        <ReceiptText class="button-icon" color="#034750":size="20" />
         <div class="button-text">Certificates</div>
       </router-link>
 
@@ -94,7 +94,7 @@ const route = useRoute()
         class="purchase-history-button"
         :class="{ active: route.name === 'PurchaseHistory' }"
       >
-        <History class="button-icon" color="#034750" size="20" />
+        <History class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Purchase History</div>
       </router-link>
     </nav>
@@ -105,7 +105,7 @@ const route = useRoute()
       class="logout-button"
       :class="{ active: route.name === 'LogoutPage' }"
     >
-      <LogOut class="button-icon" color="#034750" size="20" />
+      <LogOut class="button-icon" color="#034750" :size="20" />
       <div class="button-text">Logout</div>
     </router-link>
 
