@@ -33,11 +33,17 @@
                 <td>59746</td>
                 <td><button class="edit-button" popovertarget="editpopover">Edit/Remove</button></td>
             </tr>
+            
         </tbody>
       </table>
     </div>
 
     <div id="addpopover" popover="manual" class="popup">
+      <div class="header">
+        <div class="left">
+          <img src="../assets/owp_logo.png"/>
+        </div>
+      </div>
       <form class="form-container">
         <h1 class="popup-title">
           Add Operator Number
@@ -50,6 +56,11 @@
     </div>
 
     <div id="editpopover" popover="manual" class="popup">
+      <div class="header">
+        <div class="left">
+          <img src="../assets/owp_logo.png"/>
+        </div>
+      </div>
       <form class="form-container">
         <h1 class="popup-title">
           Edit/Remove Operator Number
@@ -101,90 +112,90 @@
 
 
 <style scoped>
-.operator-numbers-page {
-  position: relative;
-  height: 100%;
-  background-color: #fff;
-}
+  .operator-numbers-page {
+    position: relative;
+    height: 100%;
+    background-color: #fff;
+  }
 
-.header-container {
-  position: relative; 
-  left: 18px; 
-  top: 38px; 
-  display: flex;
-  flex-direction: column;
-  gap: 8px; 
-}
+  .header-container {
+    position: relative; 
+    left: 18px; 
+    top: 38px; 
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+  }
 
-.title {
-  width: 331px;
-  height: 28px;
-  font-family: 'Myriad Pro, Bold', sans-serif;
-  font-size: 28px;
-  font-weight: 790;
-  color: #034750;
-  align-items: center;
-}
+  .title {
+    width: 331px;
+    height: 28px;
+    font-family: 'Myriad Pro, Bold', sans-serif;
+    font-size: 28px;
+    font-weight: 790;
+    color: #034750;
+    align-items: center;
+  }
 
-.add-button {
-  position: relative;
-  margin-left: 55%;
-  background-color: #48773C;
-  padding:15px 15px;
-  border:none;
-  border-radius: 10px;
-  font-family: 'Myriad Pro, Bold', sans-serif;  
-  color:white
-}
+  .add-button {
+    position: relative;
+    margin-left: 55%;
+    background-color: #48773C;
+    padding:15px 15px;
+    border:none;
+    border-radius: 10px;
+    font-family: 'Myriad Pro, Bold', sans-serif;  
+    color:white
+  }
 
-.edit-button{
-  background: transparent;
-  border: none !important;
-  font-family: 'Myriad Pro', sans-serif;
-  font-size: 17px;
-  font-weight: 600;
-  color: #034750;
-}
+  .edit-button{
+    background: transparent;
+    border: none !important;
+    font-family: 'Myriad Pro', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #034750;
+  }
 
-.popup-button-left{
-  margin-left: 15px;
-  margin-top:15px;
-  background-color: #48773C;
-  padding:15px 15px;
-  border:none;
-  border-radius: 10px;
-  font-family: 'Myriad Pro, Bold', sans-serif;  
-  color:white
-}
+  .popup-button-left{
+    margin-left: 15px;
+    margin-top:15px;
+    background-color: #48773C;
+    padding:15px 15px;
+    border:none;
+    border-radius: 10px;
+    font-family: 'Myriad Pro, Bold', sans-serif;  
+    color:white
+  }
 
-.popup-button-right{
-  margin-left: 45%;
-  margin-top:15px;
-  background-color: #48773C;
-  padding:15px 15px;
-  border:none;
-  border-radius: 10px;
-  font-family: 'Myriad Pro, Bold', sans-serif;  
-  color:white
-}
+  .popup-button-right{
+    margin-left: 45%;
+    margin-top:15px;
+    background-color: #48773C;
+    padding:15px 15px;
+    border:none;
+    border-radius: 10px;
+    font-family: 'Myriad Pro, Bold', sans-serif;  
+    color:white
+  }
 
-.table-header {
+  .table-header {
     font-family: 'Myriad Pro', sans-serif;
     font-size: 20px;
     font-weight: 600;
     color: #034750;
     margin: 0;
-}
+  }
 
-.table-body {
+  .table-body {
     font-family: 'Myriad Pro', sans-serif;
     font-size: 17px;
     font-weight: 600;
     color: #034750;
     margin: 0;
-}
+  }
 
-table {
+  table {
     margin-top: 30px;
     padding-left: 18px;
     border-collapse: collapse;
@@ -228,13 +239,31 @@ table {
   .popup{
     margin-top: 15%;
     width: 20%;
-    height: 30%;
+    height: 35%;
     position: fixed;
     border: 3px solid #004d4d;
     border-radius: 10px;
-    border-top: 75px solid #004d4d;
     background-color: #f2f1f2;
   }
+
+  .popup .header {
+    width: 100%;
+    height: 15%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #034750;
+  }
+
+  .popup .header .left > img {
+    width: 316.96px;
+    height: 41.08px;
+    object-fit: scale-down;
+    object-position: center;
+    display: block;
+  }
+
 
   .popup-title{
     margin-left: 20px;
@@ -261,12 +290,12 @@ table {
   }
 
   .input-box::placeholder {
-    color: #ccc; /* light gray placeholder text */
+    color: #ccc;
     font-size: 18px;
   }
 
   .input-box:focus {
-    outline: none; /* removes blue outline */
+    outline: none;
     background-color: #e1e1e1;
   }
 
