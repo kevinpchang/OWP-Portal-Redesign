@@ -5,11 +5,13 @@ import CoursesPage from '../pages/CoursesPage.vue'
 import OPnum from '../pages/OperatorNumbers.vue'
 import CertificatesPage from '@/pages/CertificatesPage.vue'
 import PurchaseHistory from '../pages/PurchaseHistory.vue'
+ import MyTasksPage from '../pages/MyTasksPage.vue'
 
 const routes = [
   { path: "/", name: 'DashboardPage', component: DashboardPage }, // KEVIN'S DASHBOARD
   { path: "/MyAccountPage", name: 'MyAccountPage', component: MyAccountPage}, // CRISTOBEL'S MY_ACCOUNT
   { path: '/operatornumbers', name: 'Operator Numbers', component: OPnum }, // RYAN OPNUM
+  { path: "/my-tasks", name: 'MyTasksPage', component: MyTasksPage },
   { path: '/courses', name: 'CoursesPage', component: CoursesPage }, //NICK's COURSES PAGE
   { path: '/courses/:id', name: 'ActiveCourse', component: () => import ('../pages/ActiveCourse.vue'), props: true}, //NICK
   { path: '/Certificates', name: 'CertificatesPage', component: CertificatesPage }, // UDAY KYAMA
