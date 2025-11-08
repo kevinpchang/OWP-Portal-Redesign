@@ -1,7 +1,7 @@
 <template>
   <div class="account-page">
     <!-- Page title -->
-    <h1 class="page-title">Placeholder Title Text</h1>
+    <h1 class="page-title">My Account</h1>
 
     <!-- =========== GRID =========== -->
     <div class="grid">
@@ -73,7 +73,7 @@
 
           <div class="op-line">
             <span class="label">Operator numbers:</span>
-            <a href="#" class="link">California-123456a</a>
+            <a href="#" class="link">California-123456</a>
           </div>
         </div>
       </section>
@@ -121,18 +121,20 @@
 <style scoped>
 /* ===== Page frame ===== */
 .account-page {
-  padding: 16px 18px 32px;
+  padding: 16px 30px 32px;
   color: #034750;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: "Myriad Pro";
+  /*font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; */
 }
 .page-title {
-  margin: 8px 0 16px 260px; /* pushed right to clear sidebar column visually */
+  max-width: 1280px; /** aligns title text by responding to the grid below it (User info grid) */
+  margin: 8px auto 16px;
   font-size: 28px;
   font-weight: 800;
   color: #034750;
 }
 
-/* ===== Two-column grid matching your mockup widths ===== */
+/* ===== Two-column grid matching mockup widths ===== */
 .grid {
   display: grid;
   grid-template-columns: 700px 300px;
@@ -167,8 +169,8 @@
   width: 88px;
   height: 88px;
   border-radius: 50%;
-  background: #cfe9ec; /* 👈 swap for <img> when ready */
-  border: 4px solid #007C8A;
+  background: #cfe9ec;  /* swap for <img> when ready */
+  border: none;
 }
 .profile-meta {
   display: grid;
@@ -177,12 +179,12 @@
 }
 .user-name {
   font-weight: 800;
-  font-size: 22px;
+  font-size: 28px;
   color: #00A5B5;
 }
 .user-role {
-  font-size: 14px;
-  color: #4c6b6f;
+  font-size: 16px;
+  color: #707070;
   line-height: 1.3;
 }
 .btn {
@@ -208,10 +210,10 @@
 .card-head.slim { margin-bottom: 4px; }
 .head-left { display: flex; align-items: center; gap: 8px; }
 .head-icon {
-  width: 28px; height: 28px; border-radius: 6px; background: #007C8A;
+  width: 28px; height: 28px; border-radius: 6px; background: #007C8A; /** change "background: " to an image of the contact info icon */
 }
 .head-icon.small { width: 22px; height: 22px; }
-.card-head h2 { margin: 0; font-size: 18px; font-weight: 800; color: #034750; }
+.card-head h2 { margin: 0; font-size: 20px; font-weight: bold; color: #034750; }
 
 .contact-body {
   background: #ECEBEC;
@@ -225,22 +227,23 @@
   gap: 18px;
 }
 .field .label {
-  font-size: 12px; color: #6c8082; margin-bottom: 2px;
+  font-size: 18px; color:#034750; margin-bottom: 2px;
+  font-weight: 500;
 }
 .field .value {
-  font-size: 14px; color: #3a4e51;
+  font-size: 14px; color:#707070;
 }
 
 /* ===== Operator numbers ===== */
 .operator-card { padding: 10px 14px 14px; }
 .op-line { margin: 8px 8px 4px; color: #3a4e51; }
-.op-line .label { color: #6c8082; margin-right: 6px; }
+.op-line .label { color: #707070; margin-right: 6px; }
 .link { color: #007C8A; text-decoration: underline; }
 
 /* ===== Right column panels ===== */
 .side { padding: 12px; }
 .side-head { display: flex; align-items: center; gap: 8px; margin: 6px 6px 10px; }
-.side-head h3 { margin: 0; font-size: 16px; font-weight: 800; color: #034750; }
+.side-head h3 { margin: 0; font-size: 20px; font-weight: 800; color: #034750; }
 .side-icon {
   width: 26px; height: 26px; border-radius: 50%;
   background: #007C8A;
