@@ -138,7 +138,7 @@ const route = useRoute()
   left: 0;
   width: 295px; /* match sidebar width */
   border-top: 1px solid #D9D9D9;
-  z-index: 400;
+  z-index: 2;
 }
 
 /* White background under bottom line */
@@ -245,7 +245,7 @@ const route = useRoute()
   font-family: Myriad Pro;
   font-weight: 600;
   font-size: 20px;
-  z-index: 1000; /* ensure it’s above footer */
+  z-index: 2; /* ensure it’s above footer */
 }
 
 .logout-button.active {
