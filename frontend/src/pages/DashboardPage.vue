@@ -342,14 +342,14 @@
     color: #FFFFFF;
   }
 
-  .active-enrollments .view-all {
+  .view-all {
     height: 32px;
     display: flex;
     justify-content: center;
     align-items: flex-end;
   }
 
-  .active-enrollments .view-all .text {
+  .view-all .text {
     height: 20px;
     font-size: 20px;
     font-weight: 400;
@@ -416,22 +416,6 @@
     font-weight: 400;
     text-decoration: underline;
     color: #007C8A;
-  }
-
-  .instructor-slides .view-all {
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .instructor-slides .view-all .text {
-    height: 20px;
-    font-size: 20px;
-    font-weight: 400;
-    margin-bottom: 12px;
-    cursor: pointer;
-    color: #034750;
   }
 
   .dashboard-right {
@@ -501,22 +485,6 @@
     color: #007C8A;
   }
 
-  .messages .view-all {
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .messages .view-all .text {
-    height: 20px;
-    font-size: 20px;
-    font-weight: 400;
-    margin-bottom: 12px;
-    cursor: pointer;
-    color: #034750;
-  }
-
   .purchase-history {
     height: 460px;
     border-radius: 14rem;
@@ -550,6 +518,12 @@
     color: #034750;
   }
 
+  .purchase-history .body {
+    height: 460px;
+    display: flex;
+    flex-direction: column;
+  }
+
   .purchase-history .body .object {
     height: 50px;
     display: flex;
@@ -569,22 +543,6 @@
     font-weight: 400;
     text-decoration: underline;
     color: #007C8A;
-  }
-
-  .purchase-history .view-all {
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .purchase-history .view-all .text {
-    height: 20px;
-    font-size: 20px;
-    font-weight: 400;
-    margin-bottom: 12px;
-    cursor: pointer;
-    color: #034750;
   }
 
 </style>
