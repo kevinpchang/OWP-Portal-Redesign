@@ -14,6 +14,8 @@ const routes = [
   { path: "/my-tasks", name: 'MyTasksPage', component: MyTasksPage },
   { path: '/courses', name: 'CoursesPage', component: CoursesPage }, //NICK's COURSES PAGE
   { path: '/courses/:id', name: 'ActiveCourse', component: () => import ('../pages/ActiveCourse.vue'), props: true}, //NICK
+  { path: '/completed/:id', name: 'CompletedCourse', component: () => import('../pages/CompletedCourse.vue')},
+  { path: "/recommended/:id", name: "RecommendedCourse", component: () => import("../pages/RecommendedCourse.vue")},
   { path: '/Certificates', name: 'CertificatesPage', component: CertificatesPage }, // UDAY KYAMA
   { path: '/purchase-history', name: 'PurchaseHistory', component: PurchaseHistory } // VINCENT LAM
 ]

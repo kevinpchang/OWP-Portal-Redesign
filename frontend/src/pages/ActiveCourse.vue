@@ -1,20 +1,23 @@
 <template>
   <div class="active-course-page">
 
-    <div class="header-container">
-      <div class="courses-header">Courses</div>
+    <!-- header -->
+    <div class="courses-top">
+      <div class="text-block">
+        <div class="courses-header">Courses</div>
+      </div>
     </div>
 
-
-    <div class="course-tile">
-      <div class="title-header-row">
+    <div class="page-container">
+    <!-- summary (wide) -->
+    <div class="summary-tile">
+      <div class="card-header">
         <div class="header-icon"></div>
-        <h2 class="tile-header">Active Enrollments</h2>
+        <h2 class="card-title">Active Enrollments</h2>
       </div>
 
-      <div class="course-header-tile">
-
-        <div class="course-header-left">
+      <div class="summary-body">
+        <div class="summary-left">
           <div class="course-image-large"></div>
 
           <div class="course-header-info">
@@ -50,9 +53,7 @@
               class="donut-fill"
               :style="{
                 background:
-                  'conic-gradient(#00A5B5 ' +
-                  animatedAngle +
-                  'deg, #7A7A7A 0deg)'
+                  'conic-gradient(#00A5B5 ' + animatedAngle + 'deg, #7A7A7A 0deg)'
               }"
             ></div>
             <div class="donut-inner">{{ animatedProgress }}%</div>
@@ -60,44 +61,77 @@
         </div>
       </div>
     </div>
-
-    <div class="chapter-progress-tile">
-    <div class="title-header-row">
-        <div class="header-icon"></div>
-        <h2 class="tile-header">Chapter Progress</h2>
     </div>
+    <!-- main -->
+    <div class="courses-bottom">
 
-    <div class="chapter-table">
-        <div class="chapter-table-header">
-        <div class="chapter-col">Chapter</div>
-        <div class="date-col">Date</div>
-        <div class="grade-col">Grade</div>
+      <!-- left -->
+      <div class="courses-left">
+        <div class="chapter-progress-tile">
+          <div class="card-header">
+            <div class="header-icon"></div>
+            <h2 class="card-title">Chapter Progress</h2>
+          </div>
+
+          <div class="chapter-table">
+            <div class="chapter-table-header">
+              <div class="chapter-col">Chapter</div>
+              <div class="date-col">Date</div>
+              <div class="grade-col">Grade</div>
+            </div>
+
+            <div class="chapter-row" v-for="(chapter, index) in chapters" :key="index">
+              <div class="chapter-col">
+                <span class="chapter-number">{{ index + 1 }}</span>
+                <span class="chapter-title">{{ chapter.title }}</span>
+              </div>
+
+              <div class="date-col">
+                <span v-if="chapter.date">{{ chapter.date }}</span>
+                <a v-else class="exam-link">Start online exam</a>
+              </div>
+
+              <div class="grade-col">
+                <span v-if="chapter.grade">{{ chapter.grade }}</span>
+                <span v-else>—</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="chapter-row" v-for="(chapter, index) in chapters" :key="index">
-        <div class="chapter-col">
-            <span class="chapter-number">{{ index + 1 }}</span>
-            <span class="chapter-title">{{ chapter.title }}</span>
+        <router-link to="/courses" class="back-link">← Back to Courses</router-link>
+      </div>
+
+      <!-- right -->
+      <div class="courses-right">
+        <div class="side-card">
+          <div class="side-header">
+            <div class="header-icon side-icon"></div>
+            <div class="side-title">Messages</div>
+          </div>
+          <div class="side-body">
+            <div class="side-link">Example Email Message (5/5/2025)</div>
+            <div class="side-link">Example Email Message (5/03/2025)</div>
+            <div class="side-link">Example Email Message (4/21/2025)</div>
+          </div>
+          <div class="side-footer">(View all messages)</div>
         </div>
 
-        <div class="date-col">
-            <span v-if="chapter.date">{{ chapter.date }}</span>
-            <a v-else href="#" class="exam-link">Start online exam</a>
+        <div class="side-card">
+          <div class="side-header">
+            <div class="header-icon side-icon"></div>
+            <div class="side-title">Next Course</div>
+          </div>
+          <div class="side-body">
+            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 3</div>
+          </div>
+          <div class="side-footer">(View all courses)</div>
         </div>
+      </div>
 
-        <div class="grade-col">
-            <span v-if="chapter.grade">{{ chapter.grade }}</span>
-            <span v-else>—</span>
-        </div>
-        </div>
     </div>
-    </div>
-
-    <router-link to="/courses" class="back-link">← Back to Courses</router-link>
-
   </div>
 </template>
-
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
@@ -169,14 +203,21 @@ export default defineComponent({
 
 <style scoped>
 .active-course-page {
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background-color: #fff;
   font-family: 'Myriad Pro', sans-serif;
   color: #034750;
 }
 
-.header-container {
-  margin-bottom: 24px;
+.courses-top {
+  max-width: 1000px;
+  width: 100%;
+  margin:  auto;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 32px;
 }
 
 .courses-header {
@@ -185,52 +226,63 @@ export default defineComponent({
   color: #034750;
 }
 
-.course-tile {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.page-container {
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.title-header-row {
+.summary-tile {
+  background-color: #F2F1F2;
+  border-radius: 14px;
+  padding: 20px;
+  margin: 32px auto 0 auto;
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  grid-column: 1 / -1;
+}
+
+.card-header {
   display: flex;
   align-items: center;
-  color: #034750;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 10px;
 }
 
 .header-icon {
-  width: 32px;
-  height: 33px;
-  background-color: #034750;
-  border-radius: 4px;
-  flex-shrink: 0;
+  width: 26px;
+  height: 34px;
+  border-radius: 6px;
+  background-color: #007C8A;
 }
 
-.tile-header {
-  font-family: 'Myriad Pro Semibold', sans-serif;
-  font-size: 22px;
-  color: #034750;
-}
-
-.course-header-tile {
+.card-header,
+.side-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  width: 1016px;
-  height: 120px;
-  background-color: #f6f6f6;
-  border-radius: 8px;
-  padding: 16px 24px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  gap: 4px;
 }
 
-.course-header-left {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #034750;
+  font-family: 'Myriad Pro Semibold', sans-serif;
+}
+
+.summary-body {
+  display: flex;
+  align-items: flex-start; 
+  justify-content: flex-start; 
+  gap: 48px; 
+}
+
+
+.summary-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px; 
 }
 
 .course-image-large {
@@ -238,14 +290,19 @@ export default defineComponent({
   height: 120px;
   background-color: #6DBE4B;
   border-radius: 4px;
-  flex-shrink: 0;
 }
 
 .course-header-info {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 4px;
+  justify-content: space-between;
+  height: 120px;                   
+}
+
+.course-header-info h2,
+.course-header-info p {
+  margin: 0;         
+  line-height: 1.1;    
 }
 
 .course-title {
@@ -254,28 +311,28 @@ export default defineComponent({
   color: #707070;
   margin: 0;
   line-height: 1.3;
-  width: 250px;
-  word-wrap: break-word;
+  max-width: 260px;   
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .course-expiration,
 .course-completed {
-  font-family: 'Myriad Pro', sans-serif;
   font-size: 14px;
   color: #555;
-  margin: 0;
 }
 
 .extend-button {
-  align-self: flex-start;
   background-color: #00A5B5;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 6px 16px;
+  padding: 4px 14px;         
   font-family: 'Myriad Pro Semibold', sans-serif;
   font-size: 14px;
   cursor: pointer;
+  width: fit-content;          
+  display: inline-block;
   margin-top: 6px;
   transition: background-color 0.2s ease;
 }
@@ -285,49 +342,40 @@ export default defineComponent({
 }
 
 .course-metrics {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex: 1;
-    margin-left: 60px;
-    max-width: 90px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-left: 24px; 
 }
 
 .metric {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .metric-value {
-    font-size: 56px;
-    font-weight: 700;
-    color: #00A5B5;
-    line-height: 1.5;
-    margin-bottom: 6px;
-    font-family: 'Myriad Pro Semibold', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #00A5B5;
 }
 
 .metric-label {
-    font-size: 14px;
-    color: #707070;
-    font-family: 'Myriad Pro', sans-serif;
+  font-size: 14px;
+  color: #707070;
 }
 
 .course-progress {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  flex-shrink: 0;
-  margin-left: auto;
+  align-items: flex-start;
+  margin-top: -30px;   
+  margin-left: 8px;
 }
 
 .donut {
   position: relative;
-  width: 90px;
-  height: 90px;
+  width: 105px; 
+  height: 105px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -339,50 +387,43 @@ export default defineComponent({
   inset: 0;
   border-radius: 50%;
   background: conic-gradient(#00A5B5 0deg, #7A7A7A 0deg);
-  transition: background 0.1s linear;
 }
 
 .donut-inner {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 68px;  
+  height: 68px;
   border-radius: 50%;
-  background-color: #f6f6f6;
+  background-color: #F2F1F2;
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: 'Myriad Pro Semibold', sans-serif;
-  font-size: 16px;
+  font-size: 18px;
   color: #555;
 }
 
-.back-link {
-  color: #034750;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.back-link:hover {
-  text-decoration: underline;
+.courses-bottom {
+  max-width: 1000px;
+  width: 100%;
+  margin: 32px auto;
+  display: grid;
+  grid-template-columns: 1.5fr 0.9fr; 
+  align-items: flex-start;
 }
 
 .chapter-progress-tile {
-  width: 700px;
-  height: 445px;
-  background-color: #f6f6f6;
-  border-radius: 8px;
-  padding: 16px 24px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  margin-top: 32px;
+  background-color: #F2F1F2;
+  border-radius: 14px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  align-self: flex-start; 
-  margin-left: 0;
-  margin-left: -24px;
+  gap: 24px;
+  width: 100%;  
 }
 
 .chapter-table {
-  margin-top: 12px;
+  margin-top: 4px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -390,63 +431,124 @@ export default defineComponent({
 
 .chapter-table-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  font-family: 'Myriad Pro Semibold', sans-serif;
-  font-size: 15px;
-  color: #034750;
   border-bottom: 1px solid #dcdcdc;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
+  font-family: 'Myriad Pro Semibold', sans-serif;
+  font-size: 15px;         
+  color: #034750;           
+  letter-spacing: 0.2px;    
 }
 
 .chapter-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 6px 0;
-  font-family: 'Myriad Pro', sans-serif;
-  font-size: 14px;
-  color: #555;
+  padding: 8px 0;
   border-bottom: 1px solid #e2e2e2;
+  color: #034750; 
+  font-size: 14px;
 }
 
+
 .chapter-col {
+  flex: 1.4;
   display: flex;
-  align-items: center;
   gap: 8px;
-  width: 60%;
 }
 
 .date-col {
-  width: 20%;
+  flex: 0.9;
   text-align: right;
 }
 
 .grade-col {
-  width: 20%;
+  flex: 0.9;
   text-align: right;
 }
 
 .chapter-number {
   font-weight: 700;
   color: #034750;
-  min-width: 12px;
-}
-
-.chapter-title {
-  color: #034750;
 }
 
 .exam-link {
-  color: #034750;
   text-decoration: underline;
   cursor: pointer;
-  font-weight: 500;
+  color: #034750;
 }
-
 .exam-link:hover {
   color: #00A5B5;
 }
 
+.back-link {
+  margin-top: 12px;
+  display: inline-block;
+  font-size: 14px;
+  color: #034750;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.courses-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 260px;   
+  margin-left: auto; 
+}
+
+.side-card {
+  background-color: #F2F1F2;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;   
+}
+
+.side-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.side-icon {
+  width: 26px;
+  height: 34px;
+  border-radius: 6px;
+  background-color: #007C8A;
+}
+
+.side-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #034750;
+}
+
+.side-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.side-link {
+  font-size: 16px;
+  color: #007c8a;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.side-footer {
+  text-align: center;
+  font-size: 16px;
+  color: #034750;
+  cursor: pointer;
+}
+
 
 </style>
+
 
