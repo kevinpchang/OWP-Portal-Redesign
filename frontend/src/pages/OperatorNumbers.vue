@@ -45,94 +45,6 @@
                 <button class="remove-button" popovertarget="deletepopover">Remove</button>
               </td>
             </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -159,17 +71,17 @@
       <div class="purchase-history">
         <div class="header">
           <div class="icon"></div>
-          <div class="text" >Purchase History</div>
+          <div class="text">Your Tasks</div>
         </div>
         <div class="divider"></div>
         <div class="body">
-          <div class="text">Operation of Wastewater Treatment Plants, Vol 1</div>
-          <div class="text">Operation of Wastewater Treatment Plants, Vol 2</div>
-          <div class="text">Operation of Wastewater Treatment Plants, Vol 3</div>
-          <div class="text">Industrial Waste Treatment, Vol 1</div>
+          <div class="text">Waste Water 1 Certificate</div>
+          <div class="text">Waste Water 2 Certificate</div>
+          <div class="text">Utility 1 Certificate </div>
+          <div class="text">Utility 2 Certificate </div>
         </div>
         <div class="view-all">
-          <a class="text" href="/purchase-history">(View all purchases)</a>
+          <a class="text" href="/Certificates">(View all Certificates)</a>
         </div>
       </div>
     </div>
@@ -253,7 +165,7 @@
   .title {
     width: 331px;
     height: 28px;
-    margin-left: 42%;
+    margin-left: 32%;
     font-family: 'Roberto', sans-serif;
     font-size: 28px;
     font-weight: 790;
@@ -279,22 +191,28 @@
   }
 
   .edit-button{
-    background: transparent;
+    width: 40%;
+    border-radius: 8px;
     border: none !important;
     font-family: 'Roberto', sans-serif;
     font-size: 17px;
-    font-weight: 600;
-    color: #034750;
+    font-weight: 400;
+    color: #FFFFFF;
+    background-color: #D97A27;
+    cursor: pointer;
   }
 
   .remove-button{
-    background: transparent;
+    width: 80px;
     float:right;
+    border-radius: 8px;
     border: none !important;
     font-family: 'Roberto', sans-serif;
     font-size: 17px;
-    font-weight: 600;
-    color: #034750;
+    font-weight: 400;
+    color: #FFFFFF;
+    background-color: #9F3323;
+    cursor: pointer;
   }
   
   .popup-button-left{
@@ -337,9 +255,9 @@
 
   table {
     margin-top: 30px;
-    margin-left: 40%;
+    margin-left: 30%;
     border-collapse: collapse;
-    width: 52%;
+    width: 62%;
     background-color: #f2f1f2;
     border-radius: 20px;
     overflow: hidden;
@@ -448,7 +366,7 @@
     grid-column: 2 / 3;
     display: flex;
     margin-left: -15%;
-    width:40%;
+    width:50%;
     margin-top: 55px;
     flex-direction: column;
     gap: 16px;
