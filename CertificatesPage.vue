@@ -1,189 +1,360 @@
-<script setup lang="ts">
-interface Certificate {
-  id: string
-  name: string
-  course: string
-  issued: string // ISO date string or '' if none
-  pdfUrl?: string // if missing, disable download
-}
-
-// ---- Mock Data (C) ----
-const issuedCertificates: Certificate[] = [
-  { id: 'wqb-101', name: 'Water Quality Basics', course: 'WQB‑101', issued: '2025-09-30', pdfUrl: '/mock/Water_Quality_Basics.pdf' },
-  { id: 'top-201', name: 'Treatment Operations L1', course: 'TOP‑201', issued: '2025-08-12', pdfUrl: '/mock/Treatment_Operations_L1.pdf' },
-  { id: 'dss-310', name: 'Distribution Systems Safety', course: 'DSS‑310', issued: '2025-06-05' }, // no PDF yet
-]
-
-const inProgress: Certificate[] = [
-  { id: 'alm-405', name: 'Advanced Lab Methods', course: 'ALM‑405', issued: '' },
-]
-
-// ---- Download behavior (D2) ----
-function downloadCert(cert: Certificate) {
-  if (!cert.pdfUrl) return
-  window.location.href = cert.pdfUrl
-}
-
-// Top date (nice touch, optional)
-const dateStr = new Date().toLocaleDateString(undefined, {
-  weekday: 'long', month: 'long', day: 'numeric'
-})
-</script>
-
 <template>
-  <div class="certificates-page">
-    <!-- ===== Top Section ===== -->
-    <header class="top">
-      <div class="text">
-        <div class="kicker">{{ dateStr }}</div>
-        <h1 class="title">Certificates</h1>
-        <p class="subtitle">View, track, and download your course completion certificates.</p>
+  <div class="courses-page">
+    <div class="courses-top">
+      <div class="text-block">
+        <div class="courses-header">Certificates</div>
+        <p class="page-description">View and download your earned certificates</p>
       </div>
-      <div class="image">
-        <img src="@/assets/owpart.png" alt="Certificates Graphic" />
+      <div class="search-bar">
+        <input type="text" placeholder="Search certificates..." />
       </div>
-    </header>
+    </div>
 
-    <!-- ===== Bottom Section ===== -->
-    <main class="bottom">
-      <!-- Left -->
-      <section class="left">
-        <!-- Panel: Issued Certificates (A + B + C) -->
-        <div class="panel">
-          <div class="panel-head">
-            <h2 class="panel-title">Issued Certificates</h2>
-          </div>
-          <div class="cards">
-            <article
-              v-for="cert in issuedCertificates"
-              :key="cert.id"
-              class="card fancy"
-            >
-              <div class="card-left">
-                <div class="badge">PDF</div>
-                <div class="meta">
-                  <div class="name">{{ cert.name }}</div>
-                  <div class="course">Course: {{ cert.course }}</div>
-                  <div class="date">Issued: {{ cert.issued || '—' }}</div>
+    <div class="courses-bottom">
+      <!-- Left: Certificates List -->
+      <div class="courses-left">
+        <div class="tiles-container">
+          <div class="course-card certificate-card">
+            <div class="card-header">
+              <div class="header-icon certificate-icon"></div>
+              <h2 class="card-title">Earned Certificates</h2>
+            </div>
+            <div class="card-body">
+              <div
+                v-for="cert in certificates"
+                :key="cert.id"
+                class="course-row certificate-row"
+              >
+                <div class="course-image certificate-image"></div>
+                <div class="course-info">
+                  <div class="course-title">{{ cert.title }}</div>
+                  <div class="info-subrow">
+                    <div class="completion-label">Grade Achieved: {{ cert.grade }}</div>
+                  </div>
+                  <div class="download-link">
+                    Download Certificate:
+                    <a :href="cert.downloadUrl" target="_blank" class="download-btn">
+                      https://yourwebsite.com/certificates/certificate_{{ cert.id }}.pdf
+                    </a>
+                  </div>
                 </div>
               </div>
-              <div class="card-right">
-                <button
-                  class="btn"
-                  :disabled="!cert.pdfUrl"
-                  @click="downloadCert(cert)"
-                  aria-label="Download certificate as PDF"
-                >
-                  <!-- download icon -->
-                  <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-                    <path d="M5 20h14v-2H5v2Zm7-18v10.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V2h1Z"/>
-                  </svg>
-                  <span>{{ cert.pdfUrl ? 'Download PDF' : 'Pending PDF' }}</span>
-                </button>
-              </div>
-            </article>
-
-            <!-- Show skeletons if you prefer placeholders for loading -->
-            <!-- <div class="card skeleton"></div> -->
+            </div>
           </div>
         </div>
+      </div>
 
-        <!-- Panel: In Progress -->
-        <div class="panel">
-          <div class="panel-head">
-            <h2 class="panel-title">Certificates In Progress</h2>
+      <!-- Right: Side Panels (Messages, Transcripts, etc.) -->
+      <div class="courses-right">
+        <div class="side-card">
+          <div class="side-header">
+            <div class="header-icon side-icon messages-icon"></div>
+            <div class="side-title">Messages</div>
           </div>
-          <div class="cards two">
-            <article v-for="cert in inProgress" :key="cert.id" class="card fancy muted">
-              <div class="card-left">
-                <div class="badge">WIP</div>
-                <div class="meta">
-                  <div class="name">{{ cert.name }}</div>
-                  <div class="course">Course: {{ cert.course }}</div>
-                  <div class="date">Issued: —</div>
-                </div>
-              </div>
-              <div class="card-right">
-                <button class="btn" disabled>
-                  <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-                    <path d="M5 20h14v-2H5v2Zm7-18v10.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V2h1Z"/>
-                  </svg>
-                  <span>Download PDF</span>
-                </button>
-              </div>
-            </article>
+          <div class="side-body">
+            <div class="side-link">Example Email Message (5/8/2025)</div>
+            <div class="side-link">Example Email Message (5/3/2025)</div>
+            <div class="side-link">Example Email Message (4/21/2025)</div>
           </div>
+          <div class="side-footer">(View all messages)</div>
         </div>
-      </section>
 
-      <!-- Right -->
-      <aside class="right">
-        <div class="panel">
-          <div class="panel-head">
-            <h2 class="panel-title">History</h2>
+        <div class="side-card">
+          <div class="side-header">
+            <div class="header-icon side-icon transcript-icon"></div>
+            <div class="side-title">Transcripts</div>
           </div>
-          <ul class="history-list">
-            <li>2025‑05‑18 — Sample course completed</li>
-            <li>2025‑03‑02 — Sample course completed</li>
-          </ul>
+          <div class="side-body">
+            <div class="side-link">View Transcript</div>
+            <div class="side-link">Purchase Transcript</div>
+          </div>
+          <div class="side-footer">(View all transcripts)</div>
         </div>
-      </aside>
-    </main>
+
+        <div class="side-card">
+          <div class="side-header">
+            <div class="header-icon side-icon purchase-icon"></div>
+            <div class="side-title">Purchase History</div>
+          </div>
+          <div class="side-body">
+            <div class="side-link">Operation of Wastewater Treatment Plants, Vol.1</div>
+            <div class="side-link">Advanced Water Treatment</div>
+          </div>
+          <div class="side-footer">(View all purchases)</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "CertificatesPage",
+  data() {
+    return {
+      certificates: [
+        {
+          id: 1,
+          title: "Advanced Water Treatment",
+          grade: "90%",
+          downloadUrl: "#",
+        },
+        {
+          id: 2,
+          title: "Operation and Maintenance of Wastewater Collection Systems, Vol 1",
+          grade: "95%",
+          downloadUrl: "#",
+        },
+        {
+          id: 3,
+          title: "Operation and Maintenance of Wastewater Collection Systems, Vol 2",
+          grade: "100%",
+          downloadUrl: "#",
+        },
+        {
+          id: 4,
+          title: "Water Distribution System Operation and Maintenance",
+          grade: "100%",
+          downloadUrl: "#",
+        },
+      ],
+    };
+  },
+});
+</script>
+
 <style scoped>
-/* ===== Page Layout ===== */
-.certificates-page { display: grid; grid-template-rows: auto 1fr; gap: 32px; padding: 16px; }
-.top { display: grid; grid-template-columns: 508px 508px; gap: 24px; margin-top: 32px; align-items: center; }
-.bottom { display: grid; grid-template-columns: 700px 300px; column-gap: 16rem; }
-.left, .right { display: flex; flex-direction: column; gap: 16px; }
+/* Reusing exact same styles from Courses page */
+.courses-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  font-family: 'Myriad Pro', sans-serif;
+}
 
-/* ===== Top Styles ===== */
-.text { color: #034750; }
-.kicker { font-size: 14px; color: #6d8a8d; margin-bottom: 6px; }
-.title { font-size: 48px; font-weight: 800; color: #00A5B5; margin: 0; }
-.subtitle { font-size: 18px; color: #747474; margin: 6px 0 0; }
-.image img { width: 100%; object-fit: contain; display: block; }
+.courses-top {
+  max-width: 1000px;
+  width: 100%;
+  margin: 32px auto 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-/* ===== Panels ===== */
-.panel { background: #F2F1F2; border-radius: 24px; padding: 16px; box-shadow: 0 1px 0 rgba(0,0,0,.02) inset; }
-.panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.panel-title { margin: 0; color: #034750; font-size: 18px; font-weight: 800; letter-spacing: .2px; }
+.text-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-/* ===== Cards (Style 3 — Fancy) ===== */
-.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.cards.two { grid-template-columns: repeat(2, 1fr); }
+.courses-header {
+  font-size: 32px;
+  font-weight: 700;
+  color: #034750;
+}
 
-.card.fancy { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; padding: 14px; border-radius: 20px; background: #fff; box-shadow: 0 6px 24px rgba(0, 52, 58, 0.06), 0 1px 2px rgba(0,0,0,.04); }
-.card.fancy:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(0, 52, 58, 0.10), 0 2px 6px rgba(0,0,0,.06); transition: .18s ease; }
-.card.fancy.muted { opacity: .8; filter: grayscale(.1); }
+.page-description {
+  font-size: 16px;
+  color: #555;
+  margin-top: 8px;
+}
 
-.card-left { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
-.badge { background: #E6F7F9; color: #00A5B5; border-radius: 999px; padding: 4px 10px; font-weight: 700; font-size: 12px; letter-spacing: .3px; }
-.meta { display: grid; gap: 4px; }
-.name { font-weight: 800; color: #034750; font-size: 16px; }
-.course, .date { color: #6e6e6e; font-size: 13.5px; }
+.search-bar input {
+  padding: 10px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 240px;
+}
 
-.card-right { display: flex; align-items: center; justify-content: flex-end; }
-.btn { display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 12px; padding: 10px 12px; background: #00A5B5; color: #fff; cursor: pointer; font-weight: 700; box-shadow: 0 2px 0 #008898 inset; }
-.btn:hover:not(:disabled) { filter: brightness(1.02); transform: translateY(-1px); }
-.btn:disabled { background: #b6dfe3; color: #f5fbfc; cursor: not-allowed; box-shadow: none; }
-.icon { width: 18px; height: 18px; fill: currentColor; }
+.courses-bottom {
+  max-width: 1000px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 700px 300px;
+  column-gap: 16px;
+  margin: 0 auto 48px auto;
+}
 
-/* ===== History ===== */
-.history-list { margin: 0; padding-left: 18px; color: #555; display: grid; gap: 6px; }
+.courses-left,
+.courses-right {
+  display: flex;
+  flex-direction: column;
+}
 
-/* ===== Skeleton Option (if needed) ===== */
-.skeleton { position: relative; height: 120px; border-radius: 16px; background: #fff; overflow: hidden; }
-.skeleton::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.06), rgba(0,0,0,0)); transform: translateX(-100%); animation: shimmer 1.4s infinite; }
-@keyframes shimmer { 100% { transform: translateX(100%); } }
+.tiles-container {
+  margin-top: 46px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
 
-/* ===== Responsive ===== */
-@media (max-width: 1100px) {
-  .top { grid-template-columns: 1fr; }
-  .bottom { grid-template-columns: 1fr; column-gap: 0; }
-  .cards { grid-template-columns: 1fr; }
-  .cards.two { grid-template-columns: 1fr; }
+.course-card {
+  background-color: #F2F1F2;
+  border-radius: 14px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.course-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transform: translateY(-3px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.header-icon {
+  width: 26px;
+  height: 34px;
+  border-radius: 6px;
+  background-color: #007C8A;
+}
+
+.certificate-icon {
+  background-color: #6DBE4B; /* Green like completed */
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #034750;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.certificate-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.course-image {
+  width: 70px;
+  height: 84px;
+  background-color: #6DBE4B;
+  border-radius: 4px;
+  background-image: url('https://via.placeholder.com/70x84/6DBE4B/FFFFFF?text=OWP');
+  background-size: cover;
+}
+
+.certificate-image {
+  background-color: #6DBE4B;
+}
+
+.course-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.course-title {
+  font-size: 16px;
+  color: #034750;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.info-subrow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #707070;
+}
+
+.completion-label {
+  font-weight: 600;
+}
+
+.download-link {
+  font-size: 14px;
+  color: #555;
+  margin-top: 4px;
+}
+
+.download-btn {
+  color: #00A5B5;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.download-btn:hover {
+  color: #034750;
+}
+
+/* Right Sidebar - Reused exactly */
+.courses-right {
+  gap: 16px;
+  margin-top: 46px;
+}
+
+.side-card {
+  background-color: #F2F1F2;
+  border-radius: 14px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.side-card:hover {
+  box-shadow: 0px 4px 14px rgba(0,0,0,0.18);
+  transform: translateY(-3px);
+}
+
+.side-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.side-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #034750;
+}
+
+.side-icon {
+  width: 26px;
+  height: 34px;
+  border-radius: 6px;
+  background-color: #007C8A;
+}
+
+.messages-icon { background-color: #00A5B5; }
+.transcript-icon { background-color: #6DBE4B; }
+.purchase-icon { background-color: #034750; }
+
+.side-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.side-link {
+  font-size: 16px;
+  color: #007c8a;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.side-footer {
+  text-align: center;
+  font-size: 16px;
+  color: #034750;
+  cursor: pointer;
+  margin-top: 8px;
 }
 </style>
