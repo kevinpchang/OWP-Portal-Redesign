@@ -1,260 +1,404 @@
-
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-/*import { fetchCertificates } from '@/services/certificates.service'*/
-
-// Types
-export type CertStatus = 'Completed' | 'In Progress' | 'Pending'
-export interface Certificate {
-  id: string
-  title: string
-  gradePercent?: number // 0..100 if completed or graded
-  status: CertStatus
-  issued?: string       // ISO/display date if applicable
-  image?: string        // url to cover/thumb
-  pdfUrl?: string       // download link
-}
-
-// State
-const loading = ref(false)
-const error = ref<string | null>(null)
-const certificates = ref<Certificate[]>([])
-
-// Filters
-const searchTerm = ref('')
-const statusFilter = ref<CertStatus | ''>('')
-
-// Derived
-const filteredCertificates = computed(() => {
-  const term = searchTerm.value.trim().toLowerCase()
-  const status = statusFilter.value
-  return certificates.value.filter(c => {
-    const matchesTerm = term ? c.title.toLowerCase().includes(term) : true
-    const matchesStatus = status ? c.status === status : true
-    return matchesTerm && matchesStatus
-  })
-})
-
-// Summary-ish counts (optional usage)
-const totalCompleted = computed(() => certificates.value.filter(c => c.status === 'Completed').length)
-
-// Actions
-function downloadCert(c: Certificate) {
-  if (!c.pdfUrl) return
-  window.location.href = c.pdfUrl // D2 behavior
-}
-
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const data = await fetchCertificates()
-    certificates.value = data
-  } catch (e: any) {
-    error.value = e?.message || 'Failed to load certificates.'
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(load)
-</script>
-
 <template>
-  <div class="dashboard-page" data-page="certificates">
-    <!-- ===== Top: breadcrumb + page title + (optional) blurb image ===== -->
-    <div class="dashboard-top">
-      <div class="text">
-        <nav class="breadcrumb" aria-label="Breadcrumb">
-          <a href="#" class="crumb">Dashboard</a>
-          <span class="crumb-sep">&gt;</span>
-          <span class="crumb-current">Certificates</span>
-        </nav>
-        <div class="page-pill" aria-hidden="true">Certificates</div>
+  <div class="certificates-page">
+    <!-- Header -->
+    <div class="page-top">
+      <div class="text-block">
+        <h1 class="page-title">Certificates</h1>
+        <p class="page-description">View and download your earned certificates</p>
       </div>
-      <div class="image">
-        <img src="@/assets/owpart.png" alt="OWP art" />
+      <div class="search-container">
+        <input type="text" placeholder="Search certificates..." class="search-input" />
       </div>
     </div>
 
-    <!-- ===== Bottom: content + sidebar (match Courses page) ===== -->
-    <div class="dashboard-bottom">
-      <!-- LEFT: Main content -->
-      <section class="main-col">
-        <!-- Error banner -->
-        <div v-if="error" class="alert" role="alert">
-          <div class="alert-title">Couldn’t load certificates</div>
-          <div class="alert-desc">{{ error }}</div>
-          <button class="btn small" @click="load">Retry</button>
-        </div>
-
-        <!-- Certificates block -->
-        <div class="block">
-          <!-- Header row: title + search + (optional) filter -->
-          <div class="block-head">
-            <h2 class="block-title">Certificates</h2>
-            <div class="filters">
-              <label class="sr-only" for="search">Search certificates</label>
-              <input id="search" v-model="searchTerm" type="text" class="filter-input" placeholder="Search by title..." />
-
-              <label class="sr-only" for="status">Status filter</label>
-              <select id="status" v-model="statusFilter" class="filter-select">
-                <option value="">All</option>
-                <option value="Completed">Completed</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Pending">Pending</option>
-              </select>
+    <!-- Main Content -->
+    <div class="page-content">
+      <!-- Left: Certificates List -->
+      <div class="left-panel">
+        <div class="certificates-container">
+          <!-- Certificates Card -->
+          <div class="certificate-card">
+            <div class="card-header">
+              <div class="header-icon certificate-icon"></div>
+              <h2 class="card-title">Earned Certificates</h2>
             </div>
-          </div>
-
-          <!-- List -->
-          <div class="cert-list">
-            <!-- Loading skeletons -->
-            <div v-if="loading" class="skeleton-list">
-              <div class="skeleton-item" v-for="n in 4" :key="n"></div>
-            </div>
-
-            <template v-else>
-              <article v-for="c in filteredCertificates" :key="c.id" class="cert-item">
-                <img class="thumb" :src="c.image || '/placeholder.png'" :alt="c.title" />
-                <div class="info">
-                  <a class="title" href="#">{{ c.title }}</a>
-                  <div class="meta">
-                    <span v-if="typeof c.gradePercent === 'number'">Grade Achieved : <strong>{{ c.gradePercent }}%</strong></span>
-                    <span v-else>Grade Achieved : <strong>—</strong></span>
-                  </div>
-                  <div class="download">
-                    <template v-if="c.pdfUrl">
-                      <button class="linkish" @click="downloadCert(c)">Download Certificate</button>
-                    </template>
-                    <span v-else class="muted">Certificate not available yet</span>
+            <div class="card-body">
+              <div
+                v-for="cert in certificates"
+                :key="cert.id"
+                class="certificate-item"
+                @click="scrollToCertificate(cert.id)"
+              >
+                <div class="cert-thumbnail"></div>
+                <div class="cert-info">
+                  <div class="cert-title">{{ cert.title }}</div>
+                  <div class="cert-grade">Grade Achieved: <strong>{{ cert.grade }}</strong></div>
+                  <div class="download-section">
+                    Download Certificate:
+                    <a :href="cert.downloadUrl" target="_blank" class="download-link">
+                      certificate_{{ cert.id }}.pdf
+                    </a>
                   </div>
                 </div>
-              </article>
-
-              <div v-if="!filteredCertificates.length" class="placeholder">No certificates match your search/filter.</div>
-            </template>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <!-- RIGHT: Sidebar panels (mirror Courses page) -->
-      <aside class="side-col">
-        <section class="side block">
-          <header class="side-head">
-            <div class="side-icon" aria-hidden="true"></div>
-            <h3>Messages</h3>
-          </header>
-          <ul class="side-links">
-            <li><a href="#">Example Email Message (5/5/2025)</a></li>
-            <li><a href="#">Example Email Message (5/3/2025)</a></li>
-            <li><a href="#">Example Email Message (5/1/2025)</a></li>
-          </ul>
-          <div class="side-foot">(View all messages)</div>
-        </section>
+      <!-- Right: Sidebar -->
+      <div class="right-panel">
+        <!-- Messages -->
+        <div class="sidebar-card">
+          <div class="sidebar-header">
+            <div class="sidebar-icon messages-icon"></div>
+            <h3 class="sidebar-title">Messages</h3>
+          </div>
+          <div class="sidebar-body">
+            <div class="sidebar-link">Example Email Message (11/10/2025)</div>
+            <div class="sidebar-link">Example Email Message (11/08/2025)</div>
+            <div class="sidebar-link">Example Email Message (11/05/2025)</div>
+          </div>
+          <div class="sidebar-footer">(View all messages)</div>
+        </div>
 
-        <section class="side block">
-          <header class="side-head">
-            <div class="side-icon" aria-hidden="true"></div>
-            <h3>Transcripts</h3>
-          </header>
-          <ul class="side-links">
-            <li><a href="#">View Transcript</a></li>
-            <li><a href="#">Purchase Transcript</a></li>
-          </ul>
-          <div class="side-foot">(View all messages)</div>
-        </section>
+        <!-- Transcripts -->
+        <div class="sidebar-card">
+          <div class="sidebar-header">
+            <div class="sidebar-icon transcript-icon"></div>
+            <h3 class="sidebar-title">Transcripts</h3>
+          </div>
+          <div class="sidebar-body">
+            <div class="sidebar-link">View Transcript</div>
+            <div class="sidebar-link">Purchase Transcript</div>
+          </div>
+          <div class="sidebar-footer">(View all transcripts)</div>
+        </div>
 
-        <section class="side block">
-          <header class="side-head">
-            <div class="side-icon purchase" aria-hidden="true"></div>
-            <h3>Purchase History</h3>
-          </header>
-          <ul class="side-links">
-            <li><a href="#">Operation of Wastewater Treatment Plants, Vol 1</a></li>
-            <li><a href="#">Operation of Wastewater Treatment Plants, Vol 2</a></li>
-            <li><a href="#">Operation of Wastewater Treatment Plants, Vol 3</a></li>
-          </ul>
-          <div class="side-foot">(View all messages)</div>
-        </section>
-      </aside>
+        <!-- Purchase History -->
+        <div class="sidebar-card">
+          <div class="sidebar-header">
+            <div class="sidebar-icon purchase-icon"></div>
+            <h3 class="sidebar-title">Purchase History</h3>
+          </div>
+          <div class="sidebar-body">
+            <div class="sidebar-link">Operation of Wastewater Treatment Plants, Vol 1</div>
+            <div class="sidebar-link">Advanced Water Treatment</div>
+            <div class="sidebar-link">Water Distribution System Operation</div>
+          </div>
+          <div class="sidebar-footer">(View all purchases)</div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "CertificatesPage",
+  data() {
+    return {
+      certificates: [
+        {
+          id: 1,
+          title: "Advanced Water Treatment",
+          grade: "90%",
+          downloadUrl: "https://yourwebsite.com/certificates/advanced-water-treatment.pdf",
+        },
+        {
+          id: 2,
+          title: "Operation and Maintenance of Wastewater Collection Systems, Vol 1",
+          grade: "95%",
+          downloadUrl: "https://yourwebsite.com/certificates/wastewater-collection-vol1.pdf",
+        },
+        {
+          id: 3,
+          title: "Operation and Maintenance of Wastewater Collection Systems, Vol 2",
+          grade: "100%",
+          downloadUrl: "https://yourwebsite.com/certificates/wastewater-collection-vol2.pdf",
+        },
+        {
+          id: 4,
+          title: "Water Distribution System Operation and Maintenance",
+          grade: "100%",
+          downloadUrl: "https://yourwebsite.com/certificates/water-distribution.pdf",
+        },
+      ],
+    };
+  },
+  methods: {
+    scrollToCertificate(id: number) {
+      // Future: scroll to certificate detail view
+      console.log("View certificate", id);
+    },
+  },
+});
+</script>
+
 <style scoped>
-/* ===== Shared page frame (matches other pages) ===== */
-.dashboard-page { display: grid; grid-template-rows: auto 1fr; row-gap: 32px; justify-content: center; align-items: start; }
-.dashboard-top { grid-row: 1; display: grid; grid-template-columns: 508px 508px; margin-top: 32px; }
-.text { grid-column: 1; display: flex; flex-direction: column; justify-content: center; height: 160px; color: #034750; }
-.image > img { width: 100%; height: 100%; object-fit: scale-down; display: block; }
+.certificates-page {
+  font-family: 'Myriad Pro', sans-serif;
+  background-color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-/* Breadcrumb */
-.breadcrumb { margin: 0 0 8px 24px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-.crumb { color: #2563eb; text-decoration: none; }
-.crumb:hover { text-decoration: underline; }
-.crumb-sep { color: #6b7280; }
-.crumb-current { color: #111827; font-weight: 600; }
+.page-top {
+  max-width: 1000px;
+  width: 100%;
+  margin: 32px auto 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
 
-/* Pill header bar like mock */
-.page-pill { background: #00A5B5; color: #fff; font-weight: 800; border-radius: 10px; padding: 10px 16px; width: fit-content; margin-left: 24px; }
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #034750;
+  margin: 0;
+}
 
-/* Two-column grid */
-.dashboard-bottom { grid-row: 2; display: grid; grid-template-columns: 700px 300px; column-gap: 16rem; margin-bottom: 48px; }
-.main-col, .side-col { display: flex; flex-direction: column; gap: 16px; }
+.page-description {
+  font-size: 16px;
+  color: #555;
+  margin: 8px 0 0;
+}
 
-/* Blocks */
-.block { background: #F2F1F2; border-radius: 14px; padding: 16px 18px; }
-.block-title { margin: 0; font-size: 18px; font-weight: 800; color: #034750; }
-.block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.search-container {
+  position: relative;
+}
 
-/* Filters */
-.filters { display: flex; gap: 8px; align-items: center; }
-.filter-input, .filter-select { padding: 8px 10px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; }
+.search-input {
+  padding: 10px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 260px;
+  outline: none;
+}
 
-/* Certificate list */
-.cert-list { display: grid; gap: 16px; }
-.cert-item { display: grid; grid-template-columns: 90px 1fr; gap: 16px; background: #fff; border-radius: 12px; padding: 14px; }
-.thumb { width: 90px; height: 90px; object-fit: cover; border-radius: 6px; background: #e5e7eb; }
-.info { display: grid; gap: 6px; align-content: start; }
-.title { color: #034750; font-weight: 800; text-decoration: underline; }
-.meta { color: #4b5563; font-size: 14px; }
-.download { font-size: 14px; }
-.linkish { background: none; border: none; color: #2563eb; text-decoration: underline; padding: 0; cursor: pointer; font-weight: 600; }
-.linkish:hover { filter: brightness(.95); }
-.muted { color: #9ca3af; }
-.placeholder { color: #6b7280; padding: 8px 0 2px; }
+.search-input::placeholder {
+  color: #999;
+}
 
-/* Sidebar */
-.side { padding: 12px; }
-.side-head { display: flex; align-items: center; gap: 8px; margin: 6px 6px 10px; }
-.side-head h3 { margin: 0; font-size: 16px; font-weight: 800; color: #034750; }
-.side-icon { width: 26px; height: 26px; border-radius: 50%; background: #007C8A; }
-.side-icon.purchase { background: #00A5B5; }
-.side-links { list-style: none; padding: 0; margin: 0 6px 8px; display: grid; gap: 8px; }
-.side-links a { color: #007C8A; text-decoration: underline; font-size: 14px; }
-.side-foot { text-align: center; color: #6c8082; font-size: 12px; margin: 4px 0 2px; }
+.page-content {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto 48px;
+  display: grid;
+  grid-template-columns: 700px 280px;
+  gap: 20px;
+  padding: 0 20px;
+}
 
-/* Buttons & alerts */
-.btn { background: #00A5B5; color: #fff; border: 0; border-radius: 12px; padding: 8px 12px; font-weight: 700; cursor: pointer; }
-.btn.small { padding: 6px 10px; font-size: 13px; border-radius: 10px; }
-.alert { background: #fff1f2; border: 1px solid #fecdd3; color: #9f1239; padding: 12px 14px; border-radius: 12px; display: grid; gap: 6px; }
-.alert-title { font-weight: 800; }
-.alert-desc { font-size: 14px; }
+.left-panel {
+  display: flex;
+  flex-direction: column;
+}
 
-/* Skeleton list */
-.skeleton-list { display: grid; gap: 12px; }
-.skeleton-item { height: 118px; border-radius: 12px; background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%); background-size: 400% 100%; animation: shimmer 1.2s infinite; }
-@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+.certificates-container {
+  margin-top: 46px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
 
-/* Accessibility */
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+.certificate-card {
+  background-color: #F2F1F2;
+  border-radius: 14px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
 
-/* Responsive */
-@media (max-width: 1100px) {
-  .dashboard-top { grid-template-columns: 1fr; }
-  .dashboard-bottom { grid-template-columns: 1fr; column-gap: 0; }
-  .filters { width: 100%; }
-  .filter-input { flex: 1; }
+.certificate-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transform: translateY(-3px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.header-icon {
+  width: 26px;
+  height: 34px;
+  border-radius: 6px;
+  background-color: #007C8A;
+}
+
+.certificate-icon {
+  background-color: #6DBE4B;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #034750;
+  margin: 0;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.certificate-item {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.certificate-item:hover {
+  background-color: rgba(109, 190, 75, 0.05);
+  border-radius: 8px;
+  padding: 16px;
+  margin: -16px 0;
+}
+
+.certificate-item:last-child {
+  border-bottom: none;
+}
+
+.cert-thumbnail {
+  width: 70px;
+  height: 90px;
+  background: linear-gradient(135deg, #6DBE4B 0%, #5AA843 100%);
+  border-radius: 6px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" font-size="40" fill="white" font-family="Arial" font-weight="bold">OWP</text></svg>');
+  background-size: 60%;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.cert-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+}
+
+.cert-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #034750;
+  line-height: 1.4;
+}
+
+.cert-grade {
+  font-size: 14px;
+  color: #707070;
+}
+
+.download-section {
+  font-size: 14px;
+  color: #555;
+  margin-top: 4px;
+}
+
+.download-link {
+  color: #00A5B5;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.download-link:hover {
+  color: #034750;
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 46px;
+}
+
+.sidebar-card {
+  background-color: #F2F1F2;
+  border-radius: 14px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.sidebar-card:hover {
+  box-shadow: 0px 4px 14px rgba(0,0,0,0.18);
+  transform: translateY(-3px);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.sidebar-icon {
+  width: 26px;
+  height: 34px;
+  border-radius: 6px;
+}
+
+.messages-icon { background-color: #00A5B5; }
+.transcript-icon { background-color: #6DBE4B; }
+.purchase-icon { background-color: #034750; }
+
+.sidebar-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #034750;
+  margin: 0;
+}
+
+.sidebar-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-link {
+  font-size: 16px;
+  color: #007c8a;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sidebar-link:hover {
+  color: #034750;
+}
+
+.sidebar-footer {
+  text-align: center;
+  font-size: 16px;
+  color: #034750;
+  cursor: pointer;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .page-content {
+    grid-template-columns: 1fr;
+  }
+  .right-panel {
+    margin-top: 20px;
+  }
+  .search-input {
+    width: 200px;
+  }
 }
 </style>
