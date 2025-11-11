@@ -1,164 +1,184 @@
 <template>
   <div class="operator-numbers-page">
       <div class="content">
-        <div class="header-container">
-          <div class="title">Operator Numbers</div>
-          <button class = add-button popovertarget="addpopover">Add Operator Number</button>
-        </div>
+        <div class="content-left">
+          <div class="header-container">
+            <div class="title">Operator Numbers</div>
+            <button class = add-button popovertarget="addpopover">Add Operator Number</button>
+          </div>
 
-        <div name="table">
-          <table>
-            <thead class="table-header">
-              <tr>
-                  <th>State/Province</th>
-                  <th>Operator Number</th>
-                  <th>Edit/Remove</th>
-              </tr>
-            </thead>
-            <tbody class="table-body">
-              <tr>
-                <td>California</td>
-                <td>12345</td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>Colorado</td>
-                <td>67890</td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>Washington</td>
-                <td>59746</td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td>
-                  <div class="button-space">
-                    <button class="edit-button" popovertarget="editpopover">Edit</button>
-                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div name="table">
+            <table>
+              <thead class="table-header">
+                <tr>
+                    <th>State/Province</th>
+                    <th>Operator Number</th>
+                    <th>Edit/Remove</th>
+                </tr>
+              </thead>
+              <tbody class="table-body">
+                <tr>
+                  <td>California</td>
+                  <td>12345</td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Colorado</td>
+                  <td>67890</td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Washington</td>
+                  <td>59746</td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <div class="button-space">
+                      <button class="edit-button" popovertarget="editpopover">Edit</button>
+                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+        <div class="content-right">
+          <div class="messages">
+            <div class="header">
+              <div class="icon"></div>
+              <div class="text">Messages</div>
+            </div>
+            <div class="divider"></div>
+            <div class="body">
+              <div class="object"><div class="text">Email message (4/11/2025)</div></div>
+              <div class="object"><div class="text">Email message (4/07/2025)</div></div>
+              <div class="object"><div class="text">Email message (4/03/2025)</div></div>
+            </div>
+            <div class="view-all">
+              <div class="text">(View all messages)</div>
+            </div>
+          </div>
+        </div>
+        
       </div>
       
 
@@ -227,17 +247,30 @@
     width: 100%;
     height: 100%;
     display: flex;
-    justify-content: center;
     align-items: center ;
   }
 
   .content {
-    width: 1000px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: top ;
+    gap: 32px;
+  }
+
+  .content-left {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center ;
-    gap: 8px;
+    gap: 32px;
+  }
+
+  .content-right{
+    display: flex;
+    flex-direction: row;
+    margin-top: 82px;
   }
 
   .header-container {
@@ -249,10 +282,8 @@
   }
 
   .title {
-    width: 331px;
-    height: 28px;
     font-family: 'Roberto', sans-serif;
-    font-size: 28px;
+    font-size: 40px;
     font-weight: 790;
     color: #034750;
   }
@@ -461,6 +492,7 @@
 
   .messages {
     height: 240px;
+    width: 300px;
     border-radius: 14rem;
     display: flex;
     flex-direction: column;
