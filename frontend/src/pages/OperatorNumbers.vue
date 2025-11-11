@@ -1,177 +1,172 @@
 <template>
   <div class="operator-numbers-page">
-    <div class="left-column">
-      <div class="header-container">
-        <div class="title">Operator Numbers</div>
-        <button class = add-button popovertarget="addpopover">Add Operator Number</button>
+      <div class="content">
+        <div class="header-container">
+          <div class="title">Operator Numbers</div>
+          <button class = add-button popovertarget="addpopover">Add Operator Number</button>
+        </div>
+
+        <div name="table">
+          <table>
+            <thead class="table-header">
+              <tr>
+                  <th>State/Province</th>
+                  <th>Operator Number</th>
+                  <th>Edit/Remove</th>
+              </tr>
+            </thead>
+            <tbody class="table-body">
+              <tr>
+                <td>California</td>
+                <td>12345</td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Colorado</td>
+                <td>67890</td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Washington</td>
+                <td>59746</td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="button-space">
+                    <button class="edit-button" popovertarget="editpopover">Edit</button>
+                    <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+      
 
       <!---<div name="button">
         <button class = add-button popovertarget="addpopover">Add Operator Number</button>
       </div>-->
 
-      <div name="table">
-        <table>
-          <thead class="table-header">
-            <tr>
-                <th>State/Province</th>
-                <th>Operator Number</th>
-                <th></th>
-            </tr>
-          </thead>
-          <tbody class="table-body">
-            <tr>
-              <td>California</td>
-              <td>12345</td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td>Colorado</td>
-              <td>67890</td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-
-              </td>
-            </tr>
-            <tr>
-              <td>Washington</td>
-              <td>59746</td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    
-
-    <div class="quick-links">
-      <div class="messages">
-        <div class="header">
-          <div class="icon"></div>
-          <div class="text">Messages</div>
-        </div>
-        <div class="divider"></div>
-        <div class="body">
-          <div class="text">Email message (4/11/2025)</div>
-          <div class="text">Email message (4/07/2025)</div>
-          <div class="text">Email message (4/03/2025)</div>
-        </div>
-        <div class="view-all">
-          <div class="text">(View all messages)</div>
-        </div>
-      </div>
-
-      <div class="purchase-history">
-        <div class="header">
-          <div class="icon"></div>
-          <div class="text" >Purchase History</div>
-        </div>
-        <div class="divider"></div>
-        <div class="body">
-          <div class="text">Operation of Wastewater Treatment Plants, Vol 1</div>
-          <div class="text">Operation of Wastewater Treatment Plants, Vol 2</div>
-          <div class="text">Operation of Wastewater Treatment Plants, Vol 3</div>
-          <div class="text">Industrial Waste Treatment, Vol 1</div>
-        </div>
-        <div class="view-all">
-          <a class="text" href="/purchase-history">(View all purchases)</a>
-        </div>
-      </div>
+      
     </div>
 
      <div id="addpopover" popover="auto" class="popup">
@@ -224,77 +219,88 @@
 
       </form>
     </div>
-
-
-  </div>
 </template>
 
 
 <style scoped>
   .operator-numbers-page {
-    display: grid;
-    grid-template-columns: 65% 35%; 
-    align-items: start;
-    gap: 20px;
-    height: 100vh; 
-    background-color: #fff;
-    padding: 40px 40px 0 40px;
-    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center ;
+  }
+
+  .content {
+    width: 1000px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center ;
+    gap: 8px;
   }
 
   .header-container {
-    grid-column: 1 / 2;
+    width: 800px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    height:25px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .title {
     width: 331px;
     height: 28px;
-    margin-left: 42%;
     font-family: 'Roberto', sans-serif;
     font-size: 28px;
     font-weight: 790;
     color: #034750;
-    align-items: center;
   }
 
   .add-button {
     background-color: #48773C;
     padding: 15px 15px;
-    margin-left: 77%;
-    margin-top: -45px;
     border: none;
-    width:15%;
-    border-radius: 10px;
+    width: 200px;
+    height: 50px;
+    border-radius: 8px;
     font-family: 'Roberto', sans-serif;
     color: white;
-    margin-bottom: 20px;
   }
 
   .add-button:hover{
     background-color: #253e1f;
   }
 
+  .button-space {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 32px;
+  }
+
   .edit-button{
-    background: transparent;
+    width: 100px;
+    border-radius: 8px;
     border: none !important;
     font-family: 'Roberto', sans-serif;
     font-size: 17px;
-    font-weight: 600;
-    color: #034750;
+    font-weight: 400;
+    color: #FFFFFF;
+    background-color: #D97A27;
+    cursor: pointer;
   }
 
   .remove-button{
-    background: transparent;
-    float:right;
+    width: 100px;
+    border-radius: 8px;
     border: none !important;
     font-family: 'Roberto', sans-serif;
     font-size: 17px;
-    font-weight: 600;
-    color: #034750;
+    font-weight: 400;
+    color: #FFFFFF;
+    background-color: #9F3323;
+    cursor: pointer;
   }
   
   .popup-button-left{
@@ -319,6 +325,14 @@
     color:white
   }
 
+  table {
+    border-collapse: collapse;
+    width: 800px;
+    background-color: #f2f1f2;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
   .table-header {
     font-family: 'Roberto', sans-serif;
     font-size: 20px;
@@ -330,23 +344,13 @@
   .table-body {
     font-family: 'Roberto', sans-serif;
     font-size: 17px;
-    font-weight: 600;
+    font-weight: 400;
     color: #034750;
     margin: 0;
   }
 
-  table {
-    margin-top: 30px;
-    margin-left: 40%;
-    border-collapse: collapse;
-    width: 52%;
-    background-color: #f2f1f2;
-    border-radius: 20px;
-    overflow: hidden;
-  }
-
   th, td {
-    text-align: left;
+    text-align: center;
     padding: 12px 16px;
     border-right: 1px solid #ccc;
   }
