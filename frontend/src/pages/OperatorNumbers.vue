@@ -23,17 +23,115 @@
             <tr>
               <td>California</td>
               <td>12345</td>
-              <td><button class="edit-button" popovertarget="editpopover">Edit/Remove</button></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
             </tr>
             <tr>
               <td>Colorado</td>
               <td>67890</td>
-              <td><button class="edit-button" popovertarget="editpopover">Edit/Remove</button></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+
+              </td>
             </tr>
             <tr>
               <td>Washington</td>
               <td>59746</td>
-              <td><button class="edit-button" popovertarget="editpopover">Edit/Remove</button></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>
+                <button class="edit-button" popovertarget="editpopover">Edit</button>
+                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -101,15 +199,33 @@
       </div>
       <form class="form-container">
         <h1 class="popup-title">
-          Edit/Remove Operator Number
+          Edit Operator Number
         </h1>
         <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
         <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
-        <button class = popup-button-left popovertarget="addpopover" popovertargetaction="hide">Edit</button>
-        <button class = popup-button-right popovertarget="editpopover" popovertargetaction="hide">Delete</button>
+        <button class = popup-button-left popovertarget="editpopover" popovertargetaction="hide">Edit</button>
 
       </form>
     </div>
+
+    <div id="deletepopover" popover="auto" class="popup">
+      <div class="header">
+        <div class="left">
+          <img src="../assets/owp_logo.png"/>
+        </div>
+      </div>
+      <form class="form-container">
+        <h1 class="popup-title">
+          Remove Operator Number
+        </h1>
+        <p class="popup-text">Are you sure you want to remove the Operator Number?</p>
+        <button class = popup-button-left popovertarget="deletepopover" popovertargetaction="hide">Yes</button>
+        <button class = popup-button-right popovertarget="deletepopover" popovertargetaction="hide">No</button>
+
+      </form>
+    </div>
+
+
   </div>
 </template>
 
@@ -137,8 +253,8 @@
   .title {
     width: 331px;
     height: 28px;
-    margin-left: 25px;
-    font-family: 'Myriad Pro, Bold', sans-serif;
+    margin-left: 42%;
+    font-family: 'Roberto', sans-serif;
     font-size: 28px;
     font-weight: 790;
     color: #034750;
@@ -148,12 +264,12 @@
   .add-button {
     background-color: #48773C;
     padding: 15px 15px;
-    margin-left: 80%;
+    margin-left: 77%;
     margin-top: -45px;
     border: none;
-    width:20%;
+    width:15%;
     border-radius: 10px;
-    font-family: 'Myriad Pro, Bold', sans-serif;
+    font-family: 'Roberto', sans-serif;
     color: white;
     margin-bottom: 20px;
   }
@@ -165,12 +281,22 @@
   .edit-button{
     background: transparent;
     border: none !important;
-    font-family: 'Myriad Pro', sans-serif;
+    font-family: 'Roberto', sans-serif;
     font-size: 17px;
     font-weight: 600;
     color: #034750;
   }
 
+  .remove-button{
+    background: transparent;
+    float:right;
+    border: none !important;
+    font-family: 'Roberto', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #034750;
+  }
+  
   .popup-button-left{
     margin-left: 15px;
     margin-top:15px;
@@ -178,7 +304,7 @@
     padding:15px 15px;
     border:none;
     border-radius: 10px;
-    font-family: 'Myriad Pro, Bold', sans-serif;  
+    font-family: 'Roberto', sans-serif;  
     color:white
   }
 
@@ -189,12 +315,12 @@
     padding:15px 15px;
     border:none;
     border-radius: 10px;
-    font-family: 'Myriad Pro, Bold', sans-serif;  
+    font-family: 'Roberto', sans-serif;  
     color:white
   }
 
   .table-header {
-    font-family: 'Myriad Pro', sans-serif;
+    font-family: 'Roberto', sans-serif;
     font-size: 20px;
     font-weight: 600;
     color: #034750;
@@ -202,7 +328,7 @@
   }
 
   .table-body {
-    font-family: 'Myriad Pro', sans-serif;
+    font-family: 'Roberto', sans-serif;
     font-size: 17px;
     font-weight: 600;
     color: #034750;
@@ -211,13 +337,12 @@
 
   table {
     margin-top: 30px;
-    padding-left: 18px;
+    margin-left: 40%;
     border-collapse: collapse;
-    width: 100%;
+    width: 52%;
     background-color: #f2f1f2;
-    border-radius: 10px;
+    border-radius: 20px;
     overflow: hidden;
-    
   }
 
   th, td {
@@ -282,11 +407,17 @@
   .popup-title{
     margin-left: 20px;
     margin-top: 20px;
-    font-family: 'Myriad Pro, Bold', sans-serif;
+    font-family: 'Roberto', sans-serif;
     font-size: 28px;
     font-weight: 790;
     color: #034750;
     align-items: center;
+  }
+
+  .popup-text{
+    font-family: 'Roberto', sans-serif;
+    font-size: 17px;
+    margin-left: 20px;
   }
 
   .input-box {
@@ -316,6 +447,8 @@
   .quick-links {
     grid-column: 2 / 3;
     display: flex;
+    margin-left: -15%;
+    width:40%;
     margin-top: 55px;
     flex-direction: column;
     gap: 16px;
