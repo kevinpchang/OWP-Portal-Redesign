@@ -1,15 +1,32 @@
-<script setup lang="ts">
-import HeaderComponent from './page_components/HeaderComponent.vue';
-import SidebarComponent from './page_components/SidebarComponent.vue';
+<script setup>
+  import HeaderComponent from './page_components/HeaderComponent.vue'
+  import SidebarComponent from './page_components/SidebarComponent.vue'
+  import { ref, onMounted, watch }  from 'vue'
+  import { useRoute } from 'vue-router'
+
+  const scrollable = ref(null)
+  const route = useRoute()
+
+  function resetScroll() {
+    if(!scrollable.value) {
+      return
+    }
+    requestAnimationFrame(() => {
+      scrollable.value.scrollTo({top: 0})
+    })
+  }
+
+  onMounted(resetScroll)
+  watch(() => route.fullPath, resetScroll)
 </script>
 
 <template>
   <div class="shell">
     <HeaderComponent />
     <SidebarComponent />
-    <main class="content">
+    <main ref="scrollable" class="content">
 
-      <!-- <DashboardPage /> CHANGE IF NEEDED ITS MY CHANGE-->  
+      <!-- <DashboardPage /> CHANGE IF NEEDED ITS MY CHANGE-->
       <router-view />
     </main>
   </div>
@@ -26,7 +43,7 @@ import SidebarComponent from './page_components/SidebarComponent.vue';
     margin: 0;
     padding: 0;
     height:100%;
-    overflow:hidden;
+    overflow: hidden;
   }
 </style>
 

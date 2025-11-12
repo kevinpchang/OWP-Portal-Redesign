@@ -1,11 +1,11 @@
- import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import DashboardPage from '../pages/DashboardPage.vue'
 import MyAccountPage from '../pages/MyAccountPage.vue'
 import CoursesPage from '../pages/CoursesPage.vue'
 import OPnum from '../pages/OperatorNumbers.vue'
 import CertificatesPage from '@/pages/CertificatesPage.vue'
 import PurchaseHistory from '../pages/PurchaseHistory.vue'
- import MyTasksPage from '../pages/MyTasksPage.vue'
+import MyTasksPage from '../pages/MyTasksPage.vue'
 
 const routes = [
   { path: "/", name: 'DashboardPage', component: DashboardPage }, // KEVIN'S DASHBOARD
@@ -22,7 +22,11 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
+  scrollBehavior() {
+    return { top: 0};
+  }
 })
+
 
 export default router

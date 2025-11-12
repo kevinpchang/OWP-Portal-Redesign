@@ -1,5 +1,10 @@
+<script setup>
+  import { useRoute } from 'vue-router'
+  const route = useRoute()
+</script>
+
 <template>
-  <div class="dashboard-page">
+  <div ref="scrollable" class="dashboard-page">
     <div class="dashboard-top">
       <div class="text">
         <div class="date">Wednesday, October 15</div>
@@ -61,7 +66,13 @@
             </div>
           </div>
           <div class="view-all">
-            <div class="text">(View all enrollments)</div>
+            <router-link
+              to="/courses"
+              class="courses-button"
+              :class="{ active: route.name === 'CoursesPage' }"
+            >
+              <div class="text">(View all enrollments)</div>
+            </router-link>
           </div>
         </div>
 
@@ -77,7 +88,13 @@
             <div class="object"><div class="text">Operation and Maintenance of Wastewater Collection Systems, Vol II</div></div>
           </div>
           <div class="view-all">
-            <div class="text">(View all slides)</div>
+            <router-link
+              to="/slides"
+              class="slides-button"
+              :class="{ active: route.name === 'SlidesPage' }"
+            >
+              <div class="text">(View all slides)</div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -112,7 +129,13 @@
             <div class="object"><div class="text">Industrial Waste Treatment, Vol 1</div></div>
           </div>
           <div class="view-all">
-            <div class="text">(View all purchases)</div>
+            <router-link
+              to="/purchase-history"
+              class="purchase-history-button"
+              :class="{ active: route.name === 'PurchaseHistory' }"
+            >
+              <div class="text">(View all purchaes)</div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -252,7 +275,7 @@
     height: 118px;
     display: flex;
     flex-direction: row;
-    margin-top: 4px;
+    margin-bottom: 4px;
   }
 
   .active-enrollments .body .object:hover {
@@ -357,6 +380,17 @@
     cursor: pointer;
     color: #034750;
   }
+
+.dashboard-button,
+.my-account-button,
+.my-tasks-button,
+.slides-button,
+.courses-button,
+.operator-numbers-button,
+.certificates-button,
+.purchase-history-button {
+  text-decoration: none;
+}
 
   .instructor-slides {
     height: 250px;
