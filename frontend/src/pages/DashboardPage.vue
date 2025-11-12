@@ -76,9 +76,10 @@
             <div class="object"><div class="text">Operation and Maintenance of Wastewater Collection Systems, Vol I</div></div>
             <div class="object"><div class="text">Operation and Maintenance of Wastewater Collection Systems, Vol II</div></div>
           </div>
-          <div class="view-all">
+          <router-link to="/slides" class="view-all">
             <div class="text">(View all slides)</div>
-          </div>
+          </router-link>
+
         </div>
       </div>
       <div class="dashboard-right">
