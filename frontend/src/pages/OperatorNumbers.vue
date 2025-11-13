@@ -206,7 +206,7 @@
   .title {
     width: 331px;
     height: 28px;
-    margin-left: 32%;
+    margin-left: 24%;
     font-family: 'Roberto', sans-serif;
     font-size: 28px;
     font-weight: 790;
@@ -296,9 +296,9 @@
 
   table {
     margin-top: 30px;
-    margin-left: 30%;
+    margin-left: 22%;
     border-collapse: collapse;
-    width: 62%;
+    width: 70%;
     background-color: #f2f1f2;
     border-radius: 20px;
     overflow: hidden;
