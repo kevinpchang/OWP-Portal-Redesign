@@ -186,7 +186,7 @@
 <style scoped>
   .operator-numbers-page {
     display: grid;
-    grid-template-columns: auto 1fr; 
+    grid-template-columns: auto auto; 
     /* align-items: start; */
     gap: 20px;
     justify-content: center;
@@ -207,7 +207,8 @@
   .title {
     width: 331px;
     height: 28px;
-    margin-left: 24%;
+    margin-left: 2%;
+    margin-top:2%;
     font-family: 'Roberto', sans-serif;
     font-size: 28px;
     font-weight: 790;
@@ -218,10 +219,10 @@
   .add-button {
     background-color: #48773C;
     padding: 15px 15px;
-    margin-left: 72%;
+    margin-left: 70%;
     margin-top: -45px;
     border: none;
-    width:15%;
+    width:30%;
     border-radius: 10px;
     font-family: 'Roberto', sans-serif;
     color: white;
@@ -299,7 +300,7 @@
     margin-top: 30px;
     /* margin-left: 22%; */
     border-collapse: collapse;
-    /* width: 65%; */
+    width: auto;
     background-color: #f2f1f2;
     border-radius: 20px;
     overflow: hidden;
@@ -432,7 +433,7 @@
     grid-column: 2 / 3;
     display: flex;
     /* margin-left: -15%; */
-    width:55%;
+    /* width:55%; */
     margin-top: 55px;
     flex-direction: column;
     gap: 16px;
