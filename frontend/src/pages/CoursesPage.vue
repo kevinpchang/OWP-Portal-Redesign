@@ -15,39 +15,43 @@
         <div class="tiles-container">
 
           <!--Active-->
-          <div class="course-card">
+          <div class="course-card active-card">
             <div class="card-header">
               <div class="header-icon"></div>
               <h2 class="card-title">Active Enrollments</h2>
             </div>
+            <div class="card-divider"></div>
 
             <div class="card-body">
-              <div v-for="course in activeCourses" :key="course.id" class="course-row">
+              <router-link
+                v-for="course in activeCourses"
+                :key="course.id"
+                :to="`/courses/${course.id}`"
+                class="course-row-link"
+              >
+              <div class="course-row">
+                  <div class="course-image"></div>
 
-                <div class="course-image"></div>
+                  <div class="course-info">
+                      <div class="course-title">{{ course.title }}</div>
 
-                <div class="course-info">
-                  <router-link class="course-title" :to="`/courses/${course.id}`">
-                    {{ course.title }}
-                  </router-link>
+                      <div class="info-subrow"> 
+                        <div class="completion-label">Completion</div>
+                        <div class="expires-text">Expires: {{ course.expires }}</div>
+                      </div>
 
-                  <div class="info-subrow">
-                    <div class="completion-label">Completion</div>
-                    <div class="expires-text">Expires: {{ course.expires }}</div>
-                  </div>
-
-                  <div class="progress-bar">
-                    <div class="progress-fill" :style="{ width: course.progress }">
-                      <span class="progress-text">{{ course.progress }}</span>
+                      <div class="progress-bar">
+                        <div class="progress-fill" :style="{ width: course.progress }">
+                          <span class="progress-text">{{ course.progress }}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
 
-                <div class="card-action">
-                  <button class="extend-button">Extend</button>
+                    <div class="card-action">
+                      <button class="extend-button">Extend</button>
+                    </div>
                 </div>
-
-              </div>
+              </router-link>
             </div>
           </div>
 
@@ -58,35 +62,39 @@
               <div class="header-icon completed-icon"></div>
               <h2 class="card-title">Completed Enrollments</h2>
             </div>
+            <div class="card-divider"></div>
 
             <div class="card-body">
-              <div v-for="course in completedCourses" :key="course.id" class="course-row">
+              <router-link
+                v-for="course in completedCourses"
+                :key="course.id"
+                :to="`/completed/${course.id}`"
+                class="course-row-link"
+              >
+                <div class="course-row">
+                  <div class="course-image completed-image"></div>
 
-                <div class="course-image completed-image"></div>
+                  <div class="course-info">
+                    <div class="course-title">{{ course.title }}</div>
 
-                <div class="course-info">
-                  <router-link class="course-title" :to="`/completed/${course.id}`">
-                    {{ course.title }}
-                  </router-link>
-
-                  <div class="info-subrow">
-                    <div class="completion-label">Completed</div>
-                    <div class="status-text" 
-                        :class="course.status === 'Pass' ? 'status-pass' : 'status-fail'">
-                      {{ course.status }}
+                    <div class="info-subrow">
+                      <div class="completion-label">Completed</div>
+                      <div class="status-text" 
+                          :class="course.status === 'Pass' ? 'status-pass' : 'status-fail'">
+                        {{ course.status }}
+                      </div>
                     </div>
-                  </div>
 
-                  <div class="progress-bar">
-                    <div class="progress-fill"
-                        :class="course.status === 'Pass' ? 'completed-fill' : 'failed-fill'"
-                        style="width: 100%">
-                      <span class="progress-text">100%</span>
+                    <div class="progress-bar">
+                      <div class="progress-fill"
+                          :class="course.status === 'Pass' ? 'completed-fill' : 'failed-fill'"
+                          style="width: 100%">
+                        <span class="progress-text">100%</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-
-              </div>
+              </router-link>
             </div>
           </div>
 
@@ -97,23 +105,27 @@
               <div class="header-icon recommended-icon"></div>
               <h2 class="card-title">Recommended Courses</h2>
             </div>
+            <div class="card-divider"></div>
 
             <div class="card-body">
-              <div v-for="course in recommendedCourses" :key="course.id" class="course-row">
+              <router-link
+                v-for="course in recommendedCourses"
+                :key="course.id"
+                :to="`/recommended/${course.id}`"
+                class="course-row-link"
+              >
+                <div class="course-row">
+                  <div class="course-image recommended-image"></div>
 
-                <div class="course-image recommended-image"></div>
+                  <div class="course-info recommended-info">
+                    <div class="course-title">{{ course.title }}</div>
+                    <div class="rec-meta">{{ course.description }}</div>
+                    <div class="rec-meta">{{ course.chapterCount }} Chapters</div>
+                  </div>
 
-                <div class="course-info recommended-info">
-                  <router-link class="course-title" :to="`/recommended/${course.id}`">
-                    {{ course.title }}
-                  </router-link>
-
-                  <div class="rec-meta">{{ course.description }}</div>
-                  <div class="rec-meta">{{ course.chapters }}</div>
+                  <div class="card-action"></div>
                 </div>
-
-                <div class="card-action"></div>
-              </div>
+              </router-link>
             </div>
           </div>
 
@@ -122,12 +134,13 @@
       </div>
 
       <div class="courses-right">
-        <!--Messages cards and stuff-->
+        <!--Messages-->
         <div class="side-card">
           <div class="side-header">
             <div class="header-icon side-icon"></div>
             <div class="side-title">Messages</div>
           </div>
+          <div class="divider"></div>
 
           <div class="side-body">
             <div class="side-link">Email message (4/11/2025)</div>
@@ -138,11 +151,13 @@
           <div class="side-footer">(View all messages)</div>
         </div>
 
+        <!-- Purchase History-->
         <div class="side-card">
           <div class="side-header">
             <div class="header-icon side-icon"></div>
             <div class="side-title">Purchase History</div>
           </div>
+          <div class="divider"></div>
 
           <div class="side-body">
             <div class="side-link">Operation of Wastewater Treatment Plants, Vol 1</div>
@@ -151,22 +166,23 @@
             <div class="side-link">Industrial Waste Treatment, Vol 1</div>
           </div>
 
-          <div class="side-footer">(View all purchases)</div>
+          <router-link to="/purchase-history" class="side-footer">
+            (View all purchases)
+          </router-link>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script>
 import {
   activeCourses,
   completedCourses,
   recommendedCourses,
-} from "../data/coursesData";
+} from "../data/coursesData.js";
 
-export default defineComponent({
+export default {
   name: "CoursesPage",
   data() {
     return {
@@ -175,13 +191,10 @@ export default defineComponent({
       recommendedCourses,
     };
   },
-});
+};
 </script>
 
 <style scoped>
-
-
-
 .courses-page {
   display: flex;
   flex-direction: column;
@@ -192,34 +205,40 @@ export default defineComponent({
 .courses-bottom, .courses-top {
   max-width: 1000px;
   width: 100%;
-  display: grid;
-  justify-content: center;
   margin: 0 auto;
 }
 
 .courses-top {
-  max-width: 1000px;
-  width: 100%;
-  margin: 32px auto 0 auto;
+  position: sticky;
+  top: 0;
   display: flex;
   justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1000px;
+  margin: 32px auto 0 auto;
+  background-color: #fff;
+  z-index: 5;
+  padding-bottom: 8px;
 }
 
+
 .courses-bottom {
+  display: grid;
   grid-template-columns: 700px 300px;
   column-gap: 16px;
   margin-bottom: 48px;
 }
 
 .text-block {
-  font-family: 'Myriad Pro', sans-serif;
+  font-family: 'Roboto', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 
 .courses-header {
-  font-family: 'Myriad Pro', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 32px;
   font-weight: 700;
   color: #034750;
@@ -228,7 +247,7 @@ export default defineComponent({
 .page-description {
   font-size: 16px;
   color: #555;
-  font-family: 'Myriad Pro', sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .tiles-container {
@@ -244,40 +263,17 @@ export default defineComponent({
 .course-card {
   background-color: #F2F1F2;
   border-radius: 14px;
-  padding: 20px;
+  padding: 6px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.course-card:hover {
-  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
-  transform: translateY(-3px);
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.card-title {
-  font-family: 'Myriad Pro', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: #034750;
-}
-
-.card-body {
-  font-family: 'Myriad Pro', sans-serif;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.course-title:hover {
-  color: #034750;
-  text-decoration:underline;
+.course-row-link{
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  width: 100%;
 }
 
 .course-row {
@@ -285,7 +281,64 @@ export default defineComponent({
   grid-template-columns: 70px 1fr auto;
   align-items: center;
   gap: 4px;
+  border-radius: 0px; 
+  padding: 8px 12px;
+  margin: 0 -20px;
+  width: calc(100% + 17px);
+  transition: background-color 0.2s ease;
+}
+
+.course-row:hover {
+  background-color: #D9D9D9;
   cursor: pointer;
+}
+
+.course-info .course-title {
+  text-decoration: underline;
+  color: #707070;
+}
+
+/* Uncomment if we use underline display
+.course-title:hover {
+  text-decoration: underline;
+  color: #034750;
+}
+  */
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+  padding-top: 4px;
+}
+
+.divider, .card-divider {
+  border-top: 3px solid #FFFFFF;
+}
+
+.card-divider {
+  width: 150%;
+  margin-left: -50px;
+}
+
+.divider {
+  width: calc(100% + 40px);
+  margin-left: -20px;
+}
+
+.card-title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #034750;
+}
+
+.card-body {
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .course-info {
@@ -293,18 +346,6 @@ export default defineComponent({
   flex-direction: column;
   gap: 8px;
   margin-left: -2px;
-}
-
-.course-description {
-  font-size: 14px;
-  color: #555;
-  margin-top: 4px;
-}
-
-.course-chapters {
-  font-size: 14px;
-  color: #7A7A7A;
-  margin-top: 2px;
 }
 
 .course-image {
@@ -330,28 +371,48 @@ export default defineComponent({
   cursor: pointer;
 }
 
-.progress-bar {
-  background-color: #d9d9d9;
+.extend-button:hover {
+  background-color: #008c9a;
+  transition: background-color 0.2s ease;
+}
+
+.active-card .progress-bar {
+  background-color: #7A7A7A;
   border-radius: 4rem;
   height: 16px;
+  width: calc(100% + 77px);
+  margin-right: -30px;
+}
+
+.progress-bar {
+  background-color: #7A7A7A;
+  border-radius: 8px;
+  height: 16px;
   width: 100%;
+  overflow: hidden;
 }
 
 .progress-fill {
   background-color: #00A5B5;
   height: 100%;
-  border-radius: 8px;
+  border-radius: 0; 
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
+.course-card:not(.active-card) .progress-bar,
+.course-card:not(.active-card) .progress-fill {
+  border-radius: 0;
+}
+
 
 .completed-fill {
   background-color: #6DBE4B;
 }
 
 .failed-fill {
-  background-color: #7A7A7A;
+  background-color: #707070;
 }
 
 .progress-text {
@@ -373,6 +434,10 @@ export default defineComponent({
   color: #7A7A7A;
 }
 
+.expires-text {
+  margin-right: 10px;
+}
+
 .course-title {
   font-size: 16px;
   color: #707070;
@@ -387,7 +452,11 @@ export default defineComponent({
 .rec-meta {
   font-size: 14px;
   color: #707070;
-  line-height: 1.3;
+  line-height: 2;
+}
+
+.rec-meta + .rec-meta {
+  margin-top: -4px;
 }
 
 .courses-right {
@@ -396,7 +465,7 @@ export default defineComponent({
   gap: 16px;
 }
 
-.header-icon {
+.header-icon, .side-icon {
   width: 26px;
   height: 34px;
   border-radius: 6px;
@@ -410,12 +479,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 12px;
-  font-family: 'Myriad Pro', sans-serif;
-}
-
-.side-card:hover {
-  box-shadow: 0px 4px 14px rgba(0,0,0,0.18);
-  transform: translateY(-3px);
+  font-family: 'Roboto', sans-serif;
 }
 
 .side-header {
@@ -442,20 +506,47 @@ export default defineComponent({
   color: #007c8a;
   cursor: pointer;
   text-decoration: underline;
+  padding: 5px 16px;
+  margin: 0 -20px; 
+  width: calc(100% + 7px);
+  transition: background-color 0.2s ease;
+}
+
+.side-link:hover {
+  background-color: #D9D9D9;
+  color: #007c8a; 
 }
 
 .side-footer {
-  text-align: center;
-  font-size: 16px;
-  color: #034750;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 8px;
   cursor: pointer;
+  color: #034750;
+  transition: color 0.2s ease;
 }
 
-.side-icon {
-  width: 26px;
-  height: 34px;
-  border-radius: 6px;
-  background-color: #007C8A;
+.side-footer:hover {
+  text-decoration: underline;
+  color: #007C8A;
+}
+
+.messages .body .object,
+.purchase-history .body .object {
+  padding: 8px 12px;
+  margin: 0 -20px;
+  width: calc(100% + 40px);
+  transition: background-color 0.2s ease;
+}
+
+.messages .body .object:hover,
+.purchase-history .body .object:hover {
+  background-color: #D9D9D9;
+  cursor: pointer;
 }
 
 </style>
