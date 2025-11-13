@@ -186,7 +186,7 @@
 <style scoped>
   .operator-numbers-page {
     display: grid;
-    grid-template-columns: 55vw 45vh; 
+    grid-template-columns: 55vw 45vw; 
     align-items: start;
     gap: 20px;
     height: 100vh; 
@@ -217,7 +217,7 @@
   .add-button {
     background-color: #48773C;
     padding: 15px 15px;
-    margin-left: 77%;
+    margin-left: 72%;
     margin-top: -45px;
     border: none;
     width:15%;
@@ -298,7 +298,7 @@
     margin-top: 30px;
     margin-left: 22%;
     border-collapse: collapse;
-    width: 70%;
+    width: 65%;
     background-color: #f2f1f2;
     border-radius: 20px;
     overflow: hidden;
