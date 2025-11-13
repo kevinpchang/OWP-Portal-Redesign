@@ -186,13 +186,14 @@
 <style scoped>
   .operator-numbers-page {
     display: grid;
-    grid-template-columns: 55vw 45vw; 
-    align-items: start;
+    grid-template-columns: auto 1fr; 
+    /* align-items: start; */
     gap: 20px;
+    justify-content: center;
     height: 100vh; 
     background-color: #fff;
-    padding: 40px 40px 0 40px;
-    box-sizing: border-box;
+    /* padding: 40px 40px 0 40px; */
+    /* box-sizing: border-box; */
   }
 
   .header-container {
@@ -296,9 +297,9 @@
 
   table {
     margin-top: 30px;
-    margin-left: 22%;
+    /* margin-left: 22%; */
     border-collapse: collapse;
-    width: 65%;
+    /* width: 65%; */
     background-color: #f2f1f2;
     border-radius: 20px;
     overflow: hidden;
@@ -430,7 +431,7 @@
   .quick-links {
     grid-column: 2 / 3;
     display: flex;
-    margin-left: -15%;
+    /* margin-left: -15%; */
     width:55%;
     margin-top: 55px;
     flex-direction: column;
