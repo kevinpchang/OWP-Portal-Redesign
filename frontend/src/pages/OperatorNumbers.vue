@@ -41,8 +41,8 @@
         <table>
           <thead class="table-header">
             <tr>
-                <th>State/Province</th>
-                <th>Operator Number</th>
+                <th style="width: 10%;">State/Province</th>
+                <th style="width: 35%;">Operator Number</th>
                 <th></th>
             </tr>
           </thead>
@@ -232,7 +232,7 @@
   }
 
   .edit-button{
-    width: 40%;
+    width: 75px;
     border-radius: 8px;
     border: none !important;
     font-family: 'Roberto', sans-serif;
