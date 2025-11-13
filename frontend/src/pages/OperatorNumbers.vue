@@ -1,194 +1,67 @@
+<script setup>
+  import { ref } from 'vue'
+
+  const addPopup = ref(false)
+  function openAdd() {
+    addPopup.value = true
+  }
+
+  function closeAdd() {
+    addPopup.value = false
+  }
+
+  const editPopup = ref(false)
+  function openEdit() {
+    editPopup.value = true
+  }
+
+  function closeEdit() {
+    editPopup.value = false
+  }
+
+  const deletePopup = ref(false)
+  function openDelete() {
+    deletePopup.value = true
+  }
+
+  function closeDelete() {
+    deletePopup.value = false
+  }
+</script>
+
 <template>
   <div class="operator-numbers-page">
-      <div class="content">
-        <div class="content-left">
-          <div class="header-container">
-            <div class="title">Operator Numbers</div>
-            <button class = add-button popovertarget="addpopover">Add Operator Number</button>
-          </div>
-
-          <div name="table">
-            <table>
-              <thead class="table-header">
-                <tr>
-                    <th>State/Province</th>
-                    <th>Operator Number</th>
-                    <th>Edit/Remove</th>
-                </tr>
-              </thead>
-              <tbody class="table-body">
-                <tr>
-                  <td>California</td>
-                  <td>12345</td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Colorado</td>
-                  <td>67890</td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Washington</td>
-                  <td>59746</td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <div class="button-space">
-                      <button class="edit-button" popovertarget="editpopover">Edit</button>
-                      <button class="remove-button" popovertarget="deletepopover">Remove</button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="content-right">
-          <div class="messages">
-            <div class="header">
-              <div class="icon"></div>
-              <div class="text">Messages</div>
-            </div>
-            <div class="divider"></div>
-            <div class="body">
-              <div class="object"><div class="text">Email message (4/11/2025)</div></div>
-              <div class="object"><div class="text">Email message (4/07/2025)</div></div>
-              <div class="object"><div class="text">Email message (4/03/2025)</div></div>
-            </div>
-            <div class="view-all">
-              <div class="text">(View all messages)</div>
-            </div>
-          </div>
-        </div>
-        
+    <div class="left-column">
+      <div class="header-container">
+        <div class="title">Operator Numbers</div>
+        <button class = add-button @click.left="openAdd">Add Operator Number</button>
       </div>
-      
 
-      <!---<div name="button">
-        <button class = add-button popovertarget="addpopover">Add Operator Number</button>
-      </div>-->
+      <div name="table">
+        <table>
+          <thead class="table-header">
+            <tr>
+                <th style="width: 10%;">State/Province</th>
+                <th style="width: 35%;">Operator Number</th>
+                <th></th>
+            </tr>
+          </thead>
+          <tbody class="table-body">
+            <tr>
+              <td>California</td>
+              <td>12345</td>
+              <td>
+                <button class="edit-button" @click.left="openEdit">Edit</button>
+                <button class="remove-button" @click.left="openDelete">Remove</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Colorado</td>
+              <td>67890</td>
+              <td>
+                <button class="edit-button" @click.left="openEdit">Edit</button>
+                <button class="remove-button" @click.left="openDelete">Remove</button>
 
-<<<<<<< Updated upstream
-      
-=======
               </td>
             </tr>
             <tr>
@@ -238,24 +111,28 @@
           <a class="text" href="/Certificates">(View all Certificates)</a>
         </div>
       </div>
->>>>>>> Stashed changes
     </div>
 
-     <div id="addpopover" popover="auto" class="popup">
-      <div class="header">
-        <div class="left">
-          <img src="../assets/owp_logo.png"/>
+    <transition name="fade">
+      <div class="popup" v-if="addPopup">
+        <div class="blur-overlay"></div>
+        <div class="inner">
+          <div class="header">
+            <div class="left">
+              <img src="../assets/owp_logo.png"/>
+            </div>
+          </div>
+          <div class="form-container">
+            <h1 class="popup-title">
+              Add Operator Number
+            </h1>
+            <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
+            <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
+            <button class = popup-button-left @click="closeAdd">Add</button>
+
+          </div>
         </div>
       </div>
-<<<<<<< Updated upstream
-      <form class="form-container">
-        <h1 class="popup-title">
-          Add Operator Number
-        </h1>
-        <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
-        <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
-        <button class = popup-button-left popovertarget="addpopover" popovertargetaction="hide">Add</button>
-=======
     </transition>
 
     <transition name="fade">
@@ -274,78 +151,40 @@
             <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
             <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
             <button class = popup-button-left @click="closeEdit">Edit</button>
->>>>>>> Stashed changes
 
-      </form>
-    </div>
-
-    <div id="editpopover" popover="auto" class="popup">
-      <div class="header">
-        <div class="left">
-          <img src="../assets/owp_logo.png"/>
+          </div>
         </div>
       </div>
-      <form class="form-container">
-        <h1 class="popup-title">
-          Edit Operator Number
-        </h1>
-        <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
-        <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
-        <button class = popup-button-left popovertarget="editpopover" popovertargetaction="hide">Edit</button>
+    </transition>
 
-      </form>
-    </div>
+    <transition name="fade">
+      <div class="popup" v-if="deletePopup">
+        <div class="blur-overlay"></div>
+        <div class="inner">
+          <div class="header">
+            <div class="left">
+              <img src="../assets/owp_logo.png"/>
+            </div>
+          </div>
+          <div class="form-container">
+            <h1 class="popup-title">
+              Remove Operator Number
+            </h1>
+            <p class="popup-text">Are you sure you want to remove the Operator Number?</p>
+            <button class = popup-button-left @click="closeDelete">Yes</button>
+            <button class = popup-button-right @click="closeDelete">No</button>
 
-    <div id="deletepopover" popover="auto" class="popup">
-      <div class="header">
-        <div class="left">
-          <img src="../assets/owp_logo.png"/>
+          </div>
         </div>
       </div>
-      <form class="form-container">
-        <h1 class="popup-title">
-          Remove Operator Number
-        </h1>
-        <p class="popup-text">Are you sure you want to remove the Operator Number?</p>
-        <button class = popup-button-left popovertarget="deletepopover" popovertargetaction="hide">Yes</button>
-        <button class = popup-button-right popovertarget="deletepopover" popovertargetaction="hide">No</button>
+    </transition>
 
-      </form>
-    </div>
+  </div>
 </template>
 
 
 <style scoped>
   .operator-numbers-page {
-<<<<<<< Updated upstream
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center ;
-  }
-
-  .content {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: top ;
-    gap: 32px;
-  }
-
-  .content-left {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center ;
-    gap: 32px;
-  }
-
-  .content-right{
-    display: flex;
-    flex-direction: row;
-    margin-top: 82px;
-=======
     display: grid;
     grid-template-rows: auto 1fr;
     justify-content: center;
@@ -353,52 +192,43 @@
     height: 100vh;
     background-color: #fff;
     box-sizing: border-box;
->>>>>>> Stashed changes
   }
 
   .header-container {
-    width: 800px;
+    grid-column: 1 / 2;
     display: flex;
     flex-direction: row;
-<<<<<<< Updated upstream
-    justify-content: space-between;
-    align-items: center;
-=======
     gap: 8px;
->>>>>>> Stashed changes
   }
 
   .title {
+    width: 331px;
+    height: 28px;
+    margin-left: 24%;
     font-family: 'Roberto', sans-serif;
-    font-size: 40px;
+    font-size: 28px;
     font-weight: 790;
     color: #034750;
+    align-items: center;
   }
 
   .add-button {
     background-color: #48773C;
     padding: 15px 15px;
     border: none;
-    width: 200px;
-    height: 50px;
-    border-radius: 8px;
+    width:15%;
+    border-radius: 10px;
     font-family: 'Roberto', sans-serif;
     color: white;
+    margin-bottom: 20px;
   }
 
   .add-button:hover{
     background-color: #253e1f;
   }
 
-  .button-space {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 32px;
-  }
-
   .edit-button{
-    width: 100px;
+    width: 75px;
     border-radius: 8px;
     border: none !important;
     font-family: 'Roberto', sans-serif;
@@ -410,7 +240,8 @@
   }
 
   .remove-button{
-    width: 100px;
+    width: 80px;
+    float:right;
     border-radius: 8px;
     border: none !important;
     font-family: 'Roberto', sans-serif;
@@ -443,14 +274,6 @@
     color:white
   }
 
-  table {
-    border-collapse: collapse;
-    width: 800px;
-    background-color: #f2f1f2;
-    border-radius: 20px;
-    overflow: hidden;
-  }
-
   .table-header {
     font-family: 'Roberto', sans-serif;
     font-size: 20px;
@@ -467,8 +290,6 @@
     margin: 0;
   }
 
-<<<<<<< Updated upstream
-=======
   table {
     margin-top: 30px;
     border-collapse: collapse;
@@ -478,9 +299,8 @@
     overflow: hidden;
   }
 
->>>>>>> Stashed changes
   th, td {
-    text-align: center;
+    text-align: left;
     padding: 12px 16px;
     border-right: 1px solid #ccc;
   }
@@ -493,7 +313,7 @@
   th {
     background-color: #f2f1f2;
     color: #004d4d;
-    font-weight: bold;
+    font-weight: 400px;
     border-bottom: 1px solid #ccc;
   }
 
@@ -509,12 +329,33 @@
     border-bottom: 1px solid #ddd;
   }
 
+  .blur-overlay {
+    position: fixed;
+    inset: 0;
+    width:100vw;
+    height:100vh;
+    background-color: #0000009a; /* slight tint */
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+    z-index: -99999; /* below the popup */
+  }
+
   .popup{
-    margin-top: 15%;
+    margin-top: 10%;
+    margin-left: 25%;
     width: 20%;
     height: 35%;
     position: fixed;
-    border: 3px solid #004d4d;
+    z-index: 999;
+    border:none;
+    border-radius: 10px;
+    background-color: #f2f1f2;
+  }
+
+  .popup .inner{
+    background-color: #f2f1f2;
+    border:none;
+    height:95%;
     border-radius: 10px;
     background-color: #f2f1f2;
   }
@@ -524,6 +365,9 @@
     height: 15%;
     display: flex;
     flex-direction: row;
+    border-top: #034750;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     align-items: center;
     justify-content: space-between;
     background-color: #034750;
@@ -581,11 +425,6 @@
   .quick-links {
     grid-column: 2 / 3;
     display: flex;
-<<<<<<< Updated upstream
-    margin-left: -15%;
-    width:40%;
-=======
->>>>>>> Stashed changes
     margin-top: 55px;
     flex-direction: column;
     gap: 16px;
@@ -594,7 +433,6 @@
 
   .messages {
     height: 240px;
-    width: 300px;
     border-radius: 14rem;
     display: flex;
     flex-direction: column;
@@ -720,6 +558,15 @@
     font-weight: 400;
     margin-bottom: 12px;
     color: #034750;
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.25s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
   }
 </style>
 
