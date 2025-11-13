@@ -186,7 +186,59 @@
         <button class = add-button popovertarget="addpopover">Add Operator Number</button>
       </div>-->
 
+<<<<<<< Updated upstream
       
+=======
+              </td>
+            </tr>
+            <tr>
+              <td>Washington</td>
+              <td>59746</td>
+              <td>
+                <button class="edit-button" @click.left="openEdit">Edit</button>
+                <button class="remove-button" @click.left="openDelete">Remove</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <div class="quick-links">
+      <div class="messages">
+        <div class="header">
+          <div class="icon"></div>
+          <div class="text">Messages</div>
+        </div>
+        <div class="divider"></div>
+        <div class="body">
+          <div class="text">Email message (4/11/2025)</div>
+          <div class="text">Email message (4/07/2025)</div>
+          <div class="text">Email message (4/03/2025)</div>
+        </div>
+        <div class="view-all">
+          <div class="text">(View all messages)</div>
+        </div>
+      </div>
+
+      <div class="purchase-history">
+        <div class="header">
+          <div class="icon"></div>
+          <div class="text">Certificates</div>
+        </div>
+        <div class="divider"></div>
+        <div class="body">
+          <div class="text">Waste Water 1 Certificate</div>
+          <div class="text">Waste Water 2 Certificate</div>
+          <div class="text">Utility 1 Certificate </div>
+          <div class="text">Utility 2 Certificate </div>
+        </div>
+        <div class="view-all">
+          <a class="text" href="/Certificates">(View all Certificates)</a>
+        </div>
+      </div>
+>>>>>>> Stashed changes
     </div>
 
      <div id="addpopover" popover="auto" class="popup">
@@ -195,6 +247,7 @@
           <img src="../assets/owp_logo.png"/>
         </div>
       </div>
+<<<<<<< Updated upstream
       <form class="form-container">
         <h1 class="popup-title">
           Add Operator Number
@@ -202,6 +255,26 @@
         <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
         <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
         <button class = popup-button-left popovertarget="addpopover" popovertargetaction="hide">Add</button>
+=======
+    </transition>
+
+    <transition name="fade">
+      <div class="popup" v-if="editPopup">
+        <div class="blur-overlay"></div>
+        <div class="inner">
+          <div class="header">
+            <div class="left">
+              <img src="../assets/owp_logo.png"/>
+            </div>
+          </div>
+          <div class="form-container">
+            <h1 class="popup-title">
+              Edit Operator Number
+            </h1>
+            <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
+            <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
+            <button class = popup-button-left @click="closeEdit">Edit</button>
+>>>>>>> Stashed changes
 
       </form>
     </div>
@@ -244,6 +317,7 @@
 
 <style scoped>
   .operator-numbers-page {
+<<<<<<< Updated upstream
     width: 100%;
     height: 100%;
     display: flex;
@@ -271,14 +345,27 @@
     display: flex;
     flex-direction: row;
     margin-top: 82px;
+=======
+    display: grid;
+    grid-template-rows: auto 1fr;
+    justify-content: center;
+    gap: 20px;
+    height: 100vh;
+    background-color: #fff;
+    box-sizing: border-box;
+>>>>>>> Stashed changes
   }
 
   .header-container {
     width: 800px;
     display: flex;
     flex-direction: row;
+<<<<<<< Updated upstream
     justify-content: space-between;
     align-items: center;
+=======
+    gap: 8px;
+>>>>>>> Stashed changes
   }
 
   .title {
@@ -333,7 +420,7 @@
     background-color: #9F3323;
     cursor: pointer;
   }
-  
+
   .popup-button-left{
     margin-left: 15px;
     margin-top:15px;
@@ -341,7 +428,7 @@
     padding:15px 15px;
     border:none;
     border-radius: 10px;
-    font-family: 'Roberto', sans-serif;  
+    font-family: 'Roberto', sans-serif;
     color:white
   }
 
@@ -352,7 +439,7 @@
     padding:15px 15px;
     border:none;
     border-radius: 10px;
-    font-family: 'Roberto', sans-serif;  
+    font-family: 'Roberto', sans-serif;
     color:white
   }
 
@@ -380,6 +467,18 @@
     margin: 0;
   }
 
+<<<<<<< Updated upstream
+=======
+  table {
+    margin-top: 30px;
+    border-collapse: collapse;
+    width: 700px;
+    background-color: #f2f1f2;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+>>>>>>> Stashed changes
   th, td {
     text-align: center;
     padding: 12px 16px;
@@ -482,8 +581,11 @@
   .quick-links {
     grid-column: 2 / 3;
     display: flex;
+<<<<<<< Updated upstream
     margin-left: -15%;
     width:40%;
+=======
+>>>>>>> Stashed changes
     margin-top: 55px;
     flex-direction: column;
     gap: 16px;
