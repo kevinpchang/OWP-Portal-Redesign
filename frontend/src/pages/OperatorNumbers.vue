@@ -92,7 +92,7 @@
           <div class="object"><div class="text">Email message (4/03/2025)</div></div>
         </div>
         <div class="view-all">
-          <div class="text">(View all messages)</div>
+          <a class="text" href="">(View all messages)</a>
         </div>
       </div>
 
@@ -586,6 +586,15 @@
     font-weight: 400;
     margin-bottom: 12px;
     color: #034750;
+  }
+
+  .view-all .text {
+    text-decoration: none;
+  }
+
+  .view-all .text:hover {
+    text-decoration: underline;
+    color: #007C8A;
   }
 
   .fade-enter-active,
