@@ -41,8 +41,8 @@
         <table>
           <thead class="table-header">
             <tr>
-                <th>State/Province</th>
-                <th>Operator Number</th>
+                <th style="width: 10%;">State/Province</th>
+                <th style="width: 35%;">Operator Number</th>
                 <th></th>
             </tr>
           </thead>
@@ -186,27 +186,26 @@
 <style scoped>
   .operator-numbers-page {
     display: grid;
-    grid-template-columns: 65% 35%; 
-    align-items: start;
+    grid-template-rows: auto 1fr;
+    justify-content: center;
     gap: 20px;
-    height: 100vh; 
+    height: 100vh;
     background-color: #fff;
-    padding: 40px 40px 0 40px;
     box-sizing: border-box;
   }
 
   .header-container {
     grid-column: 1 / 2;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
-    height:25px;
+    margin-top: 25px;
   }
 
   .title {
     width: 331px;
     height: 28px;
-    margin-left: 32%;
+    margin-left: 2%;
     font-family: 'Roberto', sans-serif;
     font-size: 28px;
     font-weight: 790;
@@ -217,13 +216,12 @@
   .add-button {
     background-color: #48773C;
     padding: 15px 15px;
-    margin-left: 77%;
-    margin-top: -45px;
     border: none;
-    width:15%;
+    /*width:15%;*/
     border-radius: 10px;
     font-family: 'Roberto', sans-serif;
     color: white;
+    margin-left: 180px;
     margin-bottom: 20px;
   }
 
@@ -232,7 +230,7 @@
   }
 
   .edit-button{
-    width: 40%;
+    width: 75px;
     border-radius: 8px;
     border: none !important;
     font-family: 'Roberto', sans-serif;
@@ -255,7 +253,7 @@
     background-color: #9F3323;
     cursor: pointer;
   }
-  
+
   .popup-button-left{
     margin-left: 15px;
     margin-top:15px;
@@ -263,7 +261,7 @@
     padding:15px 15px;
     border:none;
     border-radius: 10px;
-    font-family: 'Roberto', sans-serif;  
+    font-family: 'Roberto', sans-serif;
     color:white
   }
 
@@ -274,7 +272,7 @@
     padding:15px 15px;
     border:none;
     border-radius: 10px;
-    font-family: 'Roberto', sans-serif;  
+    font-family: 'Roberto', sans-serif;
     color:white
   }
 
@@ -295,10 +293,9 @@
   }
 
   table {
-    margin-top: 30px;
-    margin-left: 30%;
+    /*margin-top: 30px;*/
     border-collapse: collapse;
-    width: 62%;
+    width: 700px;
     background-color: #f2f1f2;
     border-radius: 20px;
     overflow: hidden;
@@ -430,9 +427,7 @@
   .quick-links {
     grid-column: 2 / 3;
     display: flex;
-    margin-left: -15%;
-    width:50%;
-    margin-top: 55px;
+    margin-top: 90px;
     flex-direction: column;
     gap: 16px;
     top: 40px;
