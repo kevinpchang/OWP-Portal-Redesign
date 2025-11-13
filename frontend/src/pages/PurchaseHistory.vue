@@ -1,35 +1,26 @@
 <template>
   <div class="ph">
 
-    <!-- ===== HERO (welcome header + image) ===== -->
-    <section class="hero">
-      <div class="hero-text">
-        <div class="hero-date">{{ todayNice }}</div>
-        <h1 class="hero-title">Purchase History</h1>
-        <p class="hero-sub">
-          View all invoices and their details.
-        </p>
+    <!-- ===================== HEADER (TEXT LEFT + IMAGE RIGHT) ===================== -->
+    <div class="ph-header-top">
+      <div class="ph-left-text">
+        <div class="ph-date">{{ today }}</div>
+        <div class="ph-title">Purchase History</div>
+        <div class="ph-subtitle">View all invoices and their details.</div>
       </div>
-      <div class="hero-img-wrap">
-        <img :src="heroImg" alt="OWP illustration" class="hero-img" />
+
+      <div class="ph-right-image">
+        <img src="../assets/owpart.png" alt="OWP Header Image" />
       </div>
-    </section>
+    </div>
 
-    <!-- ===== PAGE HEADER ===== -->
-    <section class="ph-header">
-      <div class="title">My Purchase History</div>
-      <div class="sub">Click on any invoices and view their details.</div>
-    </section>
-
-    <!-- ===== LIST VIEW ===== -->
+    <!-- ===================== INVOICE LIST ===================== -->
     <section v-if="!selected" class="ph-grid">
       <article
         v-for="inv in invoices"
         :key="inv.id"
         class="inv-card"
         @click="open(inv)"
-        role="button"
-        tabindex="0"
       >
         <div class="inv-title">Invoice</div>
         <div class="inv-number">#{{ inv.id }}</div>
@@ -39,33 +30,31 @@
           <div class="value">{{ fmtDate(inv.invoiceDate) }}</div>
         </div>
 
-        <div class="status" :class="inv.status.toLowerCase()">
-          {{ inv.status }}
-        </div>
+        <div class="status paid">Paid</div>
       </article>
     </section>
 
-    <!-- ===== DETAIL VIEW ===== -->
+    <!-- ===================== INVOICE DETAIL ===================== -->
     <section v-else class="ph-detail">
       <div class="detail-header">
         <div class="left">
           <div class="detail-title">Invoice</div>
         </div>
+
         <div class="right">
           <button class="btn ghost" @click="printReceipt">Receipt</button>
-          <button class="btn primary" @click="selected = null">Return to Purchase History</button>
+          <button class="btn primary" @click="selected = null">
+            Return to Purchase History
+          </button>
         </div>
       </div>
 
-      <!-- INVOICE TABLE -->
       <div class="detail-table">
         <div class="row">
           <div class="cell h">Invoice Num</div>
           <div class="cell">#{{ selected!.id }}</div>
-
           <div class="cell h">Invoice Date</div>
           <div class="cell">{{ fmtDate(selected!.invoiceDate) }}</div>
-
           <div class="cell h">Invoice Due Date</div>
           <div class="cell">{{ fmtDate(selected!.dueDate) }}</div>
         </div>
@@ -73,10 +62,8 @@
         <div class="row">
           <div class="cell h">Shipped</div>
           <div class="cell">{{ selected!.shipped ? 'Yes' : 'No' }}</div>
-
           <div class="cell h">Balance Due</div>
           <div class="cell">{{ fmtMoney(selected!.balanceDue) }}</div>
-
           <div class="cell h">Order Method</div>
           <div class="cell">{{ selected!.orderMethod }}</div>
         </div>
@@ -85,21 +72,25 @@
           <div class="cell h">Order Placed By</div>
           <div class="cell">{{ selected!.placedBy }}</div>
 
-          <div class="cell h">Billing Address and Phone</div>
+          <div class="cell h">Billing Address & Phone</div>
           <div class="cell">
-            <div class="addr" v-if="selected!.billing.name">{{ selected!.billing.name }}</div>
+            <div class="addr">{{ selected!.billing.name }}</div>
             <div class="addr">{{ selected!.billing.address1 }}</div>
-            <div class="addr" v-if="selected!.billing.address2">{{ selected!.billing.address2 }}</div>
-            <div class="addr">
-              {{ selected!.billing.city }}, {{ selected!.billing.state }} {{ selected!.billing.zip }}
+            <div class="addr" v-if="selected!.billing.address2">
+              {{ selected!.billing.address2 }}
             </div>
-            <div class="addr" v-if="selected!.billing.phone">{{ selected!.billing.phone }}</div>
+            <div class="addr">
+              {{ selected!.billing.city }},
+              {{ selected!.billing.state }}
+              {{ selected!.billing.zip }}
+            </div>
+            <div class="addr">{{ selected!.billing.phone }}</div>
           </div>
         </div>
       </div>
 
-      <!-- INVOICE ITEMS -->
-      <h3 class="section-title">Invoice Items</h3>
+      <div class="section-heading">Invoice Items</div>
+
       <div class="items">
         <div class="items-row head">
           <div class="c product">Product Name</div>
@@ -118,8 +109,8 @@
         </div>
       </div>
 
-      <!-- PAYMENT -->
-      <h3 class="section-title">Payment</h3>
+      <div class="section-heading">Payment</div>
+
       <div class="payment">
         <div class="p-row">
           <div class="p-h">Amount Paid</div>
@@ -147,8 +138,14 @@
           <div class="p-h">Payment Address</div>
           <div class="p-v">
             <div>{{ selected!.payment.address1 }}</div>
-            <div v-if="selected!.payment.address2">{{ selected!.payment.address2 }}</div>
-            <div>{{ selected!.payment.city }}, {{ selected!.payment.state }} {{ selected!.payment.zip }}</div>
+            <div v-if="selected!.payment.address2">
+              {{ selected!.payment.address2 }}
+            </div>
+            <div>
+              {{ selected!.payment.city }},
+              {{ selected!.payment.state }}
+              {{ selected!.payment.zip }}
+            </div>
           </div>
         </div>
       </div>
@@ -158,8 +155,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import heroImg from '../assets/owpart.png'; // make sure this asset exists
+import { ref } from "vue";
+
+const today = new Date().toLocaleDateString(undefined, {
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+});
 
 type InvoiceItem = { product: string; qty: number; total: number };
 type Address = {
@@ -173,7 +175,7 @@ type Address = {
 };
 type Payment = {
   amountPaid: number;
-  payDate: string;   // YYYY-MM-DD
+  payDate: string;
   method: string;
   description: string;
   madeBy: string;
@@ -186,254 +188,402 @@ type Payment = {
 };
 type Invoice = {
   id: number;
-  invoiceDate: string; // YYYY-MM-DD
-  dueDate: string;     // YYYY-MM-DD
+  invoiceDate: string;
+  dueDate: string;
   shipped: boolean;
   balanceDue: number;
   placedBy: string;
   billing: Address;
   orderMethod: string;
-  status: 'Paid' | 'Unpaid';
+  status: "Paid" | "Unpaid";
   items: InvoiceItem[];
   payment: Payment;
 };
 
-/* ---- Sample data (includes the 3 courses you requested) ---- */
 const invoices = ref<Invoice[]>([
   {
     id: 901737,
-    invoiceDate: '2025-09-29',
-    dueDate: '2025-10-29',
+    invoiceDate: "2025-09-29",
+    dueDate: "2025-10-29",
     shipped: false,
     balanceDue: 0,
-    placedBy: 'David Benjamin',
+    placedBy: "David Benjamin",
     billing: {
-      name: 'BENJAMIN, DAVID',
-      address1: '6000 J ST, MODOC HALL SUITE 1001',
-      city: 'SACRAMENTO',
-      state: 'CA',
-      zip: '95819',
-      phone: '(123) 234-1111'
+      name: "BENJAMIN, DAVID",
+      address1: "6000 J ST, MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+      phone: "(123) 234-1111",
     },
-    orderMethod: 'OWP Website',
-    status: 'Paid',
-    items: [
-      { product: 'Operation of Wastewater Treatment Plants, Vol 2', qty: 1, total: 45.00 },
-      { product: 'Operation of Wastewater Treatment Plants, Vol 1', qty: 1, total: 45.00 },
-      { product: 'Operation of Wastewater Treatment Plants, Vol 3', qty: 1, total: 45.00 }
-    ],
+    orderMethod: "OWP Website",
+    status: "Paid",
+    items: [{ product: "Operation of Wastewater Treatment Plants, Vol 1", qty: 1, total: 40 }],
     payment: {
-      amountPaid: 135.00,
-      payDate: '2025-09-29',
-      method: 'Visa',
-      description: 'Course enrollments',
-      madeBy: 'David Benjamin',
-      phone: '(123) 234-1111',
-      address1: '6000 J ST',
-      address2: 'MODOC HALL SUITE 1001',
-      city: 'SACRAMENTO',
-      state: 'CA',
-      zip: '95819'
-    }
+      amountPaid: 40,
+      payDate: "2025-09-29",
+      method: "Visa",
+      description: "—",
+      madeBy: "David Benjamin",
+      phone: "(123) 234-1111",
+      address1: "6000 J ST",
+      address2: "MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+    },
   },
   {
     id: 901733,
-    invoiceDate: '2025-09-26',
-    dueDate: '2025-10-26',
-    shipped: true,
+    invoiceDate: "2025-09-26",
+    dueDate: "2025-10-26",
+    shipped: false,
     balanceDue: 0,
-    placedBy: 'David Benjamin',
+    placedBy: "David Benjamin",
     billing: {
-      address1: '6000 J ST',
-      city: 'SACRAMENTO',
-      state: 'CA',
-      zip: '95819',
-      phone: '(123) 234-1111'
+      name: "BENJAMIN, DAVID",
+      address1: "6000 J ST, MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+      phone: "(123) 234-1111",
     },
-    orderMethod: 'OWP Website',
-    status: 'Paid',
-    items: [
-      { product: 'Operation of Wastewater Treatment Plants, Vol 2', qty: 1, total: 45.00 }
-    ],
+    orderMethod: "OWP Website",
+    status: "Paid",
+    items: [{ product: "Operation of Wastewater Treatment Plants, Vol 2", qty: 1, total: 45 }],
     payment: {
-      amountPaid: 45.00,
-      payDate: '2025-09-26',
-      method: 'Visa',
-      description: 'Course enrollment',
-      madeBy: 'David Benjamin',
-      phone: '(123) 234-1111',
-      address1: '6000 J ST',
-      city: 'SACRAMENTO',
-      state: 'CA',
-      zip: '95819'
-    }
+      amountPaid: 45,
+      payDate: "2025-09-26",
+      method: "Visa",
+      description: "—",
+      madeBy: "David Benjamin",
+      phone: "(123) 234-1111",
+      address1: "6000 J ST",
+      address2: "MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+    },
   },
   {
     id: 901731,
-    invoiceDate: '2025-09-22',
-    dueDate: '2025-10-22',
+    invoiceDate: "2025-09-22",
+    dueDate: "2025-10-22",
     shipped: false,
     balanceDue: 0,
-    placedBy: 'David Benjamin',
+    placedBy: "David Benjamin",
     billing: {
-      address1: '6000 J ST',
-      city: 'SACRAMENTO',
-      state: 'CA',
-      zip: '95819'
+      name: "BENJAMIN, DAVID",
+      address1: "6000 J ST, MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+      phone: "(123) 234-1111",
     },
-    orderMethod: 'OWP Website',
-    status: 'Paid',
-    items: [
-      { product: 'Operation of Wastewater Treatment Plants, Vol 1', qty: 1, total: 45.00 }
-    ],
+    orderMethod: "OWP Website",
+    status: "Paid",
+    items: [{ product: "Operation of Wastewater Treatment Plants, Vol 3", qty: 1, total: 45 }],
     payment: {
-      amountPaid: 45.00,
-      payDate: '2025-09-22',
-      method: 'Visa',
-      description: 'Course enrollment',
-      madeBy: 'David Benjamin',
-      phone: '(123) 234-1111',
-      address1: '6000 J ST',
-      city: 'SACRAMENTO',
-      state: 'CA',
-      zip: '95819'
-    }
-  }
+      amountPaid: 45,
+      payDate: "2025-09-22",
+      method: "Visa",
+      description: "—",
+      madeBy: "David Benjamin",
+      phone: "(123) 234-1111",
+      address1: "6000 J ST",
+      address2: "MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+    },
+  },
 ]);
 
-/* ---- List/Detail state ---- */
 const selected = ref<Invoice | null>(null);
-function open(inv: Invoice) { selected.value = inv; }
-function printReceipt() { window.print(); }
 
-/* ---- Helpers ---- */
-function fmtMoney(n: number) { return `$${n.toFixed(2)}`; }
-function fmtDate(iso: string) {
-  const d = new Date(`${iso}T00:00:00`);
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
+function open(inv: Invoice) {
+  selected.value = inv;
 }
-const todayNice = computed(() =>
-  new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
-);
+function fmtMoney(n: number) {
+  return `$${n.toFixed(2)}`;
+}
+function fmtDate(iso: string) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+}
+function printReceipt() {
+  window.print();
+}
 </script>
 
 <style scoped>
-/* Slight right padding so content isn’t jammed against the sidebar */
+/* ===================== HEADER ===================== */
+
+.ph-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.ph-left-text {
+  flex: 1;
+}
+
+.ph-date {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+
+.ph-title {
+  font-size: 40px;
+  font-weight: 900;
+  color: #00a5b5;
+}
+
+.ph-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+.ph-right-image img {
+  width: 480px;
+  max-width: 100%;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* ===================== MAIN LAYOUT ===================== */
+
 .ph {
-  padding: 16px 24px 40px 40px;
+  padding: 16px 24px 32px 40px;
   display: grid;
   gap: 20px;
-  font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
 }
 
-/* ===== HERO ===== */
-.hero {
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 24px;
-  align-items: center;
-}
-.hero-text { display: flex; flex-direction: column; gap: 10px; }
-.hero-date { color: #6b7280; font-weight: 600; }
-.hero-title { color: #00A5B5; font-weight: 800; font-size: 44px; line-height: 1.05; margin: 0; }
-.hero-sub { color: #525252; font-size: 18px; max-width: 56ch; margin: 0; }
-.hero-img-wrap { width: 100%; }
-.hero-img { width: 100%; height: 220px; object-fit: contain; }
+/* ===================== INVOICE GRID ===================== */
 
-@media (max-width: 1024px) {
-  .hero { grid-template-columns: 1fr; }
-  .hero-img { height: 180px; }
-}
-
-/* ===== PAGE HEADER ===== */
-.ph-header .title {
-  color: #034750;
-  font-weight: 800;
-  font-size: 28px;
-}
-.ph-header .sub {
-  color: #707070;
-  font-size: 16px;
-  margin-top: 4px;
-}
-
-/* ===== LIST (tiles) ===== */
 .ph-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(220px, 1fr));
   gap: 16px;
 }
-@media (max-width: 1400px) { .ph-grid { grid-template-columns: repeat(3, minmax(220px, 1fr)); } }
-@media (max-width: 1024px) { .ph-grid { grid-template-columns: repeat(2, minmax(220px, 1fr)); } }
-@media (max-width: 640px)  { .ph-grid { grid-template-columns: 1fr; } }
 
 .inv-card {
-  background: #fff;
-  border: 1px solid #E4E6EA;
+  background: white;
+  border: 1px solid #e4e6ea;
   border-radius: 8px;
   padding: 14px 16px;
-  box-shadow: 0 1px 0 rgba(3,71,80,0.04);
   cursor: pointer;
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-}
-.inv-card:hover {
-  transform: translateY(-2px);
-  border-color: #D6DBE1;
-  box-shadow: 0 6px 16px rgba(3,71,80,0.08);
-}
-.inv-title { color: #5a6b70; font-size: 13px; font-weight: 600; }
-.inv-number { color: #075985; font-weight: 800; margin-top: 2px; }
-.inv-meta { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; margin-top: 8px; font-size: 13px; }
-.inv-meta .label { color: #6b7280; }
-.inv-meta .value { color: #111827; }
-.status { margin-top: 8px; font-weight: 700; font-size: 13px; }
-.status.paid { color: #2F855A; }
-.status.unpaid { color: #B45309; }
+  font-size: 14px;
 
-/* ===== DETAIL ===== */
+  /* hover animation */
+  transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+.inv-card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+}
+
+.inv-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5a6b70;
+}
+
+.inv-number {
+  color: #0b7285;
+  font-weight: 800;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.inv-meta {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.inv-meta .label {
+  font-weight: 600;
+}
+
+.status {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status.paid {
+  color: #2f855a;
+}
+
+/* ===================== DETAIL VIEW ===================== */
+
 .ph-detail {
-  background: #fff;
+  background: white;
+  border: 1px solid #e4e6ea;
   border-radius: 10px;
-  padding: 18px 20px 24px;
-  border: 1px solid #E4E6EA;
+  padding: 20px;
 }
+
 .detail-header {
-  display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px; /* <- gives space so buttons don't sit on the table border */
 }
-.detail-title { font-size: 26px; font-weight: 800; color: #034750; }
+
+.right {
+  display: flex;
+  gap: 16px;
+}
+
+.detail-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #034750;
+}
+
 .btn {
-  border-radius: 8px; padding: 8px 12px; font-weight: 700; cursor: pointer; border: 2px solid transparent;
+  padding: 8px 18px;
+  font-weight: 700;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+
+  transition: background-color 0.15s ease, color 0.15s ease,
+    box-shadow 0.15s ease, transform 0.1s ease;
 }
-.btn.primary { background: #034750; color: #fff; }
-.btn.ghost { background: transparent; border-color: #034750; color: #034750; }
-.btn:hover { filter: brightness(0.96); }
+
+.btn.primary {
+  background: #034750;
+  color: white;
+}
+
+.btn.primary:hover {
+  background: #02333a;
+  box-shadow: 0 3px 8px rgba(3, 71, 80, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn.ghost {
+  border: 2px solid #034750;
+  color: #034750;
+  background: white;
+}
+
+.btn.ghost:hover {
+  background: #034750;
+  color: white;
+  box-shadow: 0 3px 8px rgba(3, 71, 80, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ===================== TABLES ===================== */
 
 .detail-table {
-  border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden; margin-bottom: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 18px;
 }
-.detail-table .row { display: grid; grid-template-columns: 160px 1fr 160px 1fr 160px 1fr; }
-.detail-table .row.multi { grid-template-columns: 160px 1fr 220px 1fr; }
-.detail-table .cell {
-  padding: 10px 12px; border-bottom: 1px solid #F1F3F5; border-right: 1px solid #F1F3F5; font-size: 14px;
+
+.row {
+  display: grid;
+  grid-template-columns: 160px 1fr 160px 1fr 160px 1fr;
+  font-size: 14px;
 }
-.detail-table .cell.h { background:#F8FAFC; font-weight: 700; color:#374151; }
-.detail-table .row:last-child .cell { border-bottom: 0; }
-.detail-table .cell:nth-child(6n) { border-right: 0; }
-.addr { line-height: 1.35; }
 
-/* Items */
-.section-title { margin: 14px 0 8px; color:#034750; font-weight:800; }
-.items { border: 1px solid #E5E7EB; border-radius: 8px; overflow:hidden; margin-bottom: 18px; }
-.items-row { display:grid; grid-template-columns: 1fr 140px 160px; }
-.items-row.head { background:#F8FAFC; font-weight:700; color:#374151; }
-.items-row .c { padding:10px 12px; border-bottom: 1px solid #F1F3F5; }
-.items-row:last-child .c { border-bottom: 0; }
-.items-row .qty, .items-row .total { text-align:right; }
+.row.multi {
+  grid-template-columns: 160px 1fr 200px 1fr;
+}
 
-/* Payment */
-.payment { border: 1px solid #E5E7EB; border-radius: 8px; overflow:hidden; }
-.p-row { display:grid; grid-template-columns: 160px 1fr 160px 1fr 160px 1fr; }
-.p-h { padding:10px 12px; background:#F8FAFC; font-weight:700; color:#374151; border-bottom:1px solid #F1F3F5; }
-.p-v { padding:10px 12px; border-bottom:1px solid #F1F3F5; }
-.p-row:last-child .p-h, .p-row:last-child .p-v { border-bottom: 0; }
+.cell {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f3f5;
+  border-right: 1px solid #f1f3f5;
+}
+
+.cell.h {
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.addr {
+  line-height: 1.3;
+}
+
+/* ===================== SECTION HEADERS ===================== */
+
+.section-heading {
+  font-size: 20px;
+  font-weight: 800;
+  color: #034750;
+  margin: 16px 0 10px;
+}
+
+/* ===================== INVOICE ITEMS ===================== */
+
+.items {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.items-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 160px;
+  font-size: 14px;
+}
+
+.items-row.head {
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.c {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.c.qty,
+.c.total {
+  text-align: right;
+}
+
+/* ===================== PAYMENT ===================== */
+
+.payment {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.p-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 160px 1fr 160px 1fr;
+  font-size: 14px;
+}
+
+.p-h {
+  padding: 10px 12px;
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.p-v {
+  padding: 10px 12px;
+}
 </style>
