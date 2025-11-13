@@ -1,5 +1,6 @@
 <script setup>
   import { useRoute } from 'vue-router'
+  import { BookMarked, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next';
   const route = useRoute()
 </script>
 
@@ -25,7 +26,7 @@
 
         <div class="active-enrollments">
           <div class="header">
-            <div class="icon"></div>
+            <BookMarked class="icon" color="#007C8A" />
             <div class="text">Active Enrollments</div>
           </div>
           <div class="divider"></div>
@@ -78,7 +79,7 @@
 
         <div class="instructor-slides">
           <div class="header">
-            <div class="icon"></div>
+            <GalleryVerticalEnd class="icon" color="#007C8A" />
             <div class="text">Instructor Slides</div>
           </div>
           <div class="divider"></div>
@@ -102,7 +103,7 @@
 
         <div class="messages">
           <div class="header">
-            <div class="icon"></div>
+            <Mail class="icon" color="#007C8A"/>
             <div class="text">Messages</div>
           </div>
           <div class="divider"></div>
@@ -118,7 +119,7 @@
 
         <div class="purchase-history">
           <div class="header">
-            <div class="icon"></div>
+            <History class="icon" color="#007C8A"/>
             <div class="text">Purchase History</div>
           </div>
           <div class="divider"></div>
@@ -250,9 +251,8 @@
   .active-enrollments .header .icon {
     width: 26.53px;
     height: 33.67px;
-    border-radius: 4rem;
+    transform: rotate(-25deg);
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .active-enrollments .header .text {
@@ -414,9 +414,7 @@
   .instructor-slides .header .icon {
     width: 26.53px;
     height: 33.67px;
-    border-radius: 4rem;
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .instructor-slides .header .text {
@@ -480,9 +478,7 @@
   .messages .header .icon {
     width: 26.53px;
     height: 33.67px;
-    border-radius: 4rem;
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .messages .header .text {
@@ -539,9 +535,7 @@
   .purchase-history .header .icon {
     width: 26.53px;
     height: 33.67px;
-    border-radius: 4rem;
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .purchase-history .header .text {

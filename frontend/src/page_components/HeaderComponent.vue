@@ -6,20 +6,20 @@
       <div class="search-bar">
         <input type=text placeholder="Search" class="search"/>
       </div>
-      <div class="help_button"></div>
+      <CircleQuestionMark class="help_button" color="#FFFFFF"/>
       <div class="divider"></div>
-      <div class="messages_button"></div>
-      <div class="notif_button"></div>
+      <Mail class="messages_button" color="#FFFFFF"/>
+      <Bell class="notif_button" color="#FFFFFF"/>
       <div class="divider"></div>
       <div class="account_button" tabindex="0" @focus="openAccountDialog" @blur="closeAccountDialog">
-        <div class="icon"></div>
+        <SquareUserRound class="icon" color="#FFFFFF"/>
         <div class="text">User</div>
       </div>
       <transition name="fade">
         <div class="account-button-dialog" v-if="accountDialog">
           <div class="top">
             <div class="info">
-              <div class="left"><div class="icon"></div></div>
+              <div class="left"><SquareUserRound class="icon" color="#034750"/></div>
               <div class="right">
                 <div class="name"><div class="text">User</div></div>
                 <div class="email"><div class="text">User.Example@owp.csus.edu</div></div>
@@ -45,7 +45,7 @@
         <div class="contact-info-dialog" v-if="contactDialog">
           <div class="dialog">
             <div class="header">
-              <div class="icon"></div>
+              <SquareUserRound class="icon" color="#034750"/>
               <div class="text">User</div>
             </div>
             <div class="divider2"></div>
@@ -96,6 +96,7 @@
 </template>
 
 <script setup>
+  import { CircleQuestionMark, Mail, Bell, SquareUserRound } from 'lucide-vue-next';
   import { ref } from 'vue'
   import { useRoute } from 'vue-router'
 
@@ -156,14 +157,15 @@
 
   .account-button-dialog .top .info .left {
     display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
 
   .account-button-dialog .top .info .left .icon {
     width: 28px;
     height: 28px;
-    margin-left: 10px;
-    border: 2px, solid, #034750;
-    border-radius: 4px;
+    margin-left: 16px;
   }
 
   .account-button-dialog .top .info .right {
@@ -263,23 +265,21 @@
     height: 85px;
     display: flex;
     flex-direction: row;
-    justify-content: left;
+    justify-content: flex-start;
     border-radius: 14px;
     background-color: #FEFEFE;
   }
 
   .contact-info-dialog .dialog .header .icon {
-    width: 37px;
-    height: 28px;
-    margin-left: 32px;
-    background-color: #034750;
+    width: 40px;
+    height: 40px;
+    margin-left: 16px;
   }
 
   .contact-info-dialog .dialog .header .text {
     height: 16px;
     margin-left: 8px;
     font-size: 20px;
-    
     font-weight: 600;
     color: #034750;
   }
@@ -494,37 +494,20 @@
     width: 24.05px;
     height: 24.05px;
     margin-left: 16.5px;
-    background-color: #034750;
-    border-radius: 4px;
-    border: #FFFFFF;
-    border-style:solid;
-    border-width: 2px;
     cursor: pointer;
   }
 
   .header .right .messages_button {
     width: 24.05px;
     height: 24.05px;
-    border-radius: 4px;
     margin-left: 16.5px;
-    background-color: #034750;
-    border-radius: 4px;
-    border: #FFFFFF;
-    border-style:solid;
-    border-width: 2px;
     cursor: pointer;
   }
 
   .header .right .notif_button {
     width: 24.05px;
     height: 24.05px;
-    border-radius: 4px;
     margin-left: 16.5px;
-    background-color: #034750;
-    border-radius: 4px;
-    border: #FFFFFF;
-    border-style:solid;
-    border-width: 2px;
     cursor: pointer;
   }
 
@@ -542,12 +525,6 @@
   .header .right .account_button .icon {
     width: 24.05px;
     height: 24.05px;
-    border-radius: 4px;
-    background-color: #034750;
-    border-radius: 4px;
-    border: #FFFFFF;
-    border-style:solid;
-    border-width: 2px;
   }
 
   .header .right .account_button .text {
