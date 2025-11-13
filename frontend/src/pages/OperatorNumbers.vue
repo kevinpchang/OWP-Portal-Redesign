@@ -186,29 +186,26 @@
 <style scoped>
   .operator-numbers-page {
     display: grid;
-    grid-template-columns: auto auto; 
-    /* align-items: start; */
-    gap: 20px;
+    grid-template-rows: auto 1fr;
     justify-content: center;
-    height: 100vh; 
+    gap: 20px;
+    height: 100vh;
     background-color: #fff;
-    /* padding: 40px 40px 0 40px; */
-    /* box-sizing: border-box; */
+    box-sizing: border-box;
   }
 
   .header-container {
     grid-column: 1 / 2;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
-    height:25px;
+    margin-top: 25px;
   }
 
   .title {
     width: 331px;
     height: 28px;
     margin-left: 2%;
-    margin-top:2%;
     font-family: 'Roberto', sans-serif;
     font-size: 28px;
     font-weight: 790;
@@ -219,13 +216,12 @@
   .add-button {
     background-color: #48773C;
     padding: 15px 15px;
-    margin-left: 70%;
-    margin-top: -45px;
     border: none;
-    width:30%;
+    /*width:15%;*/
     border-radius: 10px;
     font-family: 'Roberto', sans-serif;
     color: white;
+    margin-left: 180px;
     margin-bottom: 20px;
   }
 
@@ -257,7 +253,7 @@
     background-color: #9F3323;
     cursor: pointer;
   }
-  
+
   .popup-button-left{
     margin-left: 15px;
     margin-top:15px;
@@ -265,7 +261,7 @@
     padding:15px 15px;
     border:none;
     border-radius: 10px;
-    font-family: 'Roberto', sans-serif;  
+    font-family: 'Roberto', sans-serif;
     color:white
   }
 
@@ -276,7 +272,7 @@
     padding:15px 15px;
     border:none;
     border-radius: 10px;
-    font-family: 'Roberto', sans-serif;  
+    font-family: 'Roberto', sans-serif;
     color:white
   }
 
@@ -297,10 +293,9 @@
   }
 
   table {
-    margin-top: 30px;
-    /* margin-left: 22%; */
+    /*margin-top: 30px;*/
     border-collapse: collapse;
-    width: auto;
+    width: 700px;
     background-color: #f2f1f2;
     border-radius: 20px;
     overflow: hidden;
@@ -432,9 +427,7 @@
   .quick-links {
     grid-column: 2 / 3;
     display: flex;
-    /* margin-left: -15%; */
-    /* width:55%; */
-    margin-top: 55px;
+    margin-top: 90px;
     flex-direction: column;
     gap: 16px;
     top: 40px;
