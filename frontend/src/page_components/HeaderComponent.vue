@@ -183,7 +183,7 @@
   }
 
   .account-button-dialog .top .info .right .name .text {
-    font-family: Myriad Pro;
+    
     font-size: 15px;
     font-weight: 600;
     color: #034750;
@@ -197,17 +197,14 @@
   }
 
   .account-button-dialog .top .info .right .email .text {
-    font-family: Myriad Pro;
+    
     font-size: 10px;
     font-weight: 400;
     color: #034750;
   }
 
   .divider2 {
-    width: 100%;
-    height: 0px;
-    align-self: center;
-    border: 0.5px, solid, #C2C2C2;
+    border-top: 1px solid #C2C2C2;
   }
 
   .account-button-dialog .bottom {
@@ -231,7 +228,7 @@
 
   .account-button-dialog .bottom .object .text {
     margin-left: 16px;
-    font-family: Myriad Pro;
+    
     font-size: 16px;
     font-weight: 400;
     color: #707070;
@@ -282,7 +279,7 @@
     height: 16px;
     margin-left: 8px;
     font-size: 20px;
-    font-family: Myriad Pro;
+    
     font-weight: 600;
     color: #034750;
   }
@@ -299,7 +296,7 @@
 
   .contact-info-dialog .dialog .body .text{
     height: 16px;
-    font-family: Myriad Pro;
+    
     font-size: 18px;
     font-weight: 600;
     line-height: 8px;
@@ -309,7 +306,7 @@
   .contact-info-dialog .dialog .input-large {
     width: 306px;
     height: 31px;
-    font-family: Myriad Pro;
+    
     font-size: 15px;
     font-weight: 400;
     border: 0.75px solid #747474;
@@ -320,7 +317,7 @@
   .contact-info-dialog .dialog .body .input-medium{
     width: 176px;
     height: 31px;
-    font-family: Myriad Pro;
+    
     font-size: 15px;
     font-weight: 400;
     border: 0.75px solid #747474;
@@ -330,7 +327,7 @@
 
   .contact-info-dialog .dialog .body .input-small{
     width: 100px;
-    font-family: Myriad Pro;
+    
     font-size: 15px;
     font-weight: 400;
     border: 0.75px solid #747474;
@@ -340,7 +337,7 @@
 
   .contact-info-dialog .dialog .body .input-tiny{
     width: 31px;
-    font-family: Myriad Pro;
+    
     font-size: 15px;
     font-weight: 400;
     border: 0.75px solid #747474;
@@ -418,7 +415,7 @@
     justify-content: center;
     align-items: center;
     font-size: 16px;
-    font-family: Myriad Pro;
+    
     font-weight: 400;
     color: #FFFFFF;
     background-color: #C2C2C2;
@@ -433,7 +430,7 @@
     justify-content: center;
     align-items: center;
     font-size: 16px;
-    font-family: Myriad Pro;
+    
     font-weight: 400;
     color: #FFFFFF;
     background-color: #00A5B5;
@@ -555,7 +552,7 @@
 
   .header .right .account_button .text {
     font-size: 15px;
-    font-family: Myriad Pro;
+    
     font-weight: 600;
     margin-top: 4px;
     margin-left: 8px;

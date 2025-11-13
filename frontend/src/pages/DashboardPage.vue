@@ -166,7 +166,6 @@
     justify-content: center;
     align-items: left;
     height: 240px;
-    font-family: Myriad Pro;
     color: #034750;
   }
 
@@ -227,12 +226,12 @@
   .divider {
     width: 100%;
     height: 0px;
-    border: 1px, solid, #FFFFFF;
+    border-top: 1px solid #FFFFFF;
   }
 
   .active-enrollments {
     height: 450px;
-    border-radius: 14rem;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     justify-content: top;
@@ -245,13 +244,13 @@
     display: flex;
     flex-direction: row;
     justify-content: left;
+    align-items: center;
   }
 
   .active-enrollments .header .icon {
     width: 26.53px;
     height: 33.67px;
     border-radius: 4rem;
-    margin-top: 18.53px;
     margin-left: 23.55px;
     background-color: #007C8A;
   }
@@ -260,7 +259,6 @@
     height: 20px;
     font-size: 20px;
     font-weight: 700;
-    margin-top: 29px;
     margin-left: 8px;
     color: #034750;
   }
@@ -366,7 +364,6 @@
   }
 
   .view-all {
-    height: 32px;
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -379,6 +376,12 @@
     margin-bottom: 12px;
     cursor: pointer;
     color: #034750;
+    transition: color 0.2s ease;
+  }
+
+  .view-all .text:hover {
+    text-decoration: underline;
+    color: #007C8A;
   }
 
 .dashboard-button,
@@ -405,13 +408,13 @@
     display: flex;
     flex-direction: row;
     justify-content: left;
+    align-items: center;
   }
 
   .instructor-slides .header .icon {
     width: 26.53px;
     height: 33.67px;
     border-radius: 4rem;
-    margin-top: 18.53px;
     margin-left: 23.55px;
     background-color: #007C8A;
   }
@@ -420,7 +423,6 @@
     height: 20px;
     font-size: 20px;
     font-weight: 700;
-    margin-top: 29px;
     margin-left: 8px;
     color: #034750;
   }
@@ -472,13 +474,13 @@
     display: flex;
     flex-direction: row;
     justify-content: left;
+    align-items: center;
   }
 
   .messages .header .icon {
     width: 26.53px;
     height: 33.67px;
     border-radius: 4rem;
-    margin-top: 18.53px;
     margin-left: 23.55px;
     background-color: #007C8A;
   }
@@ -487,7 +489,6 @@
     height: 20px;
     font-size: 20px;
     font-weight: 700;
-    margin-top: 29px;
     margin-left: 8px;
     color: #034750;
   }
@@ -532,13 +533,13 @@
     display: flex;
     flex-direction: row;
     justify-content: left;
+    align-items: center;
   }
 
   .purchase-history .header .icon {
     width: 26.53px;
     height: 33.67px;
     border-radius: 4rem;
-    margin-top: 18.53px;
     margin-left: 23.55px;
     background-color: #007C8A;
   }
@@ -547,7 +548,6 @@
     height: 20px;
     font-size: 20px;
     font-weight: 700;
-    margin-top: 29px;
     margin-left: 8px;
     color: #034750;
   }
