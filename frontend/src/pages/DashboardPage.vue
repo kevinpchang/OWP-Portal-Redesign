@@ -59,7 +59,7 @@
                   <div class="text">Enrollment expires: 10/11/2025</div>
                 </div>
                 <div class="progress">
-                  <div class="percent">
+                  <div class="percent2">
                     <div class="text">65%</div>
                   </div>
                 </div>
@@ -354,7 +354,25 @@
     background-color: #00A5B5;
   }
 
+  .active-enrollments .body .object .right .progress .percent2{
+    width: 65%;
+    border-radius: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #00A5B5;
+  }
+
   .active-enrollments .body .object .right .progress .percent .text {
+    height: 13px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1px;
+    margin-top: 2px;
+    color: #FFFFFF;
+  }
+
+  .active-enrollments .body .object .right .progress .percent2 .text {
     height: 13px;
     font-size: 14px;
     font-weight: 400;
