@@ -87,9 +87,9 @@
         </div>
         <div class="divider"></div>
         <div class="body">
-          <div class="text">Email message (4/11/2025)</div>
-          <div class="text">Email message (4/07/2025)</div>
-          <div class="text">Email message (4/03/2025)</div>
+          <div class="object"><div class="text">Email message (4/11/2025)</div></div>
+          <div class="object"><div class="text">Email message (4/07/2025)</div></div>
+          <div class="object"><div class="text">Email message (4/03/2025)</div></div>
         </div>
         <div class="view-all">
           <div class="text">(View all messages)</div>
@@ -103,10 +103,10 @@
         </div>
         <div class="divider"></div>
         <div class="body">
-          <div class="text">Waste Water 1 Certificate</div>
-          <div class="text">Waste Water 2 Certificate</div>
-          <div class="text">Utility 1 Certificate </div>
-          <div class="text">Utility 2 Certificate </div>
+          <div class="object"><div class="text">Waste Water 1 Certificate</div></div>
+          <div class="object"><div class="text">Waste Water 2 Certificate</div></div>
+          <div class="object"><div class="text">Utility 1 Certificate </div></div>
+          <div class="object"><div class="text">Utility 2 Certificate </div></div>
         </div>
         <div class="view-all">
           <a class="text" href="/Certificates">(View all Certificates)</a>
@@ -226,7 +226,7 @@
   }
 
   .divider{
-    border:2px solid white;
+    border:1px solid white;
   }
 
   .add-button {
@@ -450,6 +450,15 @@
     top: 40px;
   }
 
+  .object{
+    height: 40px;
+  }
+
+  .object:hover {
+    cursor: pointer;
+    background-color: #D9D9D9;
+  }
+
   .messages {
     height: 240px;
     border-radius: 14rem;
@@ -491,7 +500,7 @@
 
   .messages .body .text {
     height: 14px;
-    margin-top: 25px;
+    margin-top: 10px;
     margin-left: 24px;
     font-size: 16px;
     font-weight: 400;
@@ -515,7 +524,7 @@
   }
 
   .purchase-history {
-    height: 460px;
+    height: 400px;
     border-radius: 14rem;
     display: flex;
     flex-direction: column;
@@ -555,7 +564,7 @@
 
   .purchase-history .body .text {
     height: 14px;
-    margin-top: 40px;
+    margin-top: 10px;
     margin-left: 24px;
     margin-right: 24px;
     font-size: 16px;
