@@ -34,6 +34,7 @@
     <div class="left-column">
       <div class="header-container">
         <div class="title">Operator Numbers</div>
+        <p class="description">View and edit your Operator Numbers</p>
         <button class = add-button @click.left="openAdd">Add Operator Number</button>
       </div>
 
@@ -205,12 +206,27 @@
   .title {
     width: 331px;
     height: 28px;
+    display: flex;
     margin-left: 2%;
     font-family: 'Roberto', sans-serif;
     font-size: 28px;
     font-weight: 790;
     color: #034750;
     align-items: center;
+  }
+
+  .description {
+    font-family: 'Roberto', sans-serif;
+    display:flex;
+    font-size: 17px;
+    font-weight: 400;
+    color: #034750;
+    margin-top:45px;
+    margin-left: -337px;
+  }
+
+  .divider{
+    border:2px solid white;
   }
 
   .add-button {
@@ -221,7 +237,7 @@
     border-radius: 10px;
     font-family: 'Roberto', sans-serif;
     color: white;
-    margin-left: 180px;
+    margin-left: 228px;
     margin-bottom: 20px;
   }
 
@@ -297,7 +313,7 @@
     border-collapse: collapse;
     width: 700px;
     background-color: #f2f1f2;
-    border-radius: 20px;
+    border-radius: 14px;
     overflow: hidden;
   }
 
@@ -427,7 +443,8 @@
   .quick-links {
     grid-column: 2 / 3;
     display: flex;
-    margin-top: 90px;
+    margin-top: 106px;
+    width: 300px;
     flex-direction: column;
     gap: 16px;
     top: 40px;
