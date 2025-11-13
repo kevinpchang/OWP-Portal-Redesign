@@ -1,5 +1,11 @@
+<script setup>
+  import { useRoute } from 'vue-router'
+  import { BookMarked, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next';
+  const route = useRoute()
+</script>
+
 <template>
-  <div class="dashboard-page">
+  <div ref="scrollable" class="dashboard-page">
     <div class="dashboard-top">
       <div class="text">
         <div class="date">Wednesday, October 15</div>
@@ -20,7 +26,7 @@
 
         <div class="active-enrollments">
           <div class="header">
-            <div class="icon"></div>
+            <BookMarked class="icon" color="#007C8A" />
             <div class="text">Active Enrollments</div>
           </div>
           <div class="divider"></div>
@@ -61,13 +67,19 @@
             </div>
           </div>
           <div class="view-all">
-            <div class="text">(View all enrollments)</div>
+            <router-link
+              to="/courses"
+              class="courses-button"
+              :class="{ active: route.name === 'CoursesPage' }"
+            >
+              <div class="text">(View all enrollments)</div>
+            </router-link>
           </div>
         </div>
 
         <div class="instructor-slides">
           <div class="header">
-            <div class="icon"></div>
+            <GalleryVerticalEnd class="icon" color="#007C8A" />
             <div class="text">Instructor Slides</div>
           </div>
           <div class="divider"></div>
@@ -76,17 +88,22 @@
             <div class="object"><div class="text">Operation and Maintenance of Wastewater Collection Systems, Vol I</div></div>
             <div class="object"><div class="text">Operation and Maintenance of Wastewater Collection Systems, Vol II</div></div>
           </div>
-          <router-link to="/slides" class="view-all">
-            <div class="text">(View all slides)</div>
-          </router-link>
-
+          <div class="view-all">
+            <router-link
+              to="/slides"
+              class="slides-button"
+              :class="{ active: route.name === 'SlidesPage' }"
+            >
+              <div class="text">(View all slides)</div>
+            </router-link>
+          </div>
         </div>
       </div>
       <div class="dashboard-right">
 
         <div class="messages">
           <div class="header">
-            <div class="icon"></div>
+            <Mail class="icon" color="#007C8A"/>
             <div class="text">Messages</div>
           </div>
           <div class="divider"></div>
@@ -102,7 +119,7 @@
 
         <div class="purchase-history">
           <div class="header">
-            <div class="icon"></div>
+            <History class="icon" color="#007C8A"/>
             <div class="text">Purchase History</div>
           </div>
           <div class="divider"></div>
@@ -113,7 +130,13 @@
             <div class="object"><div class="text">Industrial Waste Treatment, Vol 1</div></div>
           </div>
           <div class="view-all">
-            <div class="text">(View all purchases)</div>
+            <router-link
+              to="/purchase-history"
+              class="purchase-history-button"
+              :class="{ active: route.name === 'PurchaseHistory' }"
+            >
+              <div class="text">(View all purchaes)</div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -144,7 +167,6 @@
     justify-content: center;
     align-items: left;
     height: 240px;
-    font-family: Myriad Pro;
     color: #034750;
   }
 
@@ -205,12 +227,12 @@
   .divider {
     width: 100%;
     height: 0px;
-    border: 1px, solid, #FFFFFF;
+    border-top: 1px solid #FFFFFF;
   }
 
   .active-enrollments {
     height: 450px;
-    border-radius: 14rem;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     justify-content: top;
@@ -223,22 +245,20 @@
     display: flex;
     flex-direction: row;
     justify-content: left;
+    align-items: center;
   }
 
   .active-enrollments .header .icon {
     width: 26.53px;
     height: 33.67px;
-    border-radius: 4rem;
-    margin-top: 18.53px;
+    transform: rotate(-25deg);
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .active-enrollments .header .text {
     height: 20px;
     font-size: 20px;
     font-weight: 700;
-    margin-top: 29px;
     margin-left: 8px;
     color: #034750;
   }
@@ -253,7 +273,7 @@
     height: 118px;
     display: flex;
     flex-direction: row;
-    margin-top: 4px;
+    margin-bottom: 4px;
   }
 
   .active-enrollments .body .object:hover {
@@ -344,7 +364,6 @@
   }
 
   .view-all {
-    height: 32px;
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -357,7 +376,24 @@
     margin-bottom: 12px;
     cursor: pointer;
     color: #034750;
+    transition: color 0.2s ease;
   }
+
+  .view-all .text:hover {
+    text-decoration: underline;
+    color: #007C8A;
+  }
+
+.dashboard-button,
+.my-account-button,
+.my-tasks-button,
+.slides-button,
+.courses-button,
+.operator-numbers-button,
+.certificates-button,
+.purchase-history-button {
+  text-decoration: none;
+}
 
   .instructor-slides {
     height: 250px;
@@ -372,22 +408,19 @@
     display: flex;
     flex-direction: row;
     justify-content: left;
+    align-items: center;
   }
 
   .instructor-slides .header .icon {
     width: 26.53px;
     height: 33.67px;
-    border-radius: 4rem;
-    margin-top: 18.53px;
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .instructor-slides .header .text {
     height: 20px;
     font-size: 20px;
     font-weight: 700;
-    margin-top: 29px;
     margin-left: 8px;
     color: #034750;
   }
@@ -439,22 +472,19 @@
     display: flex;
     flex-direction: row;
     justify-content: left;
+    align-items: center;
   }
 
   .messages .header .icon {
     width: 26.53px;
     height: 33.67px;
-    border-radius: 4rem;
-    margin-top: 18.53px;
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .messages .header .text {
     height: 20px;
     font-size: 20px;
     font-weight: 700;
-    margin-top: 29px;
     margin-left: 8px;
     color: #034750;
   }
@@ -499,22 +529,19 @@
     display: flex;
     flex-direction: row;
     justify-content: left;
+    align-items: center;
   }
 
   .purchase-history .header .icon {
     width: 26.53px;
     height: 33.67px;
-    border-radius: 4rem;
-    margin-top: 18.53px;
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .purchase-history .header .text {
     height: 20px;
     font-size: 20px;
     font-weight: 700;
-    margin-top: 29px;
     margin-left: 8px;
     color: #034750;
   }

@@ -72,7 +72,7 @@ const route = useRoute()
       <router-link
         to="/operatornumbers"
         class="operator-numbers-button"
-        :class="{ active: route.name === 'Operator Numbers' }"
+        :class="{ active: route.name === 'OperatorNumbers' }"
       >
         <Hash class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Operator Numbers</div>
@@ -84,7 +84,7 @@ const route = useRoute()
         class="certificates-button"
         :class="{ active: route.name === 'CertificatesPage' }"
       >
-        <ReceiptText class="button-icon" color="#034750":size="20" />
+        <ReceiptText class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Certificates</div>
       </router-link>
 
