@@ -7,59 +7,61 @@
       </div>
     </div>
 
-    <div class="page-container">
-      <div class="summary-tile">
-        <div class="card-header">
-          <div class="header-icon completed-icon"></div>
-          <h2 class="card-title">Completed Enrollments</h2>
+  <div class="page-container">
+  <div class="summary-tile">
+    <div class="card-header">
+      <div class="header-icon completed-icon"></div>
+      <h2 class="card-title">Completed Enrollments</h2>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="summary-body">
+      <div class="summary-left">
+        <div class="course-image-large completed-image"></div>
+
+        <div class="course-header-info">
+          <h2 class="course-title">{{ courseTitle }}</h2>
+          <p class="course-expiration">Completed: {{ courseCompletedDate }}</p>
+          <p class="course-grade">Final Grade: {{ courseGrade }}</p>
         </div>
 
-        <div class="summary-body">
-          <div class="summary-left">
-            <div class="course-image-large completed-image"></div>
-
-            <div class="course-header-info">
-              <h2 class="course-title">{{ courseTitle }}</h2>
-              <p class="course-expiration">Completed: {{ courseCompletedDate }}</p>
-              <p class="course-grade">Final Grade: {{ courseGrade }}</p>
-            </div>
-
-            <div class="course-metrics">
-              <div class="metric">
-                <div class="metric-value">5</div>
-                <div class="metric-label">Total Chapters</div>
-              </div>
-              <div class="metric">
-                <div class="metric-value">{{ courseGrade }}</div>
-                <div class="metric-label">Grade</div>
-              </div>
-              <div class="metric">
-                <div class="metric-value">1.0</div>
-                <div class="metric-label">CEUs</div>
-              </div>
-              <div class="metric">
-                <div class="metric-value">10</div>
-                <div class="metric-label">Contact Hours</div>
-              </div>
-            </div>
+        <div class="course-metrics">
+          <div class="metric">
+            <div class="metric-value">5</div>
+            <div class="metric-label">Total Chapters</div>
           </div>
-
-          <div class="course-progress">
-            <div class="donut">
-              <div
-                class="donut-fill"
-                :style="{
-                  background:
-                    'conic-gradient(#6DBE4B ' + animatedAngle + 'deg, #7A7A7A 0deg)'
-                }"
-              ></div>
-              <div class="donut-inner">100%</div>
-            </div>
+          <div class="metric">
+            <div class="metric-value">{{ courseGrade }}</div>
+            <div class="metric-label">Grade</div>
           </div>
+          <div class="metric">
+            <div class="metric-value">1.0</div>
+            <div class="metric-label">CEUs</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">10</div>
+            <div class="metric-label">Contact Hours</div>
+          </div>
+        </div>
+      </div>
 
+      <div class="course-progress">
+        <div class="donut">
+          <div
+            class="donut-fill"
+            :style="{
+              background:
+                'conic-gradient(#6DBE4B ' + animatedAngle + 'deg, #7A7A7A 0deg)'
+            }"
+          ></div>
+          <div class="donut-inner">100%</div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
 
     <div class="courses-bottom">
 
@@ -69,6 +71,9 @@
             <div class="header-icon completed-icon"></div>
             <h2 class="card-title">Chapter Progress</h2>
           </div>
+
+            <div class="divider"></div>
+
 
           <div class="chapter-table">
             <div class="chapter-table-header">
@@ -97,41 +102,55 @@
       </div>
 
       <div class="courses-right">
-        <div class="side-card">
-          <div class="side-header">
-            <div class="header-icon side-icon"></div>
-            <div class="side-title">Messages</div>
-          </div>
-          <div class="side-body">
-            <div class="side-link">Example Email Message (5/5/2025)</div>
-            <div class="side-link">Example Email Message (5/03/2025)</div>
-            <div class="side-link">Example Email Message (4/21/2025)</div>
-          </div>
-          <div class="side-footer">(View all messages)</div>
-        </div>
 
-        <div class="side-card">
-          <div class="side-header">
-            <div class="header-icon side-icon"></div>
-            <div class="side-title">Next Course</div>
-          </div>
-          <div class="side-body">
-            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 3</div>
-          </div>
-          <div class="side-footer">(View all courses)</div>
-        </div>
-      </div>
+          <!-- Messages -->
+          <div class="side-card">
+            <div class="side-header">
+              <div class="header-icon side-icon"></div>
+              <div class="side-title">Messages</div>
+            </div>
+            <div class="divider"></div>
 
+            <div class="side-body">
+              <div class="side-link">Email message (5/5/2025)</div>
+              <div class="side-link">Email message (5/03/2025)</div>
+              <div class="side-link">Email message (4/21/2025)</div>
+            </div>
+
+            <div class="side-footer">(View all messages)</div>
+          </div>
+
+              <!-- Purchase History -->
+            <div class="side-card">
+              <div class="side-header">
+                <div class="header-icon side-icon"></div>
+                <div class="side-title">Purchase History</div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="side-body">
+                <div class="side-link">Operation of Wastewater Treatment Plants, Vol 1</div>
+                <div class="side-link">Operation of Wastewater Treatment Plants, Vol 2</div>
+                <div class="side-link">Operation of Wastewater Treatment Plants, Vol 3</div>
+                <div class="side-link">Industrial Waste Treatment, Vol 1</div>
+              </div>
+
+              <router-link to="/purchase-history" class="side-footer">
+                (View all purchases)
+              </router-link>
+            </div>
+        </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+<script>
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { completedCourses } from "../data/coursesData";
+import { completedCourses } from "../data/coursesData.js";
 
-export default defineComponent({
+export default {
   name: "CompletedCourse",
   setup() {
     const route = useRoute();
@@ -163,14 +182,14 @@ export default defineComponent({
 
     return { courseTitle, courseCompletedDate, courseGrade, chapters, animatedAngle };
   }
-});
+};
 </script>
 
 <style scoped>
 .completed-course-page {
   padding: 0px;
   background-color: #fff;
-  font-family: 'Myriad Pro', sans-serif;
+  font-family: 'Roboto', sans-serif;
   color: #034750;
 }
 
@@ -206,6 +225,19 @@ export default defineComponent({
   gap: 16px;
 }
 
+.summary-tile .divider {
+  border-top: 3px solid #FFFFFF;
+  width: calc(100% + 40px);
+  margin-left: -20px;
+  margin-top: -15px;
+  margin-bottom: 14px;
+}
+
+.summary-tile .card-header {
+  transform: translateY(-4px);
+  margin-bottom: 4px;
+}
+
 .card-header {
   display: flex;
   align-items: center;
@@ -232,6 +264,7 @@ export default defineComponent({
 
 .summary-body {
   display: flex;
+  align-items: flex-start;
   justify-content: flex-start;
   gap: 48px;
 }
@@ -241,7 +274,6 @@ export default defineComponent({
   align-items: flex-start;
   gap: 16px;
 }
-
 .course-image-large {
   width: 100px;
   height: 120px;
@@ -256,14 +288,27 @@ export default defineComponent({
   height: 120px;
 }
 
+.course-header-info h2,
+.course-header-info p {
+  margin: 0;
+  line-height: 1.1;
+}
+
 .course-title {
-  font-family: 'Myriad Pro Semibold', sans-serif;
+  font-family: 'Roboto Semibold', sans-serif;
   font-size: 16px;
   color: #707070;
+  margin: 0;
   line-height: 1.3;
   max-width: 260px;
   white-space: normal;
   overflow-wrap: break-word;
+}
+
+.course-expiration,
+.course-grade {
+  font-size: 14px;
+  color: #555;
 }
 
 .course-metrics {
@@ -271,7 +316,29 @@ export default defineComponent({
   align-items: center;
   gap: 32px;
   margin-left: 24px;
+  transform: translateY(10px);
 }
+
+.course-progress {
+  display: flex;
+  align-items: center;
+  margin-top: -10px;
+  margin-left: 8px;
+}
+
+.chapter-progress-tile .divider {
+  border-top: 3px solid #FFFFFF;
+  width: calc(100% + 40px);
+  margin-left: -20px;
+  margin-top: 18px;
+  margin-bottom: 18px;
+}
+
+.chapter-progress-tile .card-header {
+  transform: translateY(-8px);
+  margin-bottom: -18px;
+}
+
 
 .metric-value {
   font-size: 36px;
@@ -279,11 +346,6 @@ export default defineComponent({
   color: #00A5B5;
 }
 
-.course-progress {
-  display: flex;
-  align-items: flex-start;
-  margin-top: -30px;
-}
 
 .donut {
   position: relative;
@@ -311,7 +373,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Myriad Pro Semibold', sans-serif;
+  font-family: 'Roboto Semibold', sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: #034750;
@@ -323,9 +385,19 @@ export default defineComponent({
   width: 100%;
   margin: 32px auto;
   display: grid;
-  grid-template-columns: 1.5fr 0.9fr;
-  gap: 16px;
+  grid-template-columns: 1.6fr 0.8fr; 
+  gap: 8px; 
   align-items: flex-start;
+}
+
+.courses-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; 
+}
+
+.chapter-progress-tile {
+  width: 100%;
 }
 
 .chapter-progress-tile,
@@ -338,6 +410,9 @@ export default defineComponent({
 .side-card { width: 100%; }
 .courses-right { display: flex; flex-direction: column; gap: 16px; margin-left: auto; max-width: 260px; }
 
+
+
+
 .metric {
   display: flex;
   flex-direction: column;
@@ -349,7 +424,6 @@ export default defineComponent({
   color: #707070;
 }
 
-/* Chapter Table Rows */
 .chapter-table {
   margin-top: 4px;
   display: flex;
@@ -363,7 +437,7 @@ export default defineComponent({
   justify-content: space-between;
   border-bottom: 1px solid #dcdcdc;
   padding-bottom: 6px;
-  font-family: 'Myriad Pro Semibold', sans-serif;
+  font-family: 'Roboto Semibold', sans-serif;
   font-size: 15px;
   color: #034750;
   letter-spacing: 0.2px;
@@ -394,13 +468,21 @@ export default defineComponent({
   font-weight: 700;
   color: #034750;
 }
+.side-card {
+  background-color: #F2F1F2;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: 'Roboto', sans-serif;
+  width: 100%;
+}
 
 .side-header {
   display: flex;
   align-items: center;
-  gap: 8px; 
-  flex-direction: row; 
-  margin-bottom: 8px;
+  gap: 10px;
 }
 
 .side-title {
@@ -409,10 +491,19 @@ export default defineComponent({
   color: #034750;
 }
 
+.divider {
+  border-top: 3px solid #FFFFFF;
+  width: calc(100% + 40px);
+  margin-left: -20px;
+  margin-top: 2px;
+  margin-bottom: 8px;
+}
+
 .side-body {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  padding-top: 4px;
 }
 
 .side-link {
@@ -420,13 +511,33 @@ export default defineComponent({
   color: #007c8a;
   cursor: pointer;
   text-decoration: underline;
+  padding: 5px 16px;
+  margin: 0 -20px;
+  width: calc(100% + 7px);
+  transition: background-color 0.2s ease;
+}
+
+.side-link:hover {
+  background-color: #D9D9D9;
+  color: #007c8a;
 }
 
 .side-footer {
-  text-align: center;
-  font-size: 16px;
-  color: #034750;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 8px;
   cursor: pointer;
+  color: #034750;
+  transition: color 0.2s ease;
+}
+
+.side-footer:hover {
+  text-decoration: underline;
+  color: #007C8A;
 }
 
 .back-link {
@@ -435,7 +546,9 @@ export default defineComponent({
   font-size: 14px;
   color: #034750;
 }
+
 .back-link:hover {
   text-decoration: underline;
 }
+
 </style>
