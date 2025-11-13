@@ -186,7 +186,7 @@
 <style scoped>
   .operator-numbers-page {
     display: grid;
-    grid-template-columns: 65% 35%; 
+    grid-template-columns: 55vw 45vh; 
     align-items: start;
     gap: 20px;
     height: 100vh; 
@@ -431,7 +431,7 @@
     grid-column: 2 / 3;
     display: flex;
     margin-left: -15%;
-    width:50%;
+    width:55%;
     margin-top: 55px;
     flex-direction: column;
     gap: 16px;
