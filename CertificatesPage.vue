@@ -23,7 +23,7 @@
               <h2 class="card-title">Earned Certificates</h2>
             </div>
             <div class="card-divider"></div>
-            <div class="card-body" ref="scrollable">
+            <div class="card-body">
               <div
                 v-for="cert in certificates"
                 :key="cert.id"
@@ -230,7 +230,7 @@ const scrollToCertificate = (id) => {
   padding-top: 4px;
 }
 
-.header-icon {
+.header-icon, .side-icon {
   width: 26px;
   height: 34px;
 }
@@ -242,12 +242,20 @@ const scrollToCertificate = (id) => {
   margin: 0;
 }
 
-.card-divider {
+.card-divider, .divider {
   border-top: 3px solid #FFFFFF;
   width: calc(100% + 40px);
   margin-left: -20px;
+}
+
+.card-divider {
   margin-top: -15px;
   margin-bottom: 14px;
+}
+
+.divider {
+  margin-top: 2px;
+  margin-bottom: 8px;
 }
 
 .card-body {
@@ -295,7 +303,6 @@ const scrollToCertificate = (id) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
@@ -364,23 +371,10 @@ const scrollToCertificate = (id) => {
   gap: 10px;
 }
 
-.side-icon {
-  width: 26px;
-  height: 34px;
-}
-
 .side-title {
   font-size: 20px;
   font-weight: 700;
   color: #034750;
-}
-
-.divider {
-  border-top: 3px solid #FFFFFF;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  margin-top: 2px;
-  margin-bottom: 8px;
 }
 
 .side-body {
@@ -403,7 +397,6 @@ const scrollToCertificate = (id) => {
 
 .side-link:hover {
   background-color: #D9D9D9;
-  color: #007c8a;
 }
 
 .side-footer {
@@ -416,7 +409,6 @@ const scrollToCertificate = (id) => {
   margin-bottom: 8px;
   cursor: pointer;
   color: #034750;
-  transition: color 0.2s ease;
   text-decoration: none;
 }
 
@@ -425,7 +417,6 @@ const scrollToCertificate = (id) => {
   color: #007C8A;
 }
 
-/* Mobile */
 @media (max-width: 768px) {
   .courses-bottom {
     grid-template-columns: 1fr;
