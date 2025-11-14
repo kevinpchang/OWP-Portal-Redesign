@@ -1,5 +1,9 @@
 <template>
   <div class="certificates-page">
+    <!-- Top Section -->
+    <div class="courses-top">
+      <div class="text-block">
+        <h1 class="courses-header">Certificates</h1>
     <!-- Header -->
     <div class="page-top">
       <div class="text-block">
@@ -12,6 +16,18 @@
     </div>
 
     <!-- Main Content -->
+    <div class="courses-bottom">
+      <!-- Left: Certificates List -->
+      <div class="courses-left">
+        <div class="tiles-container">
+          <!-- Earned Certificates Card -->
+          <div class="course-card">
+            <div class="card-header">
+              <Award class="header-icon" color="#6DBE4B" />
+              <h2 class="card-title">Earned Certificates</h2>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-body" ref="scrollable">
     <div class="page-content">
       <!-- Left: Certificates List -->
       <div class="left-panel">
@@ -29,6 +45,9 @@
                 class="certificate-item"
                 @click="scrollToCertificate(cert.id)"
               >
+                <div class="cert-thumbnail">
+                  <span class="owp-text">OWP</span>
+                </div>
                 <div class="cert-thumbnail"></div>
                 <div class="cert-info">
                   <div class="cert-title">{{ cert.title }}</div>
@@ -47,6 +66,51 @@
       </div>
 
       <!-- Right: Sidebar -->
+      <div class="courses-right">
+        <!-- Messages -->
+        <div class="side-card">
+          <div class="side-header">
+            <Mail class="side-icon" color="#00A5B5" />
+            <div class="side-title">Messages</div>
+          </div>
+          <div class="divider"></div>
+          <div class="side-body">
+            <div class="side-link">Email message (11/10/2025)</div>
+            <div class="side-link">Email message (11/08/2025)</div>
+            <div class="side-link">Email message (11/05/2025)</div>
+          </div>
+          <div class="side-footer">(View all messages)</div>
+        </div>
+
+        <!-- Transcripts -->
+        <div class="side-card">
+          <div class="side-header">
+            <FileText class="side-icon" color="#6DBE4B" />
+            <div class="side-title">Transcripts</div>
+          </div>
+          <div class="divider"></div>
+          <div class="side-body">
+            <div class="side-link">View Transcript</div>
+            <div class="side-link">Purchase Transcript</div>
+          </div>
+          <div class="side-footer">(View all transcripts)</div>
+        </div>
+
+        <!-- Purchase History -->
+        <div class="side-card">
+          <div class="side-header">
+            <History class="side-icon" color="#034750" />
+            <div class="side-title">Purchase History</div>
+          </div>
+          <div class="divider"></div>
+          <div class="side-body">
+            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 1</div>
+            <div class="side-link">Advanced Water Treatment</div>
+            <div class="side-link">Water Distribution System Operation</div>
+          </div>
+          <router-link to="/purchase-history" class="side-footer">
+            (View all purchases)
+          </router-link>
       <div class="right-panel">
         <!-- Messages -->
         <div class="sidebar-card">
@@ -93,6 +157,40 @@
   </div>
 </template>
 
+<script setup>
+import { ref } from 'vue'
+import { Award, Mail, FileText, History } from 'lucide-vue-next'
+
+const certificates = ref([
+  {
+    id: 1,
+    title: "Advanced Water Treatment",
+    grade: "90%",
+    downloadUrl: "https://example.com/certs/advanced.pdf"
+  },
+  {
+    id: 2,
+    title: "Operation and Maintenance of Wastewater Collection Systems, Vol 1",
+    grade: "95%",
+    downloadUrl: "https://example.com/certs/wastewater-vol1.pdf"
+  },
+  {
+    id: 3,
+    title: "Operation and Maintenance of Wastewater Collection Systems, Vol 2",
+    grade: "100%",
+    downloadUrl: "https://example.com/certs/wastewater-vol2.pdf"
+  },
+  {
+    id: 4,
+    title: "Water Distribution System Operation and Maintenance",
+    grade: "100%",
+    downloadUrl: "https://example.com/certs/distribution.pdf"
+  }
+])
+
+const scrollToCertificate = (id) => {
+  console.log('View certificate:', id)
+}
 <script lang="ts">
 import { defineComponent } from "vue";
 
@@ -139,6 +237,7 @@ export default defineComponent({
 
 <style scoped>
 .certificates-page {
+  font-family: 'Roboto', sans-serif;
   background-color: #fff;
   min-height: 100vh;
   display: flex;
@@ -146,6 +245,7 @@ export default defineComponent({
   align-items: center;
 }
 
+.courses-top {
 .page-top {
   max-width: 1000px;
   width: 100%;
@@ -154,6 +254,14 @@ export default defineComponent({
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 5;
+  padding-bottom: 8px;
+}
+
+.courses-header {
 }
 
 .page-title {
@@ -186,11 +294,18 @@ export default defineComponent({
   color: #999;
 }
 
+.courses-bottom {
 .page-content {
   max-width: 1000px;
   width: 100%;
   margin: 0 auto 48px;
   display: grid;
+  grid-template-columns: 700px 300px;
+  column-gap: 16px;
+  padding: 0 20px;
+}
+
+.courses-left {
   grid-template-columns: 700px 280px;
   gap: 20px;
   padding: 0 20px;
@@ -201,6 +316,7 @@ export default defineComponent({
   flex-direction: column;
 }
 
+.tiles-container {
 .certificates-container {
   margin-top: 46px;
   display: flex;
@@ -208,6 +324,13 @@ export default defineComponent({
   gap: 40px;
 }
 
+.course-card {
+  background-color: #F2F1F2;
+  border-radius: 14px;
+  padding: 6px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 .certificate-card {
   background-color: #F2F1F2;
   border-radius: 14px;
@@ -224,6 +347,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
   gap: 8px;
+  padding-top: 4px;
   margin-bottom: 16px;
 }
 
@@ -245,6 +369,34 @@ export default defineComponent({
   margin: 0;
 }
 
+.card-divider {
+  border-top: 3px solid #FFFFFF;
+  width: calc(100% + 40px);
+  margin-left: -20px;
+  margin-top: -15px;
+  margin-bottom: 14px;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.card-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.card-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.card-body::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
 .card-body {
   display: flex;
   flex-direction: column;
@@ -255,6 +407,15 @@ export default defineComponent({
   display: grid;
   grid-template-columns: 70px 1fr;
   gap: 16px;
+  padding: 16px 12px;
+  margin: 0 -20px;
+  width: calc(100% + 40px);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.certificate-item:hover {
+  background-color: #D9D9D9;
   padding: 16px 0;
   border-bottom: 1px solid #e0e0e0;
   cursor: pointer;
@@ -275,6 +436,22 @@ export default defineComponent({
 .cert-thumbnail {
   width: 70px;
   height: 90px;
+  background: linear-gradient(135deg, #5AA843 0%, #6DBE4B 100%);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.owp-text {
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  font-family: 'Roboto', sans-serif;
+}
+
   background: linear-gradient(135deg, #6DBE4B 0%, #5AA843 100%);
   border-radius: 6px;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" font-size="40" fill="white" font-family="Arial" font-weight="bold">OWP</text></svg>');
@@ -294,6 +471,8 @@ export default defineComponent({
 .cert-title {
   font-size: 16px;
   font-weight: 600;
+  color: #707070;
+  text-decoration: underline;
   color: #034750;
   line-height: 1.4;
 }
@@ -319,6 +498,7 @@ export default defineComponent({
   color: #034750;
 }
 
+.courses-right {
 .right-panel {
   display: flex;
   flex-direction: column;
@@ -326,6 +506,88 @@ export default defineComponent({
   margin-top: 46px;
 }
 
+.side-card {
+  background-color: #F2F1F2;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.side-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.side-icon {
+  width: 26px;
+  height: 34px;
+}
+
+.side-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #034750;
+}
+
+.divider {
+  border-top: 3px solid #FFFFFF;
+  width: calc(100% + 40px);
+  margin-left: -20px;
+  margin-top: 2px;
+  margin-bottom: 8px;
+}
+
+.side-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.side-link {
+  font-size: 16px;
+  color: #007c8a;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 5px 16px;
+  margin: 0 -20px;
+  width: calc(100% + 40px);
+  transition: background-color 0.2s ease;
+}
+
+.side-link:hover {
+  background-color: #D9D9D9;
+  color: #007c8a;
+}
+
+.side-footer {
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 8px;
+  cursor: pointer;
+  color: #034750;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.side-footer:hover {
+  text-decoration: underline;
+  color: #007C8A;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .courses-bottom {
+    grid-template-columns: 1fr;
+  }
+  .courses-right {
 .sidebar-card {
   background-color: #F2F1F2;
   border-radius: 14px;
