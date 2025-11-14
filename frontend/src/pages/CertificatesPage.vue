@@ -228,6 +228,7 @@ const scrollToCertificate = (id) => {
   align-items: center;
   gap: 8px;
   padding-top: 4px;
+  margin-left: 20px;
 }
 
 .header-icon, .side-icon {
@@ -242,10 +243,10 @@ const scrollToCertificate = (id) => {
   margin: 0;
 }
 
-/* 1px DIVIDERS — MATCH DASHBOARD */
+/* WHITE DIVIDER — DASHBOARD STYLE */
 .divider {
   width: 100%;
-  border-top: 1px solid #CCC;
+  border-top: 1px solid #FFFFFF;
   margin: 12px 0 8px 0;
 }
 
@@ -271,18 +272,18 @@ const scrollToCertificate = (id) => {
   border-radius: 3px;
 }
 
+/* EDGE-TO-EDGE HOVER */
 .certificate-item {
   display: grid;
   grid-template-columns: 70px 1fr;
   gap: 16px;
-  padding: 16px 12px;
+  padding: 16px 20px;
   margin: 0 -20px;
   width: calc(100% + 40px);
   transition: background-color 0.2s ease;
   cursor: pointer;
 }
 
-/* HOVER = DASHBOARD STYLE */
 .certificate-item:hover {
   background-color: #D9D9D9;
 }
@@ -348,10 +349,10 @@ const scrollToCertificate = (id) => {
   margin-top: 46px;
 }
 
+/* NO PADDING — MARGINS ONLY */
 .side-card {
   background-color: #F2F1F2;
   border-radius: 14px;
-  padding: 16px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -361,13 +362,14 @@ const scrollToCertificate = (id) => {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin: 16px 20px 0 20px;
 }
 
 .side-body {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding-top: 4px;
+  margin: 0 20px;
 }
 
 .side-link {
@@ -379,7 +381,7 @@ const scrollToCertificate = (id) => {
   transition: background-color 0.2s ease;
 }
 
-/* DASHBOARD-STYLE HOVER */
+/* EDGE-TO-EDGE HOVER IN SIDEBAR */
 .side-link:hover {
   background-color: #D9D9D9;
 }
@@ -391,7 +393,7 @@ const scrollToCertificate = (id) => {
   align-items: flex-end;
   font-size: 18px;
   font-weight: 400;
-  margin-bottom: 8px;
+  margin: 0 20px 20px 20px;
   cursor: pointer;
   color: #034750;
   text-decoration: none;
