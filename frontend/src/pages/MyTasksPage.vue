@@ -1,241 +1,369 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 
-const currentDate = ref(formatDate())
+/* ----------------------------------
+   TASK DATA WITH CHAPTER NUMBERS
+-----------------------------------*/
+const chapters = [
+  { id: 1, chapter: "Ch-1", title: "Introduction to Wastewater Treatment", status: "completed", date: "11/1/2025" },
+  { id: 2, chapter: "Ch-2", title: "Effluent Discharge and Reuse", status: "completed", date: "11/1/2025" },
+  { id: 3, chapter: "Ch-3", title: "Odor Control", status: "overdue", overdueDays: 5 },
+  { id: 4, chapter: "Ch-4", title: "Instrumentation and Control", status: "upcoming" },
+  { id: 5, chapter: "Ch-5", title: "Introduction to Wastewater Utility Management", status: "upcoming" }
+]
 
-// Helper function to format date based on user's local settings
-function formatDate() {
-  return new Date().toLocaleDateString(undefined, {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric'
-  })
-}
+/* ------------------------------
+   DYNAMIC PROGRESS CALCULATION
+--------------------------------*/
+const total = chapters.length
+const completed = chapters.filter(c => c.status === "completed").length
+const progressValue = computed(() => Math.round((completed / total) * 100))
 
+/* ------------------------------
+   PROGRESS RING VARIABLES
+--------------------------------*/
+const progressStroke = 10
+const radius = 70
+const circumference = 2 * Math.PI * radius
 
-let timer
-onMounted(() => {
-  scheduleNextUpdate()
+const progressOffset = computed(() => {
+  return circumference - (progressValue.value / 100) * circumference
 })
-onUnmounted(() => {
-  clearTimeout(timer)
-})
-
-// Schedule a timer to update exactly at midnight
-function scheduleNextUpdate() {
-  const now = new Date()
-  const nextMidnight = new Date(now)
-  nextMidnight.setHours(24, 0, 0, 0)
-  const timeUntilMidnight = nextMidnight - now
-
-  timer = setTimeout(() => {
-    currentDate.value = formatDate()
-    scheduleNextUpdate() // reschedule for next day
-  }, timeUntilMidnight)
-}
 </script>
 
 <template>
-  <div class="mytasks-page">
-    <div class="top-section">
-      <div class="text">
-        <div class="date">{{ currentDate }}</div>
-        <div class="welcome">Your Task Overview</div>
-        <div class="description">
+  <!-- OUTER WRAPPER (centers the whole page like My Account / Certificates) -->
+  <div class="page-content">
+
+    <!-- INNER WRAPPER (your existing tasks-page layout) -->
+    <div class="tasks-page">
+
+      <!-- PAGE HEADER -->
+      <div class="header-section">
+        <div class="title">Tasks Overview</div>
+        <div class="subtitle">
           View your completed, upcoming, and overdue course tasks all in one place.
         </div>
       </div>
-      <div class="image">
-        <img src="../assets/owpart.png" />
-      </div>
-    </div>
 
-    <div class="bottom-section">
-      <!-- Completed Section -->
-      <div class="task-box completed">
-        <div class="header">
-          <div class="icon green"></div>
-          <div class="text">Completed Tasks</div>
-        </div>
-        <div class="divider"></div>
-        <div class="body">
-          <div class="task">
-            <div class="title">Ch-1 Introduction to Waste Water Treatment</div>
-            <div class="sub">Completed on 11/1/2025</div>
-          </div>
-          <div class="task">
-            <div class="title">Ch-2 Effluent Discharge and Reuse</div>
-            <div class="sub">Completed on 11/1/2025</div>
-          </div>
-        </div>
-      </div>
+      <!-- TASK GRID -->
+      <div class="task-grid">
 
-      <!-- Progress Tracker -->
-      <div class="task-box progress">
-        <div class="header">
-          <div class="icon blue"></div>
-          <div class="text">Overall Progress</div>
-        </div>
-        <div class="divider"></div>
-        <div class="circle">
-          <div class="inner">60%</div>
-        </div>
-      </div>
+        <!-- Completed Tasks -->
+        <div class="task-box">
+          <div class="task-header">
+            <div class="dot green"></div>
+            <span>Completed Tasks</span>
+          </div>
+          <div class="divider"></div>
 
-      <!-- Upcoming Section -->
-      <div class="task-box upcoming">
-        <div class="header">
-          <div class="icon yellow"></div>
-          <div class="text">Upcoming Tasks</div>
-        </div>
-        <div class="divider"></div>
-        <div class="body">
-          <div class="task">
-            <div class="title">Ch-4 Instrumentation and Control</div>
-          </div>
-          <div class="task">
-            <div class="title">Ch-5 Wastewater Utility Management</div>
+          <div class="body">
+            <div
+              v-for="chapter in chapters.filter(c => c.status === 'completed')"
+              :key="chapter.id"
+              class="task-item"
+            >
+              <div class="item-title">{{ chapter.chapter }} {{ chapter.title }}</div>
+              <div class="sub">Completed on {{ chapter.date }}</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Overdue Section -->
-      <div class="task-box overdue">
-        <div class="header">
-          <div class="icon red"></div>
-          <div class="text">Overdue Tasks</div>
-        </div>
-        <div class="divider"></div>
-        <div class="body">
-          <div class="task">
-            <div class="title">Ch-3 Odor Control</div>
-            <div class="sub">5 days overdue</div>
+        <!-- PROGRESS -->
+        <div class="task-box progress-box">
+          <div class="task-header">
+            <div class="dot blue"></div>
+            <span>Overall Progress</span>
+          </div>
+          <div class="divider"></div>
+
+          <div class="circle-wrapper">
+            <svg
+              class="progress-ring"
+              :width="radius * 2 + progressStroke * 2"
+              :height="radius * 2 + progressStroke * 2"
+            >
+              <circle
+                class="ring-bg"
+                :stroke-width="progressStroke"
+                :r="radius"
+                :cx="radius + progressStroke"
+                :cy="radius + progressStroke"
+              />
+              <circle
+                class="ring-progress"
+                :stroke-width="progressStroke"
+                :r="radius"
+                :cx="radius + progressStroke"
+                :cy="radius + progressStroke"
+                :stroke-dasharray="circumference"
+                :stroke-dashoffset="progressOffset"
+              />
+            </svg>
+
+            <div class="ring-text">{{ progressValue }}%</div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
+
+        <!-- UPCOMING TASKS -->
+        <div class="task-box">
+          <div class="task-header">
+            <div class="dot yellow"></div>
+            <div>Upcoming Tasks</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="body">
+            <div class="task-item">
+              <div class="item-title">Ch-4 Instrumentation and Control</div>
+              <div class="sub">Due on 11/20/2025</div>
+            </div>
+
+            <div class="task-item">
+              <div class="item-title">Ch-5 Introduction to Wastewater Utility Management</div>
+              <div class="sub">Due on 11/28/2025</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OVERDUE TASKS -->
+        <div class="task-box">
+          <div class="task-header">
+            <div class="dot red"></div>
+            <span>Overdue Tasks</span>
+          </div>
+          <div class="divider"></div>
+
+          <div class="body">
+            <div
+              v-for="chapter in chapters.filter(c => c.status === 'overdue')"
+              :key="chapter.id"
+              class="task-item"
+            >
+              <div class="item-title">{{ chapter.chapter }} {{ chapter.title }}</div>
+              <div class="sub">{{ chapter.overdueDays }} days overdue</div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- END GRID -->
+
+    </div> <!-- END tasks-page -->
+
+  </div> <!-- END page-content -->
 </template>
 
+<script>
+export default {
+  data() {
+    return {
+      chapters: [
+        { id: 1, chapter: 'Ch-1', title: 'Introduction to Wastewater Treatment', status: 'completed', date: '11/1/2025' },
+        { id: 2, chapter: 'Ch-2', title: 'Effluent Discharge and Reuse', status: 'completed', date: '11/1/2025' },
+        { id: 3, chapter: 'Ch-3', title: 'Odor Control', status: 'overdue', overdueDays: 5 }
+      ],
+      progressValue: 40,
+      radius: 80,
+      progressStroke: 12
+    };
+  },
+  computed: {
+    circumference() {
+      return 2 * Math.PI * this.radius;
+    },
+    progressOffset() {
+      return this.circumference - (this.progressValue / 100) * this.circumference;
+    }
+  }
+};
+</script>
+
 <style scoped>
-.mytasks-page {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  row-gap: 32px;
-  justify-content: center;
-  align-items: start;
-  color: #034750;
-  font-family: Myriad Pro, sans-serif;
+/* Reset box-sizing for consistency */
+* {
+  box-sizing: border-box;
 }
 
-.top-section {
-  display: grid;
-  grid-template-columns: 500px 500px;
-  margin-top: 32px;
-}
-
-.text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.date {
-  font-size: 20px;
-  font-weight: 600;
-  color: #707070;
-  margin-bottom: 16px;
-}
-
-.welcome {
-  font-size: 48px;
-  font-weight: 700;
-  color: #00A5B5;
-}
-
-.description {
-  width: 400px;
-  font-size: 18px;
-  color: #747474;
-  margin-top: 10px;
-}
-
-.image img {
+/* MAIN WRAPPER - This centers everything */
+.page-content {
   width: 100%;
-  height: 100%;
-  object-fit: scale-down;
-  object-position: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 32px;
 }
 
-.bottom-section {
-  display: grid;
-  grid-template-columns: repeat(2, 500px);
-  gap: 24px;
-  margin-bottom: 48px;
-}
-
-.task-box {
-  background-color: #F2F1F2;
-  border-radius: 1rem;
-  padding: 20px;
+/* INNER WRAPPER */
+.tasks-page {
+  width: 100%;
+  font-family: "Roboto", sans-serif;
+  color: #034750;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
 }
 
-.task-box .header {
-  display: flex;
-  align-items: center;
-}
-
-.icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-}
-
-.icon.green { background-color: #5d9632; }
-.icon.blue { background-color: #00A5B5; }
-.icon.yellow { background-color: #FFD54F; }
-.icon.red { background-color: #E57373; }
-
-.header .text {
-  font-size: 20px;
-  font-weight: 700;
-  margin-left: 8px;
-}
-
-.divider {
-  border-top: 1px solid #ccc;
-  margin: 10px 0;
-}
-
-.body .task {
-  margin-bottom: 16px;
+/* HEADER */
+.header-section {
+  margin-bottom: 30px;
 }
 
 .title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 42px;
+  font-weight: 700;
+  color: #034750;
 }
 
-.sub {
-  font-size: 14px;
-  color: #707070;
+.subtitle {
+  font-size: 18px;
+  margin-top: 6px;
+  color: #747474;
 }
 
-.circle {
-  width: 160px;
-  height: 160px;
-  margin: 40px auto;
-  border-radius: 50%;
-  border: 12px solid #00A5B5;
+/* GRID */
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+/* CARD */
+.task-box {
+  background: #F2F1F2;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+/* HEADER ROW */
+.task-header {
   display: flex;
   align-items: center;
+  font-size: 20px;
+  font-weight: 700;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.green { background: #5d9632; }
+.blue { background: #00A5B5; }
+.yellow { background: #FFD54F; }
+.red { background: #E57373; }
+
+/* FULL-WIDTH DIVIDER */
+.divider {
+  border-top: 2px solid white;
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-top: 10px;
+  margin-bottom: 16px;
+}
+
+/* TASK ITEMS */
+.body {
+  overflow: hidden;
+}
+
+.body .task-item {
+  margin-bottom: 16px;
+  padding: 10px;
+  border-radius: 10px;
+  transition: 0.2s ease;
+}
+
+.body .task-item:last-child {
+  margin-bottom: 0;
+}
+
+.body .task-item:hover {
+  background: #D9D9D9;
+  cursor: pointer;
+}
+
+.task-item .item-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #034750;
+}
+
+.task-item .sub {
+  font-size: 14px;
+  color: #707070;
+  margin-top: 4px;
+}
+
+/* PROGRESS RING */
+.progress-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  font-size: 28px;
+  min-height: 280px;
+}
+
+.circle-wrapper {
+  position: relative;
+  width: 200px;   /* increased to give SVG breathing room */
+  height: 200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+  display: block;
+}
+
+.ring-bg {
+  fill: transparent;
+  stroke: #dcdcdc;
+}
+
+.ring-progress {
+  fill: transparent;
+  stroke: #00A5B5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease-in-out;
+}
+
+.ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* TRUE perfect center now */
+  font-size: 32px;
   font-weight: 700;
   color: #00A5B5;
+  pointer-events: none;
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .task-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-content {
+    padding: 20px 16px;
+  }
+  
+  .title {
+    font-size: 32px;
+  }
+  
+  .subtitle {
+    font-size: 16px;
+  }
 }
 </style>
