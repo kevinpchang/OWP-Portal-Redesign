@@ -81,7 +81,7 @@
           </div>
         </div>
       </section>
-      
+
 
       <!-- ===== RIGHT COLUMN ===== -->
       <aside class="right-col">
@@ -132,7 +132,6 @@
 .account-page {
   padding: 16px 30px 32px;
   color: #034750;
-  font-family: "Myriad Pro";
 }
 .page-title {
   max-width: 1280px; /* aligns title text by responding to the grid below it (User info grid) */
@@ -146,7 +145,7 @@
 .grid {
   display: grid;
   grid-template-columns: 700px 300px;
-  /*grid-template-columns: 2fr 1fr;   more dynamic*/ 
+  /*grid-template-columns: 2fr 1fr;   more dynamic*/
   grid-template-areas:
     "profile profile"  /* profile spans across */
     "left    right";   /* then normal two columns */
@@ -157,7 +156,7 @@
   padding: 0 16px;
 }
 /* map children to areas */
-.profile-card { 
+.profile-card {
   grid-area: profile;
   width: 100%;
   display: grid;
@@ -173,16 +172,16 @@
   padding: 8px 16px;      /* looks better with a bit more padding */
 }
 .left-col {
-  grid-area: left; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 16px; 
+  grid-area: left;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 .right-col {
-  grid-area: right; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 16px; 
+  grid-area: right;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* ===== Cards ===== */
@@ -267,7 +266,7 @@
 .op-line { margin: 8px 8px 4px; color: #3a4e51; }
 .op-line .label { color: #707070; margin-right: 6px; }
 .link { color: #007C8A; text-decoration: underline; }
-/* Force the line to be visible regardless of any inherited rules 
+/* Force the line to be visible regardless of any inherited rules
 NEED TO PRODUCE A MORE NEAT WAY TO DO THIS LATER */
 ::v-deep(.operator-card .op-line),
 ::v-deep(.operator-card .op-line .label),

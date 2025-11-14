@@ -139,7 +139,6 @@ export default defineComponent({
 
 <style scoped>
 .certificates-page {
-  font-family: 'Myriad Pro', sans-serif;
   background-color: #fff;
   min-height: 100vh;
   display: flex;
