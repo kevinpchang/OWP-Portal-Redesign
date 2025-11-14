@@ -1,167 +1,161 @@
 <template>
-  <div class="ph">
-
-    <!-- ===================== HEADER (TEXT LEFT + IMAGE RIGHT) ===================== -->
-    <div class="ph-header-top">
-      <div class="ph-left-text">
-        <div class="ph-date">{{ today }}</div>
-        <div class="ph-title">Purchase History</div>
-        <div class="ph-subtitle">View all invoices and their details.</div>
+  <div class="purchase-history-page">
+    <!-- ===================== HEADER  ===================== -->
+    <div class="page-top">
+      <div class="text-block">
+        <h1 class="page-title">Purchase History</h1>
+        <p class="page-description">
+          View your invoices and payment details for your purchases.
+        </p>
       </div>
-
-      <div class="ph-right-image">
-        <img src="../assets/owpart.png" alt="OWP Header Image" />
-      </div>
+     
     </div>
 
-    <!-- ===================== INVOICE LIST ===================== -->
-    <section v-if="!selected" class="ph-grid">
-      <article
-        v-for="inv in invoices"
-        :key="inv.id"
-        class="inv-card"
-        @click="open(inv)"
-      >
-        <div class="inv-title">Invoice</div>
-        <div class="inv-number">#{{ inv.id }}</div>
-
-        <div class="inv-meta">
-          <div class="label">Invoice Date:</div>
-          <div class="value">{{ fmtDate(inv.invoiceDate) }}</div>
-        </div>
-
-        <div class="status paid">Paid</div>
-      </article>
-    </section>
-
-    <!-- ===================== INVOICE DETAIL ===================== -->
-    <section v-else class="ph-detail">
-      <div class="detail-header">
-        <div class="left">
-          <div class="detail-title">Invoice</div>
-        </div>
-
-        <div class="right">
-          <button class="btn ghost" @click="printReceipt">Receipt</button>
-          <button class="btn primary" @click="selected = null">
-            Return to Purchase History
-          </button>
-        </div>
-      </div>
-
-      <div class="detail-table">
-        <div class="row">
-          <div class="cell h">Invoice Num</div>
-          <div class="cell">#{{ selected!.id }}</div>
-          <div class="cell h">Invoice Date</div>
-          <div class="cell">{{ fmtDate(selected!.invoiceDate) }}</div>
-          <div class="cell h">Invoice Due Date</div>
-          <div class="cell">{{ fmtDate(selected!.dueDate) }}</div>
-        </div>
-
-        <div class="row">
-          <div class="cell h">Shipped</div>
-          <div class="cell">{{ selected!.shipped ? 'Yes' : 'No' }}</div>
-          <div class="cell h">Balance Due</div>
-          <div class="cell">{{ fmtMoney(selected!.balanceDue) }}</div>
-          <div class="cell h">Order Method</div>
-          <div class="cell">{{ selected!.orderMethod }}</div>
-        </div>
-
-        <div class="row multi">
-          <div class="cell h">Order Placed By</div>
-          <div class="cell">{{ selected!.placedBy }}</div>
-
-          <div class="cell h">Billing Address & Phone</div>
-          <div class="cell">
-            <div class="addr">{{ selected!.billing.name }}</div>
-            <div class="addr">{{ selected!.billing.address1 }}</div>
-            <div class="addr" v-if="selected!.billing.address2">
-              {{ selected!.billing.address2 }}
-            </div>
-            <div class="addr">
-              {{ selected!.billing.city }},
-              {{ selected!.billing.state }}
-              {{ selected!.billing.zip }}
-            </div>
-            <div class="addr">{{ selected!.billing.phone }}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-heading">Invoice Items</div>
-
-      <div class="items">
-        <div class="items-row head">
-          <div class="c product">Product Name</div>
-          <div class="c qty">Item Quantity</div>
-          <div class="c total">Total Cost</div>
-        </div>
-
-        <div
-          v-for="(it, i) in selected!.items"
-          :key="i"
-          class="items-row"
+    <!-- ===================== MAIN CONTENT (CENTERED) ===================== -->
+    <div class="ph">
+      <!-- INVOICE LIST VIEW -->
+      <section v-if="!selected" class="ph-grid">
+        <article
+          v-for="inv in invoices"
+          :key="inv.id"
+          class="inv-card"
+          @click="open(inv)"
         >
-          <div class="c product">{{ it.product }}</div>
-          <div class="c qty">{{ it.qty }}</div>
-          <div class="c total">{{ fmtMoney(it.total) }}</div>
-        </div>
-      </div>
+          <div class="inv-title">Invoice</div>
+          <div class="inv-number">#{{ inv.id }}</div>
 
-      <div class="section-heading">Payment</div>
+          <div class="inv-meta">
+            <div class="label">Invoice Date:</div>
+            <div class="value">{{ fmtDate(inv.invoiceDate) }}</div>
+          </div>
 
-      <div class="payment">
-        <div class="p-row">
-          <div class="p-h">Amount Paid</div>
-          <div class="p-v">{{ fmtMoney(selected!.payment.amountPaid) }}</div>
+          <div class="status paid">Paid</div>
+        </article>
+      </section>
 
-          <div class="p-h">Pay Date</div>
-          <div class="p-v">{{ fmtDate(selected!.payment.payDate) }}</div>
+      <!-- INVOICE DETAIL VIEW -->
+      <section v-else class="ph-detail">
+        <div class="detail-header">
+          <div class="left">
+            
+            <div class="detail-title">Invoice Details</div>
+          </div>
 
-          <div class="p-h">Pay Method</div>
-          <div class="p-v">{{ selected!.payment.method }}</div>
-        </div>
-
-        <div class="p-row">
-          <div class="p-h">Description</div>
-          <div class="p-v">{{ selected!.payment.description }}</div>
-
-          <div class="p-h">Payment Made By</div>
-          <div class="p-v">{{ selected!.payment.madeBy }}</div>
-
-          <div class="p-h">Payment Phone</div>
-          <div class="p-v">{{ selected!.payment.phone }}</div>
+          <div class="right">
+            <button class="btn ghost" @click="printReceipt">Receipt</button>
+            <button class="btn primary" @click="selected = null">
+              Return to Purchase History
+            </button>
+          </div>
         </div>
 
-        <div class="p-row">
-          <div class="p-h">Payment Address</div>
-          <div class="p-v">
-            <div>{{ selected!.payment.address1 }}</div>
-            <div v-if="selected!.payment.address2">
-              {{ selected!.payment.address2 }}
-            </div>
-            <div>
-              {{ selected!.payment.city }},
-              {{ selected!.payment.state }}
-              {{ selected!.payment.zip }}
+        <div class="detail-table">
+          <div class="row">
+            <div class="cell h">Invoice Num</div>
+            <div class="cell">#{{ selected!.id }}</div>
+            <div class="cell h">Invoice Date</div>
+            <div class="cell">{{ fmtDate(selected!.invoiceDate) }}</div>
+            <div class="cell h">Invoice Due Date</div>
+            <div class="cell">{{ fmtDate(selected!.dueDate) }}</div>
+          </div>
+
+          <div class="row">
+            <div class="cell h">Shipped</div>
+            <div class="cell">{{ selected!.shipped ? 'Yes' : 'No' }}</div>
+            <div class="cell h">Balance Due</div>
+            <div class="cell">{{ fmtMoney(selected!.balanceDue) }}</div>
+            <div class="cell h">Order Method</div>
+            <div class="cell">{{ selected!.orderMethod }}</div>
+          </div>
+
+          <div class="row multi">
+            <div class="cell h">Order Placed By</div>
+            <div class="cell">{{ selected!.placedBy }}</div>
+
+            <div class="cell h">Billing Address & Phone</div>
+            <div class="cell">
+              <div class="addr">{{ selected!.billing.name }}</div>
+              <div class="addr">{{ selected!.billing.address1 }}</div>
+              <div class="addr" v-if="selected!.billing.address2">
+                {{ selected!.billing.address2 }}
+              </div>
+              <div class="addr">
+                {{ selected!.billing.city }},
+                {{ selected!.billing.state }}
+                {{ selected!.billing.zip }}
+              </div>
+              <div class="addr">{{ selected!.billing.phone }}</div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
+        <div class="section-heading">Invoice Items</div>
+
+        <div class="items">
+          <div class="items-row head">
+            <div class="c product">Product Name</div>
+            <div class="c qty">Item Quantity</div>
+            <div class="c total">Total Cost</div>
+          </div>
+
+          <div
+            v-for="(it, i) in selected!.items"
+            :key="i"
+            class="items-row"
+          >
+            <div class="c product">{{ it.product }}</div>
+            <div class="c qty">{{ it.qty }}</div>
+            <div class="c total">{{ fmtMoney(it.total) }}</div>
+          </div>
+        </div>
+
+        <div class="section-heading">Payment</div>
+
+        <div class="payment">
+          <div class="p-row">
+            <div class="p-h">Amount Paid</div>
+            <div class="p-v">{{ fmtMoney(selected!.payment.amountPaid) }}</div>
+
+            <div class="p-h">Pay Date</div>
+            <div class="p-v">{{ fmtDate(selected!.payment.payDate) }}</div>
+
+            <div class="p-h">Pay Method</div>
+            <div class="p-v">{{ selected!.payment.method }}</div>
+          </div>
+
+          <div class="p-row">
+            <div class="p-h">Description</div>
+            <div class="p-v">{{ selected!.payment.description }}</div>
+
+            <div class="p-h">Payment Made By</div>
+            <div class="p-v">{{ selected!.payment.madeBy }}</div>
+
+            <div class="p-h">Payment Phone</div>
+            <div class="p-v">{{ selected!.payment.phone }}</div>
+          </div>
+
+          <div class="p-row">
+            <div class="p-h">Payment Address</div>
+            <div class="p-v">
+              <div>{{ selected!.payment.address1 }}</div>
+              <div v-if="selected!.payment.address2">
+                {{ selected!.payment.address2 }}
+              </div>
+              <div>
+                {{ selected!.payment.city }},
+                {{ selected!.payment.state }}
+                {{ selected!.payment.zip }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-
-const today = new Date().toLocaleDateString(undefined, {
-  weekday: "long",
-  month: "long",
-  day: "numeric",
-});
 
 type InvoiceItem = { product: string; qty: number; total: number };
 type Address = {
@@ -321,50 +315,53 @@ function printReceipt() {
 </script>
 
 <style scoped>
-/* ===================== HEADER ===================== */
+/* ===================== PAGE SHELL  ===================== */
 
-.ph-header-top {
+.purchase-history-page {
+  font-family: 'Myriad Pro', sans-serif;
+  background-color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page-top {
+  max-width: 1000px;
+  width: 100%;
+  margin: 32px auto 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 24px;
-  margin-bottom: 32px;
+  padding: 0 20px;
 }
 
-.ph-left-text {
-  flex: 1;
+.text-block {
+  display: flex;
+  flex-direction: column;
 }
 
-.ph-date {
-  font-size: 18px;
-  font-weight: 600;
-  color: #4b5563;
-  margin-bottom: 6px;
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #034750; 
+  margin: 0;
 }
 
-.ph-title {
-  font-size: 40px;
-  font-weight: 900;
-  color: #00a5b5;
-}
-
-.ph-subtitle {
+.page-description {
   font-size: 16px;
-  color: #6b7280;
-  margin-top: 6px;
+  color: #555;
+  margin: 8px 0 0;
 }
 
-.ph-right-image img {
-  width: 480px;
-  max-width: 100%;
-  border-radius: 6px;
-  object-fit: cover;
-}
 
-/* ===================== MAIN LAYOUT ===================== */
+/* ===================== MAIN CONTENT (CENTERED WRAPPER) ===================== */
 
 .ph {
-  padding: 16px 24px 32px 40px;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto 48px;
+  padding: 16px 20px 32px 20px;
   display: grid;
   gap: 20px;
 }
@@ -384,8 +381,6 @@ function printReceipt() {
   padding: 14px 16px;
   cursor: pointer;
   font-size: 14px;
-
-  /* hover animation */
   transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
 }
 
@@ -441,7 +436,7 @@ function printReceipt() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px; /* <- gives space so buttons don't sit on the table border */
+  margin-bottom: 16px;
 }
 
 .right {
@@ -449,8 +444,9 @@ function printReceipt() {
   gap: 16px;
 }
 
+/* Invoice Details title color matches scheme */
 .detail-title {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 800;
   color: #034750;
 }
@@ -461,7 +457,6 @@ function printReceipt() {
   border-radius: 999px;
   border: none;
   cursor: pointer;
-
   transition: background-color 0.15s ease, color 0.15s ease,
     box-shadow 0.15s ease, transform 0.1s ease;
 }
@@ -518,6 +513,7 @@ function printReceipt() {
 .cell.h {
   background: #f8fafc;
   font-weight: 700;
+  color: #034750; /* match scheme for header cells */
 }
 
 .addr {
@@ -581,9 +577,33 @@ function printReceipt() {
   padding: 10px 12px;
   background: #f8fafc;
   font-weight: 700;
+  color: #034750; /* match scheme */
 }
 
 .p-v {
   padding: 10px 12px;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 900px) {
+  .ph-grid {
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .ph-grid {
+    grid-template-columns: 1fr;
+  }
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .right {
+    align-self: stretch;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }
 </style>
