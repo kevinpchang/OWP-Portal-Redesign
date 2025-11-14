@@ -27,6 +27,10 @@
   function closeDelete() {
     deletePopup.value = false
   }
+
+  import { useRoute } from 'vue-router'
+  import { Award, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next';
+  const route = useRoute()
 </script>
 
 <template>
@@ -82,7 +86,7 @@
     <div class="quick-links">
       <div class="messages">
         <div class="header">
-          <div class="icon"></div>
+          <Mail class="icon" color="#007C8A"/>
           <div class="text">Messages</div>
         </div>
         <div class="divider"></div>
@@ -98,7 +102,7 @@
 
       <div class="purchase-history">
         <div class="header">
-          <div class="icon"></div>
+          <Award class="icon" color="#007C8A"/>
           <div class="text">Certificates</div>
         </div>
         <div class="divider"></div>
@@ -480,7 +484,6 @@
     border-radius: 4rem;
     margin-top: 18.53px;
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .messages .header .text {
@@ -544,7 +547,6 @@
     border-radius: 4rem;
     margin-top: 18.53px;
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .purchase-history .header .text {
