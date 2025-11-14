@@ -5,8 +5,6 @@
 
     <!-- =========== GRID =========== -->
     <div class="grid">
-      <!-- ===== LEFT COLUMN ===== -->
-      <section class="left-col">
 
         <!-- Profile header card -->
         <div class="card profile-card">
@@ -19,6 +17,8 @@
           </div>
         </div>
 
+        <!-- ===== LEFT COLUMN ===== -->
+        <section class="left-col">
         <!-- Contact info card -->
         <div class="card contact-card">
           <header class="card-head">
@@ -29,6 +29,8 @@
             </div>
             <button class="btn xsmall">Edit</button>
           </header>
+
+          <div class="divider"></div>
 
           <div class="contact-body">
             <div class="row">
@@ -71,12 +73,15 @@
             <button class="btn xsmall">Edit</button>
           </header>
 
+          <div class="divider"></div>
+
           <div class="op-line">
             <span class="label">Operator numbers:</span>
             <a href="#" class="link">California-123456</a>
           </div>
         </div>
       </section>
+
 
       <!-- ===== RIGHT COLUMN ===== -->
       <aside class="right-col">
@@ -87,6 +92,8 @@
             <div class="side-icon" aria-hidden="true"></div>
             <h3>Transcripts</h3>
           </header>
+
+          <div class="divider"></div>
 
           <ul class="side-links">
             <li><a href="#">View Transcript</a></li>
@@ -102,6 +109,8 @@
             <div class="side-icon purchase" aria-hidden="true"></div>
             <h3>Purchase History</h3>
           </header>
+
+          <div class="divider"></div>
 
           <ul class="side-links">
             <li><a href="#">Operation of Wastewater Treatment Plants, Vol 1</a></li>
@@ -123,11 +132,9 @@
 .account-page {
   padding: 16px 30px 32px;
   color: #034750;
-  font-family: "Myriad Pro";
-  /*font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; */
 }
 .page-title {
-  max-width: 1280px; /** aligns title text by responding to the grid below it (User info grid) */
+  max-width: 1280px; /* aligns title text by responding to the grid below it (User info grid) */
   margin: 8px auto 16px;
   font-size: 28px;
   font-weight: 800;
@@ -138,12 +145,40 @@
 .grid {
   display: grid;
   grid-template-columns: 700px 300px;
-  column-gap: 16rem; /* you used 16rem elsewhere; keeps same spacing */
+  /*grid-template-columns: 2fr 1fr;   more dynamic*/
+  grid-template-areas:
+    "profile profile"  /* profile spans across */
+    "left    right";   /* then normal two columns */
+  column-gap: 16px;
+  row-gap: 16px;       /* add a little vertical spacing */
   max-width: 1280px;
   margin: 0 auto;
+  padding: 0 16px;
 }
-.left-col,
+/* map children to areas */
+.profile-card {
+  grid-area: profile;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 88px 1fr;  /* avatar | text */
+  column-gap: 16px;
+  align-items: center;               /* vertically center avatar + text */
+  padding: 24px 28px;                /* restore comfortable padding */
+}
+/* Keep the Edit button from stretching */
+.profile-card .btn {
+  justify-self: start;    /* pin to left edge of the text column */
+  width: auto;            /* no full-width bar */
+  padding: 8px 16px;      /* looks better with a bit more padding */
+}
+.left-col {
+  grid-area: left;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 .right-col {
+  grid-area: right;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -157,14 +192,6 @@
   box-shadow: 0 1px 0 rgba(0,0,0,.02) inset;
 }
 
-/* ===== Profile header ===== */
-.profile-card {
-  display: grid;
-  grid-template-columns: 88px 1fr;
-  gap: 16px;
-  align-items: center;
-  padding: 16px 18px;
-}
 .avatar {
   width: 88px;
   height: 88px;
@@ -174,7 +201,7 @@
 }
 .profile-meta {
   display: grid;
-  align-items: start;
+  align-content: start;   /* keep content top-aligned within the cell */
   gap: 6px;
 }
 .user-name {
@@ -216,7 +243,7 @@
 .card-head h2 { margin: 0; font-size: 20px; font-weight: bold; color: #034750; }
 
 .contact-body {
-  background: #ECEBEC;
+  background: transparent;
   border-radius: 18px;
   padding: 16px 18px;
 }
@@ -239,6 +266,29 @@
 .op-line { margin: 8px 8px 4px; color: #3a4e51; }
 .op-line .label { color: #707070; margin-right: 6px; }
 .link { color: #007C8A; text-decoration: underline; }
+/* Force the line to be visible regardless of any inherited rules
+NEED TO PRODUCE A MORE NEAT WAY TO DO THIS LATER */
+::v-deep(.operator-card .op-line),
+::v-deep(.operator-card .op-line .label),
+::v-deep(.operator-card .op-line .link),
+::v-deep(.operator-card .op-line a) {
+  display: inline;
+  position: relative;
+  z-index: 1;
+  color: #034750;
+  font-size: 16px;
+  opacity: 1;
+  visibility: visible;
+  filter: none;
+  mix-blend-mode: normal;
+  -webkit-text-fill-color: currentColor;
+  text-indent: 0;
+  letter-spacing: 0;
+  word-spacing: normal;
+  text-shadow: none;
+  white-space: normal;
+}
+
 
 /* ===== Right column panels ===== */
 .side { padding: 12px; }
@@ -274,8 +324,24 @@ a { text-decoration: none; }
 a:hover { text-decoration: underline; }
 .card :where(h2, h3) { letter-spacing: .2px; }
 
-/* Fix old border commas if you reuse .divider anywhere */
-.divider { border: 1px solid #FFFFFF; }
+/* Hover effects */
+.card {
+  transition: all 0.3s ease;        /* enables the animation */
+}
+
+/* Lift any card (profile, contact, operator, side) on hover */
+.card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transform: translateY(-3px);
+}
+
+/* ===== Divider ===== */
+.divider {
+  width: 100%;
+  height: 0;
+  border: 1px solid #FFFFFF;
+  margin: 12px 0;
+}
 
 /* ===== Responsive ===== */
 @media (max-width: 1200px) {

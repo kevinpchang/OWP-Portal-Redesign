@@ -1,78 +1,79 @@
 <template>
   <div class="active-course-page">
 
-    <!-- header -->
+    <!-- Header -->
     <div class="courses-top">
       <div class="text-block">
         <div class="courses-header">Courses</div>
       </div>
     </div>
 
+    <!-- Summary Tile (Wide) -->
     <div class="page-container">
-    <!-- summary (wide) -->
-    <div class="summary-tile">
-      <div class="card-header">
-        <div class="header-icon"></div>
-        <h2 class="card-title">Active Enrollments</h2>
-      </div>
-
-      <div class="summary-body">
-        <div class="summary-left">
-          <div class="course-image-large"></div>
-
-          <div class="course-header-info">
-            <h2 class="course-title">{{ courseTitle }}</h2>
-            <p class="course-expiration">Expires: {{ courseExpiration }}</p>
-            <p class="course-completed">Completed: {{ courseCompleted }}</p>
-            <button class="extend-button">Extend</button>
-          </div>
-
-          <div class="course-metrics">
-            <div class="metric">
-              <div class="metric-value">5</div>
-              <div class="metric-label">Total Chapters</div>
-            </div>
-            <div class="metric">
-              <div class="metric-value">B</div>
-              <div class="metric-label">Grade Average</div>
-            </div>
-            <div class="metric">
-              <div class="metric-value">--</div>
-              <div class="metric-label">CEUs</div>
-            </div>
-            <div class="metric">
-              <div class="metric-value">--</div>
-              <div class="metric-label">Contact Hours</div>
-            </div>
-          </div>
+      <div class="summary-tile">
+        <div class="card-header">
+          <div class="header-icon"></div>
+          <h2 class="card-title">Active Enrollments</h2>
         </div>
 
-        <div class="course-progress">
-          <div class="donut">
-            <div
-              class="donut-fill"
-              :style="{
-                background:
-                  'conic-gradient(#00A5B5 ' + animatedAngle + 'deg, #7A7A7A 0deg)'
-              }"
-            ></div>
-            <div class="donut-inner">{{ animatedProgress }}%</div>
+        <div class="divider"></div>
+
+        <div class="summary-body">
+          <div class="summary-left">
+            <div class="course-image-large"></div>
+
+            <div class="course-header-info">
+              <h2 class="course-title">{{ courseTitle }}</h2>
+              <p class="course-expiration">Expires: {{ courseExpiration }}</p>
+              <p class="course-completed">Completed: {{ courseCompleted }}</p>
+              <button class="extend-button">Extend</button>
+            </div>
+
+            <div class="course-metrics">
+              <div class="metric">
+                <div class="metric-value">5</div>
+                <div class="metric-label">Total Chapters</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">B</div>
+                <div class="metric-label">Grade Average</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">--</div>
+                <div class="metric-label">CEUs</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">--</div>
+                <div class="metric-label">Contact Hours</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="course-progress">
+            <div class="donut">
+              <div
+                class="donut-fill"
+                :style="{
+                  background:
+                    'conic-gradient(#00A5B5 ' + animatedAngle + 'deg, #7A7A7A 0deg)'
+                }"
+              ></div>
+              <div class="donut-inner">{{ animatedProgress }}%</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    </div>
-    <!-- main -->
+
+    <!-- Bottom Grid -->
     <div class="courses-bottom">
-
-      <!-- left -->
       <div class="courses-left">
         <div class="chapter-progress-tile">
           <div class="card-header">
             <div class="header-icon"></div>
             <h2 class="card-title">Chapter Progress</h2>
           </div>
-
+<div class="divider"></div>
           <div class="chapter-table">
             <div class="chapter-table-header">
               <div class="chapter-col">Chapter</div>
@@ -102,43 +103,55 @@
         <router-link to="/courses" class="back-link">← Back to Courses</router-link>
       </div>
 
-      <!-- right -->
       <div class="courses-right">
-        <div class="side-card">
-          <div class="side-header">
-            <div class="header-icon side-icon"></div>
-            <div class="side-title">Messages</div>
-          </div>
-          <div class="side-body">
-            <div class="side-link">Example Email Message (5/5/2025)</div>
-            <div class="side-link">Example Email Message (5/03/2025)</div>
-            <div class="side-link">Example Email Message (4/21/2025)</div>
-          </div>
-          <div class="side-footer">(View all messages)</div>
-        </div>
+  <!-- Messages -->
+  <div class="side-card">
+    <div class="side-header">
+      <div class="header-icon side-icon"></div>
+      <div class="side-title">Messages</div>
+    </div>
+    <div class="divider"></div>
 
-        <div class="side-card">
-          <div class="side-header">
-            <div class="header-icon side-icon"></div>
-            <div class="side-title">Next Course</div>
-          </div>
-          <div class="side-body">
-            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 3</div>
-          </div>
-          <div class="side-footer">(View all courses)</div>
-        </div>
-      </div>
+    <div class="side-body">
+      <div class="side-link">Email message (5/5/2025)</div>
+      <div class="side-link">Email message (5/03/2025)</div>
+      <div class="side-link">Email message (4/21/2025)</div>
+    </div>
+
+    <div class="side-footer">(View all messages)</div>
+  </div>
+
+  <!-- Purchase History -->
+  <div class="side-card">
+    <div class="side-header">
+      <div class="header-icon side-icon"></div>
+      <div class="side-title">Purchase History</div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="side-body">
+      <div class="side-link">Operation of Wastewater Treatment Plants, Vol 1</div>
+      <div class="side-link">Operation of Wastewater Treatment Plants, Vol 2</div>
+      <div class="side-link">Operation of Wastewater Treatment Plants, Vol 3</div>
+      <div class="side-link">Industrial Waste Treatment, Vol 1</div>
+    </div>
+
+    <router-link to="/purchase-history" class="side-footer">
+      (View all purchases)
+    </router-link>
+  </div>
+</div>
 
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+<script>
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { activeCourses } from "../data/coursesData";
+import { activeCourses } from "../data/coursesData.js";
 
-export default defineComponent({
+export default {
   name: "ActiveCourse",
   setup() {
     const route = useRoute();
@@ -198,7 +211,7 @@ export default defineComponent({
       chapters
     };
   },
-});
+};
 </script>
 
 <style scoped>
@@ -207,7 +220,7 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   background-color: #fff;
-  font-family: 'Myriad Pro', sans-serif;
+  font-family: 'Roboto', sans-serif;
   color: #034750;
 }
 
@@ -226,9 +239,11 @@ export default defineComponent({
   color: #034750;
 }
 
-.page-container {
+.page-container,
+.courses-bottom {
   max-width: 1000px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .summary-tile {
@@ -241,14 +256,15 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 16px;
-  grid-column: 1 / -1;
 }
 
-.card-header {
+.card-header,
+.side-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px; 
 }
+
 
 .header-icon {
   width: 26px;
@@ -257,18 +273,24 @@ export default defineComponent({
   background-color: #007C8A;
 }
 
-.card-header,
-.side-header {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .card-title {
   font-size: 20px;
   font-weight: 700;
   color: #034750;
-  font-family: 'Myriad Pro Semibold', sans-serif;
+  font-family: 'Roboto Semibold', sans-serif;
+}
+
+.summary-tile .card-header {
+  transform: translateY(-4px); 
+  margin-bottom: 4px; 
+}
+
+.summary-tile .divider {
+  border-top: 3px solid #FFFFFF;
+  width: calc(100% + 40px);
+  margin-left: -20px;
+  margin-top: -15px;  
+  margin-bottom: 14px;
 }
 
 .summary-body {
@@ -306,7 +328,7 @@ export default defineComponent({
 }
 
 .course-title {
-  font-family: 'Myriad Pro Semibold', sans-serif;
+  font-family: 'Roboto Semibold', sans-serif;
   font-size: 16px;
   color: #707070;
   margin: 0;
@@ -328,7 +350,7 @@ export default defineComponent({
   border: none;
   border-radius: 4px;
   padding: 4px 14px;         
-  font-family: 'Myriad Pro Semibold', sans-serif;
+  font-family: 'Roboto Semibold', sans-serif;
   font-size: 14px;
   cursor: pointer;
   width: fit-content;          
@@ -345,7 +367,15 @@ export default defineComponent({
   display: flex;
   align-items: center;
   gap: 32px;
-  margin-left: 24px; 
+  margin-left: 24px;
+  transform: translateY(10px);
+}
+
+.course-progress {
+  display: flex;
+  align-items: center; 
+  margin-top: -10px;   
+  margin-left: 8px;
 }
 
 .metric {
@@ -363,13 +393,6 @@ export default defineComponent({
 .metric-label {
   font-size: 14px;
   color: #707070;
-}
-
-.course-progress {
-  display: flex;
-  align-items: flex-start;
-  margin-top: -30px;   
-  margin-left: 8px;
 }
 
 .donut {
@@ -398,7 +421,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Myriad Pro Semibold', sans-serif;
+  font-family: 'Roboto Semibold', sans-serif;
   font-size: 18px;
   color: #555;
 }
@@ -408,7 +431,8 @@ export default defineComponent({
   width: 100%;
   margin: 32px auto;
   display: grid;
-  grid-template-columns: 1.5fr 0.9fr; 
+  grid-template-columns: 1.6fr 0.8fr; 
+  gap: 8px;
   align-items: flex-start;
 }
 
@@ -435,10 +459,15 @@ export default defineComponent({
   justify-content: space-between;
   border-bottom: 1px solid #dcdcdc;
   padding-bottom: 6px;
-  font-family: 'Myriad Pro Semibold', sans-serif;
+  font-family: 'Roboto Semibold', sans-serif;
   font-size: 15px;         
   color: #034750;           
   letter-spacing: 0.2px;    
+}
+
+.chapter-progress-tile .card-header {
+  transform: translateY(-4px); 
+  margin-bottom: -18px;      
 }
 
 .chapter-row {
@@ -499,6 +528,14 @@ export default defineComponent({
   margin-left: auto; 
 }
 
+.divider {
+  border-top: 3px solid #FFFFFF;
+  width: calc(100% + 40px);
+  margin-left: -20px;
+  margin-top: 2px;
+  margin-bottom: 8px;
+}
+
 .side-card {
   background-color: #F2F1F2;
   border-radius: 14px;
@@ -506,20 +543,14 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: 100%;   
+  font-family: 'Roboto', sans-serif;
+  width: 100%;
 }
 
 .side-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-}
-
-.side-icon {
-  width: 26px;
-  height: 34px;
-  border-radius: 6px;
-  background-color: #007C8A;
+  gap: 10px;
 }
 
 .side-title {
@@ -532,6 +563,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 14px;
+  padding-top: 4px;
 }
 
 .side-link {
@@ -539,16 +571,34 @@ export default defineComponent({
   color: #007c8a;
   cursor: pointer;
   text-decoration: underline;
+  padding: 5px 16px;
+  margin: 0 -20px;
+  width: calc(100% + 7px);
+  transition: background-color 0.2s ease;
+}
+
+.side-link:hover {
+  background-color: #D9D9D9;
+  color: #007c8a;
 }
 
 .side-footer {
-  text-align: center;
-  font-size: 16px;
-  color: #034750;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 8px;
   cursor: pointer;
+  color: #034750;
+  transition: color 0.2s ease;
 }
 
-
+.side-footer:hover {
+  text-decoration: underline;
+  color: #007C8A;
+}
 </style>
 
 

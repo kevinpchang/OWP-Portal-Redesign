@@ -1,21 +1,53 @@
+<script setup>
+  import { ref } from 'vue'
+
+  const addPopup = ref(false)
+  function openAdd() {
+    addPopup.value = true
+  }
+
+  function closeAdd() {
+    addPopup.value = false
+  }
+
+  const editPopup = ref(false)
+  function openEdit() {
+    editPopup.value = true
+  }
+
+  function closeEdit() {
+    editPopup.value = false
+  }
+
+  const deletePopup = ref(false)
+  function openDelete() {
+    deletePopup.value = true
+  }
+
+  function closeDelete() {
+    deletePopup.value = false
+  }
+
+  import { useRoute } from 'vue-router'
+  import { Award, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next';
+  const route = useRoute()
+</script>
+
 <template>
   <div class="operator-numbers-page">
     <div class="left-column">
       <div class="header-container">
         <div class="title">Operator Numbers</div>
-        <button class = add-button popovertarget="addpopover">Add Operator Number</button>
+        <p class="description">View and edit your Operator Numbers</p>
+        <button class = add-button @click.left="openAdd">Add Operator Number</button>
       </div>
-
-      <!---<div name="button">
-        <button class = add-button popovertarget="addpopover">Add Operator Number</button>
-      </div>-->
 
       <div name="table">
         <table>
           <thead class="table-header">
             <tr>
-                <th>State/Province</th>
-                <th>Operator Number</th>
+                <th style="width: 10%;">State/Province</th>
+                <th style="width: 35%;">Operator Number</th>
                 <th></th>
             </tr>
           </thead>
@@ -24,16 +56,16 @@
               <td>California</td>
               <td>12345</td>
               <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                <button class="edit-button" @click.left="openEdit">Edit</button>
+                <button class="remove-button" @click.left="openDelete">Remove</button>
               </td>
             </tr>
             <tr>
               <td>Colorado</td>
               <td>67890</td>
               <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                <button class="edit-button" @click.left="openEdit">Edit</button>
+                <button class="remove-button" @click.left="openDelete">Remove</button>
 
               </td>
             </tr>
@@ -41,190 +73,116 @@
               <td>Washington</td>
               <td>59746</td>
               <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td>
-                <button class="edit-button" popovertarget="editpopover">Edit</button>
-                <button class="remove-button" popovertarget="deletepopover">Remove</button>
+                <button class="edit-button" @click.left="openEdit">Edit</button>
+                <button class="remove-button" @click.left="openDelete">Remove</button>
               </td>
             </tr>
           </tbody>
         </table>
-      </div>
+      </div>  
     </div>
     
 
     <div class="quick-links">
       <div class="messages">
         <div class="header">
-          <div class="icon"></div>
+          <Mail class="icon" color="#007C8A"/>
           <div class="text">Messages</div>
         </div>
         <div class="divider"></div>
         <div class="body">
-          <div class="text">Email message (4/11/2025)</div>
-          <div class="text">Email message (4/07/2025)</div>
-          <div class="text">Email message (4/03/2025)</div>
+          <div class="object"><div class="text">Email message (4/11/2025)</div></div>
+          <div class="object"><div class="text">Email message (4/07/2025)</div></div>
+          <div class="object"><div class="text">Email message (4/03/2025)</div></div>
         </div>
         <div class="view-all">
-          <div class="text">(View all messages)</div>
+          <a class="text" href="">(View all messages)</a>
         </div>
       </div>
 
       <div class="purchase-history">
         <div class="header">
-          <div class="icon"></div>
-          <div class="text" >Purchase History</div>
+          <Award class="icon" color="#007C8A"/>
+          <div class="text">Certificates</div>
         </div>
         <div class="divider"></div>
         <div class="body">
-          <div class="text">Operation of Wastewater Treatment Plants, Vol 1</div>
-          <div class="text">Operation of Wastewater Treatment Plants, Vol 2</div>
-          <div class="text">Operation of Wastewater Treatment Plants, Vol 3</div>
-          <div class="text">Industrial Waste Treatment, Vol 1</div>
+          <div class="object"><div class="text">Waste Water 1 Certificate</div></div>
+          <div class="object"><div class="text">Waste Water 2 Certificate</div></div>
+          <div class="object"><div class="text">Utility 1 Certificate </div></div>
+          <div class="object"><div class="text">Utility 2 Certificate </div></div>
         </div>
         <div class="view-all">
-          <a class="text" href="/purchase-history">(View all purchases)</a>
+          <a class="text" href="/Certificates">(View all Certificates)</a>
         </div>
       </div>
     </div>
 
-     <div id="addpopover" popover="auto" class="popup">
-      <div class="header">
-        <div class="left">
-          <img src="../assets/owp_logo.png"/>
+    <transition name="fade">
+      <div class="popup" v-if="addPopup">
+        <div class="blur-overlay"></div>
+        <div class="inner">
+          <div class="header">
+            <div class="left">
+              <img src="../assets/owp_logo.png"/>
+            </div>
+          </div>
+          <div class="form-container">
+            <h1 class="popup-title">
+              Add Operator Number
+            </h1>
+            <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
+            <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
+            <button class = popup-button-left @click="closeAdd">Add</button>
+
+          </div>
         </div>
       </div>
-      <form class="form-container">
-        <h1 class="popup-title">
-          Add Operator Number
-        </h1>
-        <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
-        <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
-        <button class = popup-button-left popovertarget="addpopover" popovertargetaction="hide">Add</button>
+    </transition>
+    
+    <transition name="fade">
+      <div class="popup" v-if="editPopup">
+        <div class="blur-overlay"></div>
+        <div class="inner">
+          <div class="header">
+            <div class="left">
+              <img src="../assets/owp_logo.png"/>
+            </div>
+          </div>
+          <div class="form-container">
+            <h1 class="popup-title">
+              Edit Operator Number
+            </h1>
+            <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
+            <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
+            <button class = popup-button-left @click="closeEdit">Edit</button>
 
-      </form>
-    </div>
-
-    <div id="editpopover" popover="auto" class="popup">
-      <div class="header">
-        <div class="left">
-          <img src="../assets/owp_logo.png"/>
+          </div>
         </div>
       </div>
-      <form class="form-container">
-        <h1 class="popup-title">
-          Edit Operator Number
-        </h1>
-        <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
-        <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
-        <button class = popup-button-left popovertarget="editpopover" popovertargetaction="hide">Edit</button>
+    </transition>
 
-      </form>
-    </div>
+    <transition name="fade">
+      <div class="popup" v-if="deletePopup">
+        <div class="blur-overlay"></div>
+        <div class="inner">
+          <div class="header">
+            <div class="left">
+              <img src="../assets/owp_logo.png"/>
+            </div>
+          </div>
+          <div class="form-container">
+            <h1 class="popup-title">
+              Remove Operator Number
+            </h1>
+            <p class="popup-text">Are you sure you want to remove the Operator Number?</p>
+            <button class = popup-button-left @click="closeDelete">Yes</button>
+            <button class = popup-button-right @click="closeDelete">No</button>
 
-    <div id="deletepopover" popover="auto" class="popup">
-      <div class="header">
-        <div class="left">
-          <img src="../assets/owp_logo.png"/>
+          </div>
         </div>
       </div>
-      <form class="form-container">
-        <h1 class="popup-title">
-          Remove Operator Number
-        </h1>
-        <p class="popup-text">Are you sure you want to remove the Operator Number?</p>
-        <button class = popup-button-left popovertarget="deletepopover" popovertargetaction="hide">Yes</button>
-        <button class = popup-button-right popovertarget="deletepopover" popovertargetaction="hide">No</button>
-
-      </form>
-    </div>
-
+    </transition>
 
   </div>
 </template>
@@ -233,27 +191,27 @@
 <style scoped>
   .operator-numbers-page {
     display: grid;
-    grid-template-columns: 65% 35%; 
-    align-items: start;
+    grid-template-rows: auto 1fr;
+    justify-content: center;
     gap: 20px;
-    height: 100vh; 
+    height: 100vh;
     background-color: #fff;
-    padding: 40px 40px 0 40px;
     box-sizing: border-box;
   }
 
   .header-container {
     grid-column: 1 / 2;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
-    height:25px;
+    margin-top: 25px;
   }
 
   .title {
     width: 331px;
     height: 28px;
-    margin-left: 42%;
+    display: flex;
+    margin-left: 2%;
     font-family: 'Roberto', sans-serif;
     font-size: 28px;
     font-weight: 790;
@@ -261,16 +219,29 @@
     align-items: center;
   }
 
+  .description {
+    font-family: 'Roberto', sans-serif;
+    display:flex;
+    font-size: 17px;
+    font-weight: 400;
+    color: #034750;
+    margin-top:45px;
+    margin-left: -337px;
+  }
+
+  .divider{
+    border:1px solid white;
+  }
+
   .add-button {
     background-color: #48773C;
     padding: 15px 15px;
-    margin-left: 77%;
-    margin-top: -45px;
     border: none;
-    width:15%;
+    /*width:15%;*/
     border-radius: 10px;
     font-family: 'Roberto', sans-serif;
     color: white;
+    margin-left: 228px;
     margin-bottom: 20px;
   }
 
@@ -279,24 +250,30 @@
   }
 
   .edit-button{
-    background: transparent;
+    width: 75px;
+    border-radius: 8px;
     border: none !important;
     font-family: 'Roberto', sans-serif;
     font-size: 17px;
-    font-weight: 600;
-    color: #034750;
+    font-weight: 400;
+    color: #FFFFFF;
+    background-color: #D97A27;
+    cursor: pointer;
   }
 
   .remove-button{
-    background: transparent;
+    width: 80px;
     float:right;
+    border-radius: 8px;
     border: none !important;
     font-family: 'Roberto', sans-serif;
     font-size: 17px;
-    font-weight: 600;
-    color: #034750;
+    font-weight: 400;
+    color: #FFFFFF;
+    background-color: #9F3323;
+    cursor: pointer;
   }
-  
+
   .popup-button-left{
     margin-left: 15px;
     margin-top:15px;
@@ -304,7 +281,7 @@
     padding:15px 15px;
     border:none;
     border-radius: 10px;
-    font-family: 'Roberto', sans-serif;  
+    font-family: 'Roberto', sans-serif;
     color:white
   }
 
@@ -315,7 +292,7 @@
     padding:15px 15px;
     border:none;
     border-radius: 10px;
-    font-family: 'Roberto', sans-serif;  
+    font-family: 'Roberto', sans-serif;
     color:white
   }
 
@@ -330,18 +307,17 @@
   .table-body {
     font-family: 'Roberto', sans-serif;
     font-size: 17px;
-    font-weight: 600;
+    font-weight: 400;
     color: #034750;
     margin: 0;
   }
 
   table {
-    margin-top: 30px;
-    margin-left: 40%;
+    /*margin-top: 30px;*/
     border-collapse: collapse;
-    width: 52%;
+    width: 700px;
     background-color: #f2f1f2;
-    border-radius: 20px;
+    border-radius: 14px;
     overflow: hidden;
   }
 
@@ -359,7 +335,7 @@
   th {
     background-color: #f2f1f2;
     color: #004d4d;
-    font-weight: bold;
+    font-weight: 400px;
     border-bottom: 1px solid #ccc;
   }
 
@@ -375,12 +351,33 @@
     border-bottom: 1px solid #ddd;
   }
 
+  .blur-overlay {
+    position: fixed;
+    inset: 0;
+    width:100vw;
+    height:100vh;
+    background-color: #0000009a; /* slight tint */
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+    z-index: -99999; /* below the popup */
+  }
+
   .popup{
-    margin-top: 15%;
+    margin-top: 10%;
+    margin-left: 25%;
     width: 20%;
     height: 35%;
     position: fixed;
-    border: 3px solid #004d4d;
+    z-index: 999;
+    border:none;
+    border-radius: 10px;
+    background-color: #f2f1f2;
+  }
+
+  .popup .inner{
+    background-color: #f2f1f2;
+    border:none;
+    height:95%;
     border-radius: 10px;
     background-color: #f2f1f2;
   }
@@ -390,6 +387,9 @@
     height: 15%;
     display: flex;
     flex-direction: row;
+    border-top: #034750;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     align-items: center;
     justify-content: space-between;
     background-color: #034750;
@@ -447,12 +447,20 @@
   .quick-links {
     grid-column: 2 / 3;
     display: flex;
-    margin-left: -15%;
-    width:40%;
-    margin-top: 55px;
+    margin-top: 106px;
+    width: 300px;
     flex-direction: column;
     gap: 16px;
     top: 40px;
+  }
+
+  .object{
+    height: 40px;
+  }
+
+  .object:hover {
+    cursor: pointer;
+    background-color: #D9D9D9;
   }
 
   .messages {
@@ -476,7 +484,6 @@
     border-radius: 4rem;
     margin-top: 18.53px;
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .messages .header .text {
@@ -496,7 +503,7 @@
 
   .messages .body .text {
     height: 14px;
-    margin-top: 25px;
+    margin-top: 10px;
     margin-left: 24px;
     font-size: 16px;
     font-weight: 400;
@@ -520,7 +527,7 @@
   }
 
   .purchase-history {
-    height: 460px;
+    height: 400px;
     border-radius: 14rem;
     display: flex;
     flex-direction: column;
@@ -540,7 +547,6 @@
     border-radius: 4rem;
     margin-top: 18.53px;
     margin-left: 23.55px;
-    background-color: #007C8A;
   }
 
   .purchase-history .header .text {
@@ -560,7 +566,7 @@
 
   .purchase-history .body .text {
     height: 14px;
-    margin-top: 40px;
+    margin-top: 10px;
     margin-left: 24px;
     margin-right: 24px;
     font-size: 16px;
@@ -582,6 +588,24 @@
     font-weight: 400;
     margin-bottom: 12px;
     color: #034750;
+  }
+
+  .view-all .text {
+    text-decoration: none;
+  }
+
+  .view-all .text:hover {
+    text-decoration: underline;
+    color: #007C8A;
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.25s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
   }
 </style>
 

@@ -1,446 +1,589 @@
 <template>
-  <div class="dashboard-page">
-    <!-- top: breadcrumb + title + blurb + image slot -->
-    <div class="dashboard-top">
-      <div class="text">
-        <nav class="breadcrumb" aria-label="Breadcrumb">
-          <a href="#" class="crumb">Dashboard</a>
-          <span class="crumb-sep">&gt;</span>
-          <span class="crumb-current">Purchase History</span>
-        </nav>
+  <div class="ph">
 
-        <div class="welcome-message">My Purchase History</div>
-        <div class="dashboard-description">
-          Review your recent purchases, track progress, and download certificates.
+    <!-- ===================== HEADER (TEXT LEFT + IMAGE RIGHT) ===================== -->
+    <div class="ph-header-top">
+      <div class="ph-left-text">
+        <div class="ph-date">{{ today }}</div>
+        <div class="ph-title">Purchase History</div>
+        <div class="ph-subtitle">View all invoices and their details.</div>
+      </div>
+
+      <div class="ph-right-image">
+        <img src="../assets/owpart.png" alt="OWP Header Image" />
+      </div>
+    </div>
+
+    <!-- ===================== INVOICE LIST ===================== -->
+    <section v-if="!selected" class="ph-grid">
+      <article
+        v-for="inv in invoices"
+        :key="inv.id"
+        class="inv-card"
+        @click="open(inv)"
+      >
+        <div class="inv-title">Invoice</div>
+        <div class="inv-number">#{{ inv.id }}</div>
+
+        <div class="inv-meta">
+          <div class="label">Invoice Date:</div>
+          <div class="value">{{ fmtDate(inv.invoiceDate) }}</div>
+        </div>
+
+        <div class="status paid">Paid</div>
+      </article>
+    </section>
+
+    <!-- ===================== INVOICE DETAIL ===================== -->
+    <section v-else class="ph-detail">
+      <div class="detail-header">
+        <div class="left">
+          <div class="detail-title">Invoice</div>
+        </div>
+
+        <div class="right">
+          <button class="btn ghost" @click="printReceipt">Receipt</button>
+          <button class="btn primary" @click="selected = null">
+            Return to Purchase History
+          </button>
         </div>
       </div>
 
-      <div class="image">
-        <img src="../assets/owpart.png" alt="OWP art" />
-      </div>
-    </div>
+      <div class="detail-table">
+        <div class="row">
+          <div class="cell h">Invoice Num</div>
+          <div class="cell">#{{ selected!.id }}</div>
+          <div class="cell h">Invoice Date</div>
+          <div class="cell">{{ fmtDate(selected!.invoiceDate) }}</div>
+          <div class="cell h">Invoice Due Date</div>
+          <div class="cell">{{ fmtDate(selected!.dueDate) }}</div>
+        </div>
 
-    <!-- bottom: two columns -->
-    <div class="dashboard-bottom">
-      <div class="dashboard-left">
-        <!-- SUMMARY HEADER -->
-        <section class="block">
-          <h2 class="block-title">Summary</h2>
-          <div class="summary-stats">
-            <div class="stat">
-              <span class="label">Total Purchases</span>
-              <span class="value">{{ totalPurchases }}</span>
+        <div class="row">
+          <div class="cell h">Shipped</div>
+          <div class="cell">{{ selected!.shipped ? 'Yes' : 'No' }}</div>
+          <div class="cell h">Balance Due</div>
+          <div class="cell">{{ fmtMoney(selected!.balanceDue) }}</div>
+          <div class="cell h">Order Method</div>
+          <div class="cell">{{ selected!.orderMethod }}</div>
+        </div>
+
+        <div class="row multi">
+          <div class="cell h">Order Placed By</div>
+          <div class="cell">{{ selected!.placedBy }}</div>
+
+          <div class="cell h">Billing Address & Phone</div>
+          <div class="cell">
+            <div class="addr">{{ selected!.billing.name }}</div>
+            <div class="addr">{{ selected!.billing.address1 }}</div>
+            <div class="addr" v-if="selected!.billing.address2">
+              {{ selected!.billing.address2 }}
             </div>
-            <div class="stat">
-              <span class="label">Certificates Completed</span>
-              <span class="value">{{ certificatesCompleted }}</span>
+            <div class="addr">
+              {{ selected!.billing.city }},
+              {{ selected!.billing.state }}
+              {{ selected!.billing.zip }}
             </div>
-            <div class="stat">
-              <span class="label">Total Spent</span>
-              <span class="value">\${{ totalSpent.toFixed(2) }}</span>
-            </div>
-            <div class="stat">
-              <span class="label">Last Purchase</span>
-              <span class="value">{{ lastPurchaseDate }}</span>
-            </div>
+            <div class="addr">{{ selected!.billing.phone }}</div>
           </div>
-        </section>
-
-        <!-- RECENT PURCHASES -->
-        <section class="block">
-          <div class="row-between">
-            <h2 class="block-title">Recent Purchases</h2>
-            <button class="btn">View All</button>
-          </div>
-
-          <div class="purchase-list">
-            <div
-              class="purchase-card"
-              v-for="(purchase, index) in filteredPurchases"
-              :key="index"
-            >
-              <img
-                class="purchase-img"
-                :src="purchase.image"
-                :alt="purchase.title"
-              />
-              <div class="purchase-info">
-                <h3 class="purchase-title">{{ purchase.title }}</h3>
-                <p class="purchase-meta">
-                  Purchased on {{ purchase.date }} •
-                  <strong>{{ purchase.status }}</strong>
-                </p>
-                <p class="purchase-price">\${{ purchase.price.toFixed(2) }}</p>
-                <div class="progress-bar">
-                  <div
-                    class="progress"
-                    :style="{ width: purchase.progress + '%' }"
-                  ></div>
-                </div>
-                <p class="progress-text">Progress: {{ purchase.progress }}%</p>
-                <div class="purchase-actions">
-                  <button class="btn small">Download Certificate</button>
-                  <button class="btn-outline small">View Details</button>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="filteredPurchases.length === 0" class="placeholder">
-              No purchases match your filters.
-            </div>
-          </div>
-        </section>
+        </div>
       </div>
 
-      <div class="dashboard-right">
-        <!-- FILTERS -->
-        <section class="block">
-          <h2 class="block-title">Filters</h2>
-          <input
-            type="text"
-            v-model="searchTerm"
-            placeholder="Search by course..."
-            class="filter-input"
-          />
-          <select v-model="statusFilter" class="filter-select">
-            <option value="">All Status</option>
-            <option value="Completed">Completed</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Pending">Pending</option>
-          </select>
-        </section>
+      <div class="section-heading">Invoice Items</div>
 
-        <!-- INVOICES -->
-        <section class="block">
-          <h2 class="block-title">Invoices</h2>
-          <ul class="invoice-list">
-            <li v-for="(invoice, i) in invoices" :key="i" class="invoice-item">
-              <span>{{ invoice.id }}</span>
-              <span>{{ invoice.date }}</span>
-              <a href="#" class="invoice-link">Download</a>
-            </li>
-          </ul>
-        </section>
+      <div class="items">
+        <div class="items-row head">
+          <div class="c product">Product Name</div>
+          <div class="c qty">Item Quantity</div>
+          <div class="c total">Total Cost</div>
+        </div>
+
+        <div
+          v-for="(it, i) in selected!.items"
+          :key="i"
+          class="items-row"
+        >
+          <div class="c product">{{ it.product }}</div>
+          <div class="c qty">{{ it.qty }}</div>
+          <div class="c total">{{ fmtMoney(it.total) }}</div>
+        </div>
       </div>
-    </div>
+
+      <div class="section-heading">Payment</div>
+
+      <div class="payment">
+        <div class="p-row">
+          <div class="p-h">Amount Paid</div>
+          <div class="p-v">{{ fmtMoney(selected!.payment.amountPaid) }}</div>
+
+          <div class="p-h">Pay Date</div>
+          <div class="p-v">{{ fmtDate(selected!.payment.payDate) }}</div>
+
+          <div class="p-h">Pay Method</div>
+          <div class="p-v">{{ selected!.payment.method }}</div>
+        </div>
+
+        <div class="p-row">
+          <div class="p-h">Description</div>
+          <div class="p-v">{{ selected!.payment.description }}</div>
+
+          <div class="p-h">Payment Made By</div>
+          <div class="p-v">{{ selected!.payment.madeBy }}</div>
+
+          <div class="p-h">Payment Phone</div>
+          <div class="p-v">{{ selected!.payment.phone }}</div>
+        </div>
+
+        <div class="p-row">
+          <div class="p-h">Payment Address</div>
+          <div class="p-v">
+            <div>{{ selected!.payment.address1 }}</div>
+            <div v-if="selected!.payment.address2">
+              {{ selected!.payment.address2 }}
+            </div>
+            <div>
+              {{ selected!.payment.city }},
+              {{ selected!.payment.state }}
+              {{ selected!.payment.zip }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref } from "vue";
 
-// ✅ Import images so Vite resolves them reliably
-import keyPng from "../assets/key.png";
-import lilGuyPng from "../assets/lil_guy.png";
-import owpartPng from "../assets/owpart.png";
+const today = new Date().toLocaleDateString(undefined, {
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+});
 
-type Purchase = {
-  title: string;
-  date: string;      // ISO or display date
-  status: "Completed" | "In Progress" | "Pending";
-  price: number;
-  progress: number;  // 0..100
-  image: string;     // resolved asset url
+type InvoiceItem = { product: string; qty: number; total: number };
+type Address = {
+  name?: string;
+  address1: string;
+  address2?: string;
+  city: string;
+  state: string;
+  zip: string;
+  phone?: string;
+};
+type Payment = {
+  amountPaid: number;
+  payDate: string;
+  method: string;
+  description: string;
+  madeBy: string;
+  phone: string;
+  address1: string;
+  address2?: string;
+  city: string;
+  state: string;
+  zip: string;
+};
+type Invoice = {
+  id: number;
+  invoiceDate: string;
+  dueDate: string;
+  shipped: boolean;
+  balanceDue: number;
+  placedBy: string;
+  billing: Address;
+  orderMethod: string;
+  status: "Paid" | "Unpaid";
+  items: InvoiceItem[];
+  payment: Payment;
 };
 
-type Invoice = { id: string; date: string };
-
-const purchases = ref<Purchase[]>([
-  {
-    title: "Operations of Wastewater Treatment Plants, Vol 2 Certificate",
-    date: "10/11/2024",
-    status: "Completed",
-    price: 45.0,
-    progress: 100,
-    image: keyPng,
-  },
-  {
-    title: "Operations of Wastewater Treatment Plants, Vol 1 Certificate",
-    date: "09/28/2024",
-    status: "In Progress",
-    price: 45.0,
-    progress: 70,
-    image: lilGuyPng,
-  },
-  {
-    title: "Water Treatment Plant Operation, Vol 1 Certificate",
-    date: "08/15/2024",
-    status: "Pending",
-    price: 45.0,
-    progress: 0,
-    image: owpartPng,
-  },
-]);
-
 const invoices = ref<Invoice[]>([
-  { id: "INV-12345", date: "10/11/2024" },
-  { id: "INV-12346", date: "09/28/2024" },
-  { id: "INV-12347", date: "08/15/2024" },
+  {
+    id: 901737,
+    invoiceDate: "2025-09-29",
+    dueDate: "2025-10-29",
+    shipped: false,
+    balanceDue: 0,
+    placedBy: "David Benjamin",
+    billing: {
+      name: "BENJAMIN, DAVID",
+      address1: "6000 J ST, MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+      phone: "(123) 234-1111",
+    },
+    orderMethod: "OWP Website",
+    status: "Paid",
+    items: [{ product: "Operation of Wastewater Treatment Plants, Vol 1", qty: 1, total: 40 }],
+    payment: {
+      amountPaid: 40,
+      payDate: "2025-09-29",
+      method: "Visa",
+      description: "—",
+      madeBy: "David Benjamin",
+      phone: "(123) 234-1111",
+      address1: "6000 J ST",
+      address2: "MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+    },
+  },
+  {
+    id: 901733,
+    invoiceDate: "2025-09-26",
+    dueDate: "2025-10-26",
+    shipped: false,
+    balanceDue: 0,
+    placedBy: "David Benjamin",
+    billing: {
+      name: "BENJAMIN, DAVID",
+      address1: "6000 J ST, MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+      phone: "(123) 234-1111",
+    },
+    orderMethod: "OWP Website",
+    status: "Paid",
+    items: [{ product: "Operation of Wastewater Treatment Plants, Vol 2", qty: 1, total: 45 }],
+    payment: {
+      amountPaid: 45,
+      payDate: "2025-09-26",
+      method: "Visa",
+      description: "—",
+      madeBy: "David Benjamin",
+      phone: "(123) 234-1111",
+      address1: "6000 J ST",
+      address2: "MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+    },
+  },
+  {
+    id: 901731,
+    invoiceDate: "2025-09-22",
+    dueDate: "2025-10-22",
+    shipped: false,
+    balanceDue: 0,
+    placedBy: "David Benjamin",
+    billing: {
+      name: "BENJAMIN, DAVID",
+      address1: "6000 J ST, MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+      phone: "(123) 234-1111",
+    },
+    orderMethod: "OWP Website",
+    status: "Paid",
+    items: [{ product: "Operation of Wastewater Treatment Plants, Vol 3", qty: 1, total: 45 }],
+    payment: {
+      amountPaid: 45,
+      payDate: "2025-09-22",
+      method: "Visa",
+      description: "—",
+      madeBy: "David Benjamin",
+      phone: "(123) 234-1111",
+      address1: "6000 J ST",
+      address2: "MODOC HALL SUITE 1001",
+      city: "SACRAMENTO",
+      state: "CA",
+      zip: "95819",
+    },
+  },
 ]);
 
-// Summary
-const totalPurchases = computed(() => purchases.value.length);
-const certificatesCompleted = computed(
-  () => purchases.value.filter((p) => p.status === "Completed").length
-);
-const totalSpent = computed(() =>
-  purchases.value.reduce((sum, p) => sum + p.price, 0)
-);
-const lastPurchaseDate = computed(() => purchases.value?.[0]?.date ?? "—");
+const selected = ref<Invoice | null>(null);
 
-
-// Filters (and actually use them so TS doesn't complain)
-const searchTerm = ref("");
-const statusFilter = ref<Purchase["status"] | "">("");
-
-// Apply filters to list
-const filteredPurchases = computed(() => {
-  const term = searchTerm.value.trim().toLowerCase();
-  const status = statusFilter.value;
-
-  return purchases.value.filter((p) => {
-    const matchesTerm = term
-      ? p.title.toLowerCase().includes(term)
-      : true;
-    const matchesStatus = status ? p.status === status : true;
-    return matchesTerm && matchesStatus;
+function open(inv: Invoice) {
+  selected.value = inv;
+}
+function fmtMoney(n: number) {
+  return `$${n.toFixed(2)}`;
+}
+function fmtDate(iso: string) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   });
-});
+}
+function printReceipt() {
+  window.print();
+}
 </script>
 
 <style scoped>
-.dashboard-page {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  row-gap: 32px;
-  justify-content: center;
-  align-items: start;
-}
+/* ===================== HEADER ===================== */
 
-/* --- top layout --- */
-.dashboard-top {
-  grid-row: 1;
-  display: grid;
-  grid-template-columns: 508px 508px;
-  margin-top: 32px;
-}
-
-.text {
-  grid-column: 1;
+.ph-header-top {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 240px;
-  color: #034750;
-}
-
-.image > img {
-  width: 100%;
-  height: 100%;
-  object-fit: scale-down;
-  display: block;
-}
-
-.welcome-message {
-  font-size: 56px;
-  font-weight: 700;
-  color: #00a5b5;
-  margin: 8px 0 16px 24px;
-}
-
-.dashboard-description {
-  width: 395px;
-  font-size: 19px;
-  color: #747474;
-  margin: 0 0 16px 24px;
-}
-
-/* --- breadcrumb --- */
-.breadcrumb {
-  margin: 0 0 8px 24px;
-  font-size: 14px;
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  gap: 24px;
+  margin-bottom: 32px;
 }
-.crumb {
-  color: #2563eb;
-  text-decoration: none;
+
+.ph-left-text {
+  flex: 1;
 }
-.crumb:hover {
-  text-decoration: underline;
+
+.ph-date {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 6px;
 }
-.crumb-sep {
+
+.ph-title {
+  font-size: 40px;
+  font-weight: 900;
+  color: #00a5b5;
+}
+
+.ph-subtitle {
+  font-size: 16px;
   color: #6b7280;
+  margin-top: 6px;
 }
-.crumb-current {
-  color: #111827;
+
+.ph-right-image img {
+  width: 480px;
+  max-width: 100%;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* ===================== MAIN LAYOUT ===================== */
+
+.ph {
+  padding: 16px 24px 32px 40px;
+  display: grid;
+  gap: 20px;
+}
+
+/* ===================== INVOICE GRID ===================== */
+
+.ph-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.inv-card {
+  background: white;
+  border: 1px solid #e4e6ea;
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 14px;
+
+  /* hover animation */
+  transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+.inv-card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+}
+
+.inv-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5a6b70;
+}
+
+.inv-number {
+  color: #0b7285;
+  font-weight: 800;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.inv-meta {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.inv-meta .label {
   font-weight: 600;
 }
 
-/* --- bottom grid --- */
-.dashboard-bottom {
-  grid-row: 2;
-  display: grid;
-  grid-template-columns: 700px 300px;
-  column-gap: 16rem;
-  margin-bottom: 48px;
+.status {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.block {
-  background: #f2f1f2;
-  border-radius: 14px;
-  padding: 20px 24px;
-  min-height: 160px;
+.status.paid {
+  color: #2f855a;
 }
-.block-title {
-  margin: 0 0 8px 0;
-  font-size: 18px;
+
+/* ===================== DETAIL VIEW ===================== */
+
+.ph-detail {
+  background: white;
+  border: 1px solid #e4e6ea;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px; /* <- gives space so buttons don't sit on the table border */
+}
+
+.right {
+  display: flex;
+  gap: 16px;
+}
+
+.detail-title {
+  font-size: 28px;
   font-weight: 800;
   color: #034750;
 }
 
-/* --- summary --- */
-.summary-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 12px;
-}
-.stat {
-  display: flex;
-  flex-direction: column;
-}
-.label {
-  font-size: 14px;
-  color: #6b7280;
-}
-.value {
-  font-weight: 700;
-  color: #034750;
-}
-
-/* --- purchase list --- */
-.purchase-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-top: 12px;
-}
-
-.purchase-card {
-  display: flex;
-  gap: 16px;
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.purchase-card:hover {
-  transform: scale(1.01);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-.purchase-img {
-  width: 90px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-.purchase-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #034750;
-}
-.purchase-meta {
-  font-size: 13px;
-  color: #6b7280;
-  margin-top: 2px;
-}
-.purchase-price {
-  font-size: 14px;
-  font-weight: 600;
-  color: #00a5b5;
-  margin-top: 6px;
-}
-
-/* --- progress bar --- */
-.progress-bar {
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 4px;
-  margin: 8px 0;
-  width: 200px;
-}
-.progress {
-  height: 6px;
-  background: #00a5b5;
-  border-radius: 4px;
-}
-.progress-text {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-/* --- actions --- */
-.purchase-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
 .btn {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 10px;
+  padding: 8px 18px;
   font-weight: 700;
+  border-radius: 999px;
+  border: none;
   cursor: pointer;
-}
-.btn:hover {
-  filter: brightness(0.95);
-}
-.btn-outline {
-  background: transparent;
-  border: 2px solid #2563eb;
-  color: #2563eb;
-}
-.small {
-  font-size: 13px;
-  padding: 4px 10px;
+
+  transition: background-color 0.15s ease, color 0.15s ease,
+    box-shadow 0.15s ease, transform 0.1s ease;
 }
 
-/* --- filters --- */
-.filter-input,
-.filter-select {
-  width: 100%;
-  margin-top: 8px;
-  padding: 8px;
+.btn.primary {
+  background: #034750;
+  color: white;
+}
+
+.btn.primary:hover {
+  background: #02333a;
+  box-shadow: 0 3px 8px rgba(3, 71, 80, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn.ghost {
+  border: 2px solid #034750;
+  color: #034750;
+  background: white;
+}
+
+.btn.ghost:hover {
+  background: #034750;
+  color: white;
+  box-shadow: 0 3px 8px rgba(3, 71, 80, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ===================== TABLES ===================== */
+
+.detail-table {
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 160px 1fr 160px 1fr 160px 1fr;
   font-size: 14px;
 }
 
-/* --- invoices --- */
-.invoice-list {
-  list-style: none;
-  padding: 0;
-  margin: 8px 0 0;
+.row.multi {
+  grid-template-columns: 160px 1fr 200px 1fr;
 }
-.invoice-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  padding: 8px 12px;
+
+.cell {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f3f5;
+  border-right: 1px solid #f1f3f5;
+}
+
+.cell.h {
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.addr {
+  line-height: 1.3;
+}
+
+/* ===================== SECTION HEADERS ===================== */
+
+.section-heading {
+  font-size: 20px;
+  font-weight: 800;
+  color: #034750;
+  margin: 16px 0 10px;
+}
+
+/* ===================== INVOICE ITEMS ===================== */
+
+.items {
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  margin-bottom: 8px;
+  overflow: hidden;
+  margin-bottom: 18px;
 }
-.invoice-link {
-  color: #2563eb;
-  text-decoration: none;
-  font-size: 13px;
+
+.items-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 160px;
+  font-size: 14px;
 }
-.invoice-link:hover {
-  text-decoration: underline;
+
+.items-row.head {
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.c {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.c.qty,
+.c.total {
+  text-align: right;
+}
+
+/* ===================== PAYMENT ===================== */
+
+.payment {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.p-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 160px 1fr 160px 1fr;
+  font-size: 14px;
+}
+
+.p-h {
+  padding: 10px 12px;
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.p-v {
+  padding: 10px 12px;
 }
 </style>

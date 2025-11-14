@@ -72,7 +72,7 @@ const route = useRoute()
       <router-link
         to="/operatornumbers"
         class="operator-numbers-button"
-        :class="{ active: route.name === 'Operator Numbers' }"
+        :class="{ active: route.name === 'OperatorNumbers' }"
       >
         <Hash class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Operator Numbers</div>
@@ -84,7 +84,7 @@ const route = useRoute()
         class="certificates-button"
         :class="{ active: route.name === 'CertificatesPage' }"
       >
-        <ReceiptText class="button-icon" color="#034750":size="20" />
+        <ReceiptText class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Certificates</div>
       </router-link>
 
@@ -173,7 +173,6 @@ const route = useRoute()
 
 /* Button text style */
 .button-text {
-  font-family: Myriad Pro;
   font-size: 20px;
   font-weight: 600;
   margin-left: 20px;
@@ -242,7 +241,6 @@ const route = useRoute()
   text-decoration: none;
   background-color: white;
   color: #034750;
-  font-family: Myriad Pro;
   font-weight: 600;
   font-size: 20px;
   z-index: 2; /* ensure it’s above footer */

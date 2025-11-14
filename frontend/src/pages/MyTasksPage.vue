@@ -1,8 +1,46 @@
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const currentDate = ref(formatDate())
+
+// Helper function to format date based on user's local settings
+function formatDate() {
+  return new Date().toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  })
+}
+
+
+let timer
+onMounted(() => {
+  scheduleNextUpdate()
+})
+onUnmounted(() => {
+  clearTimeout(timer)
+})
+
+// Schedule a timer to update exactly at midnight
+function scheduleNextUpdate() {
+  const now = new Date()
+  const nextMidnight = new Date(now)
+  nextMidnight.setHours(24, 0, 0, 0)
+  const timeUntilMidnight = nextMidnight - now
+
+  timer = setTimeout(() => {
+    currentDate.value = formatDate()
+    scheduleNextUpdate() // reschedule for next day
+  }, timeUntilMidnight)
+}
+</script>
+
 <template>
   <div class="mytasks-page">
     <div class="top-section">
       <div class="text">
-        <div class="date">Wednesday, November 3</div>
+        <div class="date">{{ currentDate }}</div>
         <div class="welcome">Your Task Overview</div>
         <div class="description">
           View your completed, upcoming, and overdue course tasks all in one place.
