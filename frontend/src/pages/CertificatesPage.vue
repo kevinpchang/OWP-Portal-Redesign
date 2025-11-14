@@ -22,7 +22,7 @@
               <Award class="header-icon" color="#6DBE4B" />
               <h2 class="card-title">Earned Certificates</h2>
             </div>
-            <div class="card-divider"></div>
+            <div class="divider"></div>
             <div class="card-body">
               <div
                 v-for="cert in certificates"
@@ -52,7 +52,7 @@
       <!-- Right: Sidebar -->
       <div class="courses-right">
         <!-- Messages -->
-        <div class="side-card">
+        <div class="side-card messages">
           <div class="side-header">
             <Mail class="side-icon" color="#00A5B5" />
             <div class="side-title">Messages</div>
@@ -67,7 +67,7 @@
         </div>
 
         <!-- Transcripts -->
-        <div class="side-card">
+        <div class="side-card transcripts">
           <div class="side-header">
             <FileText class="side-icon" color="#6DBE4B" />
             <div class="side-title">Transcripts</div>
@@ -81,7 +81,7 @@
         </div>
 
         <!-- Purchase History -->
-        <div class="side-card">
+        <div class="side-card purchase-history">
           <div class="side-header">
             <History class="side-icon" color="#034750" />
             <div class="side-title">Purchase History</div>
@@ -217,7 +217,7 @@ const scrollToCertificate = (id) => {
 .course-card {
   background-color: #F2F1F2;
   border-radius: 14px;
-  padding: 6px 20px 20px 20px;
+  padding: 16px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -235,27 +235,18 @@ const scrollToCertificate = (id) => {
   height: 34px;
 }
 
-.card-title {
+.card-title, .side-title {
   font-size: 20px;
   font-weight: 700;
   color: #034750;
   margin: 0;
 }
 
-.card-divider, .divider {
-  border-top: 3px solid #FFFFFF;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-}
-
-.card-divider {
-  margin-top: -15px;
-  margin-bottom: 14px;
-}
-
+/* 1px DIVIDERS — MATCH DASHBOARD */
 .divider {
-  margin-top: 2px;
-  margin-bottom: 8px;
+  width: 100%;
+  border-top: 1px solid #CCC;
+  margin: 12px 0 8px 0;
 }
 
 .card-body {
@@ -291,6 +282,7 @@ const scrollToCertificate = (id) => {
   cursor: pointer;
 }
 
+/* HOVER = DASHBOARD STYLE */
 .certificate-item:hover {
   background-color: #D9D9D9;
 }
@@ -359,7 +351,7 @@ const scrollToCertificate = (id) => {
 .side-card {
   background-color: #F2F1F2;
   border-radius: 14px;
-  padding: 20px;
+  padding: 16px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -369,12 +361,6 @@ const scrollToCertificate = (id) => {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.side-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #034750;
 }
 
 .side-body {
@@ -389,12 +375,11 @@ const scrollToCertificate = (id) => {
   color: #007c8a;
   cursor: pointer;
   text-decoration: underline;
-  padding: 5px 16px;
-  margin: 0 -20px;
-  width: calc(100% + 40px);
+  padding: 5px 0;
   transition: background-color 0.2s ease;
 }
 
+/* DASHBOARD-STYLE HOVER */
 .side-link:hover {
   background-color: #D9D9D9;
 }
