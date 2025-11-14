@@ -1,12 +1,14 @@
 <template>
   <div class="courses-page">
 
-    <div class="courses-top">
-      <div class="text-block">
-        <div class="courses-header">Courses</div>
-        <p class="page-description"></p>
-      </div>
-    </div>
+   <div class="page-top">
+  <div class="text-block">
+    <h1 class="page-title">Courses</h1>
+    <p class="page-description">
+      View your active, completed, and recommended courses
+    </p>
+  </div>
+</div>
 
     <div class="courses-bottom">
 
@@ -17,7 +19,21 @@
           <!--Active-->
           <div class="course-card active-card">
             <div class="card-header">
-              <div class="header-icon"></div>
+              <div class="header-icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                  width="32" 
+                  height="40"
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="#007C8A" 
+                  stroke-width="2" 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  class="lucide lucide-book-marked-icon lucide-book-marked">
+                  <path d="M10 2v8l3-3 3 3V2"/>
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+                </svg>
+              </div>
               <h2 class="card-title">Active Enrollments</h2>
             </div>
             <div class="card-divider"></div>
@@ -59,7 +75,21 @@
           <!--Completed-->
           <div class="course-card">
             <div class="card-header">
-              <div class="header-icon completed-icon"></div>
+              <div class="header-icon completed-icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                  width="32" 
+                  height="40"
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="#007C8A" 
+                  stroke-width="2" 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  class="lucide lucide-book-marked-icon lucide-book-marked">
+                  <path d="M10 2v8l3-3 3 3V2"/>
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+                </svg>
+              </div>
               <h2 class="card-title">Completed Enrollments</h2>
             </div>
             <div class="card-divider"></div>
@@ -102,7 +132,21 @@
           <!--Recommended-->
           <div class="course-card">
             <div class="card-header">
-              <div class="header-icon recommended-icon"></div>
+              <div class="header-icon recommended-icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                  width="32" 
+                  height="40"
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="#007C8A" 
+                  stroke-width="2" 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  class="lucide lucide-book-marked-icon lucide-book-marked">
+                  <path d="M10 2v8l3-3 3 3V2"/>
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+                </svg>
+              </div>
               <h2 class="card-title">Recommended Courses</h2>
             </div>
             <div class="card-divider"></div>
@@ -137,7 +181,21 @@
         <!--Messages-->
         <div class="side-card">
           <div class="side-header">
-            <div class="header-icon side-icon"></div>
+            <div class="header-icon side-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                class="lucide lucide-mail-icon lucide-mail">
+                <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/>
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+              </svg>
+            </div>
             <div class="side-title">Messages</div>
           </div>
           <div class="divider"></div>
@@ -154,7 +212,23 @@
         <!-- Purchase History-->
         <div class="side-card">
           <div class="side-header">
-            <div class="header-icon side-icon"></div>
+            <div class="header-icon side-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                class="lucide 
+                lucide-history-icon lucide-history">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+                <path d="M12 7v5l4 2"/>
+              </svg>
+            </div>
             <div class="side-title">Purchase History</div>
           </div>
           <div class="divider"></div>
@@ -208,30 +282,36 @@ export default {
   margin: 0 auto;
 }
 
-.courses-top {
-  position: sticky;
-  top: 0;
+.page-top {
+  max-width: 1000px;
+  width: 100%;
+  margin: 32px auto 0;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  width: 100%;
-  max-width: 1000px;
-  margin: 32px auto 0 auto;
-  background-color: #fff;
-  z-index: 5;
-  padding-bottom: 8px;
+  padding: 0 20px;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #034750;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
 }
 
 
 .courses-bottom {
+  max-width: 1000px;
+  width: 100%;
+  margin: 46px auto 48px;
+  padding: 0 20px;
   display: grid;
   grid-template-columns: 700px 300px;
   column-gap: 16px;
-  margin-bottom: 48px;
 }
 
 .text-block {
-  font-family: 'Roboto', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -247,6 +327,7 @@ export default {
 .page-description {
   font-size: 16px;
   color: #555;
+  margin: 8px 0 0;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -254,7 +335,7 @@ export default {
   margin-top: 46px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 15px;
   width: 100%;
   max-width: 700px;
   margin: 0 auto;
@@ -314,7 +395,7 @@ export default {
 }
 
 .divider, .card-divider {
-  border-top: 3px solid #FFFFFF;
+  border-top: 1px solid #FFFFFF;
 }
 
 .card-divider {
@@ -354,6 +435,7 @@ export default {
   background-color: #6DBE4B;
   border-radius: 4px;
 }
+
 
 .info-subrow {
   display: flex;
@@ -465,11 +547,27 @@ export default {
   gap: 16px;
 }
 
-.header-icon, .side-icon {
-  width: 26px;
-  height: 34px;
-  border-radius: 6px;
-  background-color: #007C8A;
+.header-icon-svg {
+  width: 30px;
+  height: 30px;
+  stroke: #007C8A;
+  flex-shrink: 0;
+}
+
+.side-icon {
+  width: 36px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  padding: 0;
+}
+
+.side-icon svg {
+  width: 28px;
+  height: 28px;
+  stroke: #007C8A;
 }
 
 .side-card {
