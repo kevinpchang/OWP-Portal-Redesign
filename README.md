@@ -1,15 +1,3 @@
-<<<<<<< Updated upstream
-# OWP-Portal-Redesign
-A redesign of the Office of Water Program's Student Portal.
-Kevin Chang
-Ryan Crandall
-Youssef Boujebha
-Nicholas Guzman
-Uday Kyama 
-Cristobel Navarro-Miranda
-Vincent Lam
-Heet Shah
-=======
 # Office of Water Program's Learning Portal Redesign Project
 
 ## A fully functional OWP Learning Portal project written in Vue.js that creates a modern, user-friendly student center integrated directly into the official OWP website at California State University of Sacramento!
@@ -81,4 +69,3 @@ Insert link to owp learning portal website.
 - Cristobel Navarro-Miranda
 - Vincent Lam
 - Heet Shah
->>>>>>> Stashed changes
