@@ -49,6 +49,7 @@ const toggleCategory = (id: string) => {
     <div class="slides-top">
       <div class="text-block">
         <div class="slides-header">Instructor Slides</div>
+        <div class="slides-subtitle">View your assigned slides from past and present courses</div>
       </div>
     </div>
 
@@ -103,7 +104,7 @@ const toggleCategory = (id: string) => {
   flex-direction: column;
   align-items: center;
   background-color: #fff;
-  font-family: 'Myriad Pro', sans-serif;
+
   color: #034750;
 }
 
@@ -126,6 +127,14 @@ const toggleCategory = (id: string) => {
   font-size: 32px;
   font-weight: 700;
   color: #034750;
+}
+
+/* Subtitle under header */
+.slides-subtitle {
+  font-size: 18px;
+  font-weight: 400;
+  color: #747474;
+  margin-top: 6px;
 }
 
 /* --- Section --- */

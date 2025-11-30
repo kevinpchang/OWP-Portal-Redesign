@@ -173,7 +173,6 @@ const route = useRoute()
 
 /* Button text style */
 .button-text {
-  font-family: Myriad Pro;
   font-size: 20px;
   font-weight: 600;
   margin-left: 20px;
@@ -242,7 +241,6 @@ const route = useRoute()
   text-decoration: none;
   background-color: white;
   color: #034750;
-  font-family: Myriad Pro;
   font-weight: 600;
   font-size: 20px;
   z-index: 2; /* ensure it’s above footer */

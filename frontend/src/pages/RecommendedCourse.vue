@@ -12,7 +12,21 @@
     <div class="page-container">
       <div class="summary-tile">
         <div class="card-header">
-          <div class="header-icon"></div>
+          <div class="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg"
+              width="32" 
+              height="40"
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="#007C8A" 
+              stroke-width="2" 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              class="lucide lucide-book-marked-icon lucide-book-marked">
+              <path d="M10 2v8l3-3 3 3V2"/>
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+            </svg>
+          </div>
           <h2 class="card-title">Recommended Course</h2>
         </div>
 
@@ -44,12 +58,26 @@
     <!-- Bottom Grid -->
     <div class="courses-bottom">
 
-      <!-- Left: Course Contents -->
+      <!-- Left-->
       <div class="courses-left">
         <div class="chapter-progress-tile">
 
           <div class="card-header">
-            <div class="header-icon"></div>
+            <div class="header-icon">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                width="32" 
+                height="40"
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="#007C8A" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                class="lucide lucide-book-marked-icon lucide-book-marked">
+                <path d="M10 2v8l3-3 3 3V2"/>
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+              </svg>
+            </div>
             <h2 class="card-title">Course Contents</h2>
           </div>
 
@@ -77,7 +105,21 @@
         <!-- Messages -->
         <div class="side-card">
           <div class="side-header">
-            <div class="header-icon side-icon"></div>
+            <div class="header-icon side-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                class="lucide lucide-mail-icon lucide-mail">
+                <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/>
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+              </svg>
+            </div>
             <div class="side-title">Messages</div>
           </div>
 
@@ -95,7 +137,23 @@
         <!-- Purchase History -->
         <div class="side-card">
           <div class="side-header">
-            <div class="header-icon side-icon"></div>
+            <div class="header-icon side-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                class="lucide 
+                lucide-history-icon lucide-history">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+                <path d="M12 7v5l4 2"/>
+              </svg>
+            </div>
             <div class="side-title">Purchase History</div>
           </div>
 
@@ -196,11 +254,31 @@ export default {
 }
 
 .header-icon {
-  width: 26px;
-  height: 34px;
-  border-radius: 6px;
-  background-color: #007C8A;
+  width: 32px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;   
+  border-radius: 0;  
+  padding: 0;
 }
+
+.side-icon {
+  width: 36px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;  
+}
+
+.side-icon svg {
+  width: 28px;
+  height: 28px;
+  stroke: #007C8A;
+}
+
 
 .card-title {
   font-size: 20px;
@@ -209,7 +287,7 @@ export default {
 }
 
 .summary-tile .divider {
-  border-top: 3px solid #FFFFFF;
+  border-top: 1px solid #FFFFFF;
   width: calc(100% + 40px);
   margin-left: -20px;
   margin-top: -15px;
@@ -217,7 +295,7 @@ export default {
 }
 
 .chapter-progress-tile .divider {
-  border-top: 3px solid #FFFFFF;
+  border-top: 1px solid #FFFFFF;
   width: calc(100% + 40px);
   margin-left: -20px;
   margin-top: 18px;
@@ -299,7 +377,7 @@ export default {
 
 .chapter-progress-tile {
   width: 95%;
-  max-width: none;   /*to adjust Chapter Progress size */
+  max-width: none;  
 }
 
 .chapter-progress-tile .card-header {
@@ -384,7 +462,7 @@ export default {
 }
 
 .divider {
-  border-top: 3px solid #FFFFFF;
+  border-top: 1px solid #FFFFFF;
   width: calc(100% + 40px);
   margin-left: -20px;
   margin-top: 2px;
