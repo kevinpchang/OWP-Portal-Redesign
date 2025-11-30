@@ -30,14 +30,13 @@ Instructor Slides Page
 Purchasde History Page
 ![alt text](./assets/Purchase.png)
 
-## Developer Instructions
 ## How to install the OWP Portal Redesign on your local machine with Git
 
-1. clone this project
-2. Set up a local kubernetes cluster - https://askcloudarchitech.com/posts/tutorials/local-kubernetes-startup-script/
-3. Install helm - `brew install helm`
-4. Setup your keys - see the video here - https://www.youtube.com/watch?v=k0L_yR30PqI&list=PLSvCAHoiHC_rqKbcu1ummWVpLTDBNZHH7&index=5
-5. Install with Helm
+1. Clone this project
+2. Install Node.js - https://nodejs.org/en/download
+3. Open a terminal and CD to the frontend folder
+4. Run 'npm install' to install core project files
+5. Run 'npm run dev' to run the site locally
 
 ## Testing
 
