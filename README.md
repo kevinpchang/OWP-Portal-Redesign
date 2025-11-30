@@ -34,15 +34,15 @@ Purchasde History Page
 
 1. Clone this project
 2. Install Node.js - https://nodejs.org/en/download
-3. Open a terminal and CD to the frontend folder
+3. Open a terminal and CD to the 'frontend' folder
 4. Run 'npm install' to install core project files
 5. Run 'npm run dev' to run the site locally
 
 ## Testing
 
-Checked routing for each "link" element on the page.
-Checked hover, click, and dialog effects worked correctly.
-Ensured each page looked standard to OWP design (font, color scheme, crossreference with design example).
+- Checked routing for each "link" element on the page.
+- Checked hover, click, and dialog effects worked correctly.
+- Ensured each page looked standard to OWP design (font, color scheme, crossreference with design example).
 
 ## Deployment - explain how OWP will deploy the app and not usm give cost estimates here 
 
