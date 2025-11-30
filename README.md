@@ -19,44 +19,45 @@ With that in mind our expected outcomes are:​
 - Ease of access​
 - Intuitive navigation​
 
-## EXAMPLE LINK FOR A POTENTIAL DEMO VIDEO OR JUST OMIT
-## MAYBE IMPLEMENT SCREENSHOTS OF OUR WEBSITE 
+## How the site looks
 
-<a href="https://www.youtube.com/playlist?list=PLSvCAHoiHC_rqKbcu1ummWVpLTDBNZHH7" target="_blank">
-<img src="http://img.youtube.com/vi/SiGxu2N9ndU/mqdefault.jpg" alt="Watch the series" width="240" height="180" border="10" />
-</a>
+Dashboard Page
+![alt text](./assets/Dash.png)
 
-## Developer Instructions
+Instructor Slides Page
+![alt text](./assets/Slides.png)
+
+Purchasde History Page
+![alt text](./assets/Purchase.png)
+
 ## How to install the OWP Portal Redesign on your local machine with Git
 
-1. clone this project
-2. Set up a local kubernetes cluster - https://askcloudarchitech.com/posts/tutorials/local-kubernetes-startup-script/
-3. Install helm - `brew install helm`
-4. Setup your keys - see the video here - https://www.youtube.com/watch?v=k0L_yR30PqI&list=PLSvCAHoiHC_rqKbcu1ummWVpLTDBNZHH7&index=5
-5. Install with Helm
+1. Clone this project
+2. Install Node.js - https://nodejs.org/en/download
+3. Open a terminal and CD to the 'frontend' folder
+4. Run 'npm install' to install core project files
+5. Run 'npm run dev' to run the site locally
 
 ## Testing
 
-Include Testing we did.
+- Checked routing for each "link" element on the page.
+- Checked hover, click, and dialog effects worked correctly.
+- Ensured each page looked standard to OWP design (font, color scheme, crossreference with design example).
 
-## Deployment
+## Deployment - explain how OWP will deploy the app and not usm give cost estimates here 
 
-IDK what to put here.
+IDK what to put here. 
 
 ## CANVAS INSTRUCTIONS:
 
 Use your JIRA to create a timeline section with key milestones for your project
 NOTE: When coming up with the timeline this is the timeline for what you expect to get done in 191 based on the user stories you created in the backlog for all the key features with estimates.
 
-## Find a bug?
-
-If you found an issue or would like to submit an improvement to this project, please submit an issue using the issues tab above. If you would like to submit a PR with a fix, reference the issue you created!
-
 ## Known issues (Work in progress)
 
-Print issues we know.
+Scaling for mobile.
 
-## Like this project?
+## Like this project? - Remove this probably
 
 Insert link to owp learning portal website.
 
