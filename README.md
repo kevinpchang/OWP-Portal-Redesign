@@ -1,5 +1,5 @@
 # Office of Water Program's Learning Portal Redesign Project
-<img src="./assets/owp_logo.png" alt="OWP Logo">
+<img src="./assets/owp.png" alt="OWP Logo">
 
 ## A fully functional OWP Learning Portal project written in Vue.js that creates a modern, user-friendly student center integrated directly into the official OWP website at California State University of Sacramento!
 
