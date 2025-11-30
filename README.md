@@ -21,13 +21,14 @@ With that in mind our expected outcomes are:​
 
 ## How the site looks
 
-<a href="https://www.youtube.com/playlist?list=PLSvCAHoiHC_rqKbcu1ummWVpLTDBNZHH7" target="_blank">
-<img src="./assets/Dash.png" width="240" height="180" />
-</a>
+Dashboard Page
+![alt text](./assets/Dash.png)
 
-## ![alt text](./assets/Dash.png)
-## ![alt text](./assets/Slides.png)
-## ![alt text](./assets/Purchase.png)
+Instructor Slides Page
+![alt text](./assets/Slides.png)
+
+Purchasde History Page
+![alt text](./assets/Purchase.png)
 
 ## Developer Instructions
 ## How to install the OWP Portal Redesign on your local machine with Git
