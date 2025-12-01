@@ -76,16 +76,16 @@ This colloborative senior project is a industry-grade redesign that provides the
 
 | **Sprint** | **Goal / Milestone** | **Description / Deliverables** |
 |-----------|-----------------------|--------------------------------|
-| **Sprint 5** | API Integration 1 | Connected Vue components to backend PHP API across all webpages. Established base endpoints and replaced mock data for Dashboard, MyAccount, Courses, and Certificates. |
-| **Sprint 6** | API Integration 2 | Expanded API coverage across all pages. Implemented message retrieval, purchase history lookup, and dynamic student data loading. Ensured JSON structure consistency. |
+| **Sprint 5** | API Integration 1 | Connected Vue components to backend PHP API across all webpages. Established base endpoints and replaced mock data for all pages. |
+| **Sprint 6** | API Integration 2 | Expanded API coverage across all pages. Implemented dynamic data retrieve on all pages like: message retrieval, purchase history lookup, course retrieval, live operator numbers and dynamic student data loading. Ensured JSON structure consistency. (refer to Client)|
 | **Sprint 7** | API Integration 3 | Optimized API calls, added loading states, error handling, and improved page responsiveness. Implemented certificate filtering and course data enhancements. |
 | **Sprint 8** | API Integration 4 + Debugging & Final Routing | Completed debugging, removed stale data, resolved API inconsistencies, connected final routes, and performed QA/testing for deployment-readiness. |
 
 
 ## Known issues (Work in progress)
 
-Scaling for mobile.
-Certain backend API endpoints may need caching for performance.
+- Scaling for mobile.
+- Certain backend API endpoints may need caching for performance.
 
 ## Authors:
 - Kevin Chang
