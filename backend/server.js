@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const { connectToDatabase } = require("./src/database/connect"); // adjust path if needed
 
