@@ -1,7 +1,28 @@
 <script setup>
+  import { ref } from 'vue'
   import { useRoute } from 'vue-router'
   const route = useRoute()
-  import { UserRound, NotebookText, Hash, FileText, History } from 'lucide-vue-next'
+  import { UserRound, NotebookText, Hash, FileText, History, SquareUserRound } from 'lucide-vue-next'
+  
+  const contactDialog = ref(false)
+
+  function openContactDialog() {
+    contactDialog.value = true
+  }
+
+  function closeContactDialog() {
+    contactDialog.value = false
+  }
+
+  const profileDialog = ref(false)
+
+  function openProfileDialog() {
+    profileDialog.value = true
+  }
+
+  function closeProfileDialog() {
+    profileDialog.value = false
+  }
 </script>
 
 <template>
@@ -18,7 +39,8 @@
         <div class="profile-meta">
           <div class="user-name">User</div>
           <div class="user-role">Student, <br />Office of Water Programs</div>
-          <button class="btn xsmall">Edit</button>
+          <button class="btn xsmall" @click="openProfileDialog">Edit</button>
+          <!-- <button class="btn xsmall">Edit</button> -->
         </div>
       </div>
 
@@ -31,7 +53,8 @@
               <NotebookText :size="26" color="#007C8A" class="head-icon-svg" aria-hidden="true" />
               <h2>Contact Info</h2>
             </div>
-            <button class="btn xsmall">Edit</button>
+            <button class="btn xsmall" @click="openContactDialog">Edit</button>
+            <!-- <button class="btn xsmall">Edit</button> OLD UNEEDED "Edit" button functionality-->
           </header>
 
           <div class="divider"></div>
@@ -74,7 +97,13 @@
               <Hash :size="22" color="#007C8A" class="head-icon-svg" aria-hidden="true" />
               <h2>Operator Numbers</h2>
             </div>
+            <router-link
+              to="/operatornumbers"
+              class="btn-link-OPnumbers-button"
+              :class="{ active: route.name === 'OperatorNumbers' }"
+            >
             <button class="btn xsmall">Edit</button>
+            </router-link>
           </header>
 
           <div class="divider"></div>
@@ -137,6 +166,100 @@
       </aside>
     </div>
   </div>
+
+      <!-- Contact Info Dialog (pasted from HeaderComponent.vue) -->
+  <transition name="fade">
+    <div class="contact-info-dialog" v-if="contactDialog">
+      <div class="dialog">
+        <div class="header">
+          <SquareUserRound class="icon" color="#034750"/>
+          <div class="text">User</div>
+        </div>
+        <div class="divider2"></div>
+        <div class="body">
+          <div class="object">
+            <div class="left">
+              <div class="text">Email</div>
+              <input type=text placeholder="User.Example@owp.csus.edu" class="input-large"/>
+            </div>
+            <div class="right"></div>
+          </div>
+          <div class="object">
+            <div class="left">
+              <div class="text">Phone</div>
+              <input type=text placeholder="(916) 278-8110" class="input-large"/>
+            </div>
+            <div class="right">
+              <div class="text">Mobile</div>
+              <input type=text placeholder="(916) 278-8116" class="input-large"/>
+            </div>
+          </div>
+          <div class="object-large">
+            <div class="left">
+              <div class="text">Address</div>
+              <input type=text placeholder='6000 J Street' class="input-large"/>
+              <div class="whitespace"></div>
+              <input type=text placeholder='Sacramento' class="input-large"/>
+            </div>
+            <div class="right">
+              <div class="whitespace"></div>
+              <input type=text placeholder='Suite 1001' class="input-medium"/>
+              <div class="whitespace"></div>
+              <div class="right-subdiv">
+                <input type=text placeholder='CA' class="input-tiny"/>
+                <input type=text placeholder='95819' class="input-small"/>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom">
+          <div class="cancel" @click="closeContactDialog">Cancel</div>
+          <div class="save" @click="closeContactDialog">Save</div>
+        </div>
+      </div>
+    </div>
+  </transition>
+
+    <!-- Profile Dialog -->
+  <transition name="fade">
+    <div class="contact-info-dialog" v-if="profileDialog">
+      <div class="dialog">
+        <div class="header">
+          <SquareUserRound class="icon" color="#034750"/>
+          <div class="text">Edit Profile</div>
+        </div>
+
+        <div class="divider2"></div>
+
+        <div class="body">
+          <div class="object">
+            <div class="left">
+              <div class="text">Name</div>
+              <input type="text" placeholder="User" class="input-large"/>
+            </div>
+            <div class="right"></div>
+          </div>
+
+          <div class="object">
+            <div class="left">
+              <div class="text">Role</div>
+              <input type="text" placeholder="Student" class="input-large"/>
+            </div>
+            <div class="right">
+              <div class="text">Department</div>
+              <input type="text" placeholder="Office of Water Programs" class="input-large"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <div class="cancel" @click="closeProfileDialog">Cancel</div>
+          <div class="save" @click="closeProfileDialog">Save</div>
+        </div>
+      </div>
+    </div>
+  </transition>
+  
 </template>
 
 <style scoped>
@@ -397,6 +520,214 @@ a:hover { text-decoration: underline; }
   }
   /* remove right trim when there’s no right column */
   .profile-card { padding-right: 28px; }
+}
+
+
+
+/* ===== Pasted from HeaderComponent.vue for dialog + fade ===== */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.divider2 {
+  border-top: 1px solid #C2C2C2;
+}
+
+.contact-info-dialog {
+  position: fixed;
+  z-index: 200;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0000009a;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+}
+
+.contact-info-dialog .dialog {
+  width: 700px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  border: #707070 solid 1px;
+  background-color: #FEFEFE;
+}
+
+.contact-info-dialog .dialog .header {
+  width: 100%;
+  height: 85px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  border-radius: 14px;
+  background-color: #FEFEFE;
+}
+
+.contact-info-dialog .dialog .header .icon {
+  width: 40px;
+  height: 40px;
+  margin-left: 16px;
+}
+
+.contact-info-dialog .dialog .header .text {
+  height: 16px;
+  margin-left: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #034750;
+}
+
+.contact-info-dialog .dialog .body {
+  height: 386px;
+  margin-top: 32px;
+  margin-left: 32px;
+  margin-right: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.contact-info-dialog .dialog .body .text{
+  height: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 8px;
+  color: #034750;
+}
+
+.contact-info-dialog .dialog .input-large {
+  width: 306px;
+  height: 31px;
+  font-size: 15px;
+  font-weight: 400;
+  border: 0.75px solid #747474;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.contact-info-dialog .dialog .body .input-medium{
+  width: 176px;
+  height: 31px;
+  font-size: 15px;
+  font-weight: 400;
+  border: 0.75px solid #747474;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.contact-info-dialog .dialog .body .input-small{
+  width: 100px;
+  font-size: 15px;
+  font-weight: 400;
+  border: 0.75px solid #747474;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.contact-info-dialog .dialog .body .input-tiny{
+  width: 31px;
+  font-size: 15px;
+  font-weight: 400;
+  border: 0.75px solid #747474;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.contact-info-dialog .dialog .whitespace{
+  width: 100%;
+  height: 16px;
+}
+
+.contact-info-dialog .dialog .body .object {
+  width: 100%;
+  height: 78px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+  box-sizing: border-box;
+}
+
+.contact-info-dialog .dialog .body .object-large {
+  width: 100%;
+  height: 109px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+  box-sizing: border-box;
+}
+
+.contact-info-dialog .dialog .body .left{
+  width: 50%;
+  height: 78px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.contact-info-dialog .dialog .body .right{
+  width: 50%;
+  height: 78px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.contact-info-dialog .dialog .body .object-large .right .right-subdiv{
+  width: 176px;
+  height: 31px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.contact-info-dialog .dialog .bottom{
+  height: 29;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 32px;
+}
+
+.contact-info-dialog .dialog .bottom .cancel{
+  width: 306px;
+  height: 29px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 400;
+  color: #FFFFFF;
+  background-color: #C2C2C2;
+  cursor: pointer;
+}
+
+.contact-info-dialog .dialog .bottom .save{
+  width: 306px;
+  height: 29px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 400;
+  color: #FFFFFF;
+  background-color: #00A5B5;
+  cursor: pointer;
 }
 </style>
 
