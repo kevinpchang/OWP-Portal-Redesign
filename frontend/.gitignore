@@ -31,3 +31,6 @@ coverage
 
 test-results/
 playwright-report/
+
+#make the DB and frontend api-ing (calls) to backend secure, by not commiting it to the github repo 
+*.env
