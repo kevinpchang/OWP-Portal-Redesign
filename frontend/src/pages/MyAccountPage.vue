@@ -1,9 +1,116 @@
 <script setup>
-  import { ref } from 'vue'
-  import { useRoute } from 'vue-router'
-  const route = useRoute()
-  import { UserRound, NotebookText, Hash, FileText, History, SquareUserRound } from 'lucide-vue-next'
+import { ref, reactive, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { UserRound, NotebookText, Hash, FileText, History, SquareUserRound } from "lucide-vue-next";
+
+import {
+  getAccountDetails,
+  getActiveEnrollment,
+  getCourseGrades,
+  getOperatorList,
+  updateContactInfo
+} from "@/services/myAccountAPI";
+
+const route = useRoute();
+
+// --- API STATE ---
+const pid = 458860; // later: come from auth/session
+
+const loading = ref(false);
+const error = ref("");
+
+const account = ref(null);          // will hold accountDetails response.response
+const enrollments = ref([]);        // will hold activeEnrollment response.response
+const selectedEnrollId = ref(null);
+const grades = ref([]);             // will hold getCourseGrades response.response
+const operatorList = ref([]);       // will hold getOperatorList response.response
+
+async function loadAccount() {
+  loading.value = true;
+  error.value = "";
+  try {
+    const acc = await getAccountDetails(pid);
+    account.value = acc.response;
+
+    const enr = await getActiveEnrollment(pid);
+    enrollments.value = enr.response ?? [];
+
+    const op = await getOperatorList(pid);
+    operatorList.value = op.response ?? [];
+
+    // pick an "Enrolled" one if possible, else first
+    const preferred =
+      enrollments.value.find(e => e.statustxt === "Enrolled") ?? enrollments.value[0];
+
+    if (preferred?.enrollid) {
+      selectedEnrollId.value = preferred.enrollid;
+      const g = await getCourseGrades(preferred.enrollid);
+      grades.value = g.response ?? [];
+    } else {
+      grades.value = [];
+    }
+  } catch (e) {
+    error.value = e?.message ?? String(e);
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(loadAccount);
   
+  // form state for updateContactInfo
+  const contactForm = reactive({
+    street_1: "",
+    street_2: "",
+    street_3: "",
+    city: "",
+    state: "",
+    postal_code: "",
+    country: "US",
+    ipAddr: "127.0.0.1",
+
+    // ONE input box in the UI
+    phone_display: "",
+    mobile_display: "",
+
+    // what the API actually needs
+    phone_area_code: "",
+    phone_local: "",
+    phone_extension: "",
+    fax_area_code: "",
+    fax_local: "",
+  });
+
+  // helper: safely split "(415) 866-9053" into area/local if needed
+  function splitPhone(fmt) {
+    const digits = String(fmt ?? "").replace(/\D/g, "");
+    if (digits.length >= 10) {
+      return { area: digits.slice(0, 3), local: digits.slice(3, 10) };
+    }
+    return { area: "", local: "" };
+  }
+
+  function openContactDialogWithData() {
+    // fill the form from current account data so the dialog opens pre-populated
+    const a = account.value;
+
+    contactForm.street_1 = a?.hmstreet1 ?? "";
+    contactForm.street_2 = a?.hmstreet2 ?? "";
+    contactForm.street_3 = a?.hmstreet3 ?? "";
+    contactForm.city     = a?.hmcity ?? "";
+    contactForm.state    = a?.hmstate ?? "";
+    contactForm.postal_code = a?.hmzip ?? "";
+
+    // phone: prefer the formatted phone; otherwise use raw pieces if you have them
+    const p = splitPhone(a?.hmfmtdphn);
+    contactForm.phone_area_code = a?.hmphncity ?? p.area ?? "";
+    contactForm.phone_local     = a?.hmphnlocal ?? p.local ?? "";
+    contactForm.phone_extension = a?.hmphnext ?? "";
+    //contactForm.phone_display = a?.hmfmtdphn ?? "";
+    //contactForm.mobile_display = a?.hmmobilefmtdphn ?? a?.hmfmtdphn ?? ""; <--see-through phone numbers
+    contactDialog.value = true;
+  }
+
   const contactDialog = ref(false)
 
   function openContactDialog() {
@@ -23,6 +130,7 @@
   function closeProfileDialog() {
     profileDialog.value = false
   }
+  
 </script>
 
 <template>
@@ -30,6 +138,8 @@
     <!-- Page title -->
     <h1 class="page-title">My Account</h1>
 
+    <div v-if="loading" style="padding:0 16px;">Loading...</div>
+    <div v-if="error" style="padding:0 16px; color:red;">{{ error }}</div>
     <!-- GRID -->
     <div class="grid">
       
@@ -37,9 +147,11 @@
       <div class="card profile-card">
         <UserRound class="avatar-icon" :size="125" color="#00A5B5" />
         <div class="profile-meta">
-          <div class="user-name">User</div>
-          <div class="user-role">Student, <br />Office of Water Programs</div>
-          <button class="btn xsmall" @click="openProfileDialog">Edit</button>
+          <div class="user-name">{{ account?.fullname ?? "Loading..." }}</div>
+          <div class="user-role">Student,<br />Office of Water Programs</div>
+
+          <!--<button class="btn xsmall" @click="openProfileDialog">Edit</button> -->
+          <button class="btn xsmall" @click="openContactDialogWithData">Edit</button>
           <!-- <button class="btn xsmall">Edit</button> -->
         </div>
       </div>
@@ -53,8 +165,9 @@
               <NotebookText :size="26" color="#007C8A" class="head-icon-svg" aria-hidden="true" />
               <h2>Contact Info</h2>
             </div>
-            <button class="btn xsmall" @click="openContactDialog">Edit</button>
-            <!-- <button class="btn xsmall">Edit</button> OLD UNEEDED "Edit" button functionality-->
+            <button class="btn xsmall" @click="openContactDialogWithData">Edit</button>
+            <!--<button class="btn xsmall" @click="openContactDialog">Edit</button>
+                <button class="btn xsmall">Edit</button> OLD UNEEDED "Edit" button functionality-->
           </header>
 
           <div class="divider"></div>
@@ -63,18 +176,26 @@
             <div class="row">
               <div class="field">
                 <div class="label">Email</div>
-                <div class="value">User.Example@owp.csus.edu</div>
+                <div class="value">
+                  {{ account?.hmemail ?? account?.prfdemailval ?? "—" }}
+                </div>
+                <!--<div class="value">User.Example@owp.csus.edu</div>  HARCODED DONT USE
+                    <div class="value">(xxx) - xxx - xxxx</div>         HARDCODED DONT USE #nums-->
               </div>
             </div>
 
             <div class="row two">
               <div class="field">
                 <div class="label">Phone</div>
-                <div class="value">(xxx) - xxx - xxxx</div>
+                <div class="value">
+                  {{ account?.hmfmtdphn ?? "—" }}
+                </div>
               </div>
               <div class="field">
                 <div class="label">Mobile</div>
-                <div class="value">(xxx) - xxx - xxxx</div>
+                <div class="value">
+                  {{ account?.hmfmtdphn ?? "—" }}
+                </div>
               </div>
             </div>
 
@@ -82,8 +203,9 @@
               <div class="field">
                 <div class="label">Address</div>
                 <div class="value">
-                  3020 State University Drive<br />
-                  Sacramento, CA 95819
+                  {{ account?.hmstreet1 ?? "—" }}<br />
+                  {{ account?.hmcity ?? "" }}{{ account?.hmstate ? ", " + account.hmstate : "" }}
+                  {{ account?.hmzip ?? "" }}
                 </div>
               </div>
             </div>
@@ -109,8 +231,18 @@
           <div class="divider"></div>
 
           <div class="op-line">
-            <span class="label">Operator numbers:</span>
-            <a href="#" class="link">California-123456</a>
+          <span class="label">Operator numbers:</span>
+
+          <template v-if="operatorList.length">
+            <span v-for="(op, i) in operatorList" :key="op.oprlicid">
+              <a href="#" class="link">
+                {{ op.stateid }}-{{ op.operatornumber }}
+              </a>
+              <span v-if="i < operatorList.length - 1">, </span>
+            </span>
+          </template>
+
+          <span v-else>—</span>
           </div>
         </div>
       </section>
@@ -180,34 +312,37 @@
           <div class="object">
             <div class="left">
               <div class="text">Email</div>
-              <input type=text placeholder="User.Example@owp.csus.edu" class="input-large"/>
+              <input type="text" :value="account?.hmemail ?? account?.prfdemailval ?? ''" class="input-large" disabled />
             </div>
             <div class="right"></div>
           </div>
           <div class="object">
             <div class="left">
               <div class="text">Phone</div>
-              <input type=text placeholder="(916) 278-8110" class="input-large"/>
+              <input type="text" v-model="contactForm.phone_area_code" class="input-medium" placeholder="415" />
+              <input type="text" v-model="contactForm.phone_local" class="input-large" placeholder="8669053" />
             </div>
             <div class="right">
               <div class="text">Mobile</div>
-              <input type=text placeholder="(916) 278-8116" class="input-large"/>
+              <input type="text" v-model="contactForm.phone_area_code" class="input-medium" placeholder="415" />
+              <input type="text" v-model="contactForm.phone_local" class="input-large" placeholder="8669053" />
             </div>
           </div>
           <div class="object-large">
             <div class="left">
               <div class="text">Address</div>
-              <input type=text placeholder='6000 J Street' class="input-large"/>
+              <input type="text" v-model="contactForm.street_1" class="input-large" placeholder="Street address" />
               <div class="whitespace"></div>
-              <input type=text placeholder='Sacramento' class="input-large"/>
+              <input type="text" v-model="contactForm.city" class="input-large" placeholder="City" />
             </div>
+
             <div class="right">
               <div class="whitespace"></div>
-              <input type=text placeholder='Suite 1001' class="input-medium"/>
+              <input type="text" v-model="contactForm.street_2" class="input-medium" placeholder="Apt / Suite (optional)" />
               <div class="whitespace"></div>
               <div class="right-subdiv">
-                <input type=text placeholder='CA' class="input-tiny"/>
-                <input type=text placeholder='95819' class="input-small"/>
+                <input type="text" v-model="contactForm.state" class="input-tiny" placeholder="CA" />
+                <input type="text" v-model="contactForm.postal_code" class="input-small" placeholder="95819" />
               </div>
             </div>
           </div>
@@ -235,7 +370,7 @@
           <div class="object">
             <div class="left">
               <div class="text">Name</div>
-              <input type="text" placeholder="User" class="input-large"/>
+              <input type="text" placeholder="Loading..." class="input-large"/>
             </div>
             <div class="right"></div>
           </div>
