@@ -42,7 +42,7 @@
         <button class = add-button @click.left="openAdd">Add Operator Number</button>
       </div>
 
-      <!--Table needs to populate based on GET from database-->
+      <!--Table needs to populate based on GET from database api/v1/account/getOperatorList/{pid}-->
       <div name="table">
         <table>
           <thead class="table-header">
@@ -134,7 +134,7 @@
             </h1>
             <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
             <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
-            <!-- Method=POST for button-->
+            <!-- Method=POST for button /api/v1/account/addOperator-->
             <button class = popup-button-left @click="closeAdd">Add</button>
 
           </div>
@@ -157,7 +157,7 @@
             </h1>
             <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
             <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
-            <!-- Method=POST for button-->
+            <!-- Method=POST for button /api/v1/account/updateOperatorNumber-->
             <button class = popup-button-left @click="closeEdit">Edit</button>
 
           </div>
@@ -179,7 +179,7 @@
               Remove Operator Number
             </h1>
             <p class="popup-text">Are you sure you want to remove the Operator Number?</p>
-            <!-- Method=POST for buttons-->
+            <!-- Method=GET for buttons api/v1/account/deleteOperator/{ip}/{id}/{pid}-->
             <button class = popup-button-left @click="closeDelete">Yes</button>
             <button class = popup-button-right @click="closeDelete">No</button>
 
