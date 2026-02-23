@@ -63,14 +63,14 @@ const activeEnrollments = computed(() =>
 
 function getCourseCompletion(enrollid) {
   const sections = grades.value[enrollid] ?? [];
-  const completed = sections.filter(section => section.grade != null).length
+  const completed = sections?.filter(section => section.grade != null).length
   return Math.round((completed / sections.length) * 100);
 }
 
 function getInvoiceName(invoicenum) {
   const item = invoicedata.value[invoicenum] ?? [];
-  const data = item.find(item => item.coursetitle != null)
-  return data.coursetitle;
+  const data = item?.find(item => item.coursetitle != null)
+  return data?.coursetitle;
 }
 
 onMounted(loadDash);

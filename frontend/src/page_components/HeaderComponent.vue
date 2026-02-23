@@ -13,7 +13,7 @@
       <div class="divider"></div>
       <div class="account_button" tabindex="0" @focus="openAccountDialog" @blur="closeAccountDialog">
         <SquareUserRound class="icon" color="#FFFFFF"/>
-        <div class="text">{{ account.fullname }}</div>
+        <div class="text">{{ account?.firstname ?? "Null" }}</div>
       </div>
       <transition name="fade">
         <div class="account-button-dialog" v-if="accountDialog">
@@ -21,8 +21,8 @@
             <div class="info">
               <div class="left"><SquareUserRound class="icon" color="#034750"/></div>
               <div class="right">
-                <div class="name"><div class="text">{{ account.firstname }}</div></div>
-                <div class="email"><div class="text">{{ account.prfdemailval }}</div></div>
+                <div class="name"><div class="text">{{ account?.firstname ?? "Null" }}</div></div>
+                <div class="email"><div class="text">{{ account?.prfdemailval ?? "Null" }}</div></div>
               </div>
             </div>
           </div>
@@ -46,25 +46,25 @@
           <div class="dialog">
             <div class="header">
               <SquareUserRound class="icon" color="#034750"/>
-              <div class="text">{{ account.fullname }}</div>
+              <div class="text">{{ account?.fullname ?? "Null" }}</div>
             </div>
             <div class="divider2"></div>
             <div class="body">
               <div class="object">
                 <div class="left">
                   <div class="text">Email</div>
-                  <input type=text :placeholder="account.prfdemailval" class="input-large"/>
+                  <input type=text :placeholder="account?.prfdemailval" class="input-large"/>
                 </div>
                 <div class="right"></div>
               </div>
               <div class="object">
                 <div class="left">
                   <div class="text">Phone</div>
-                  <input type=text :placeholder="account.hmfmtdphnlocal" class="input-large"/>
+                  <input type=text :placeholder="account?.hmfmtdphnlocal" class="input-large"/>
                 </div>
                 <div class="right">
                   <div class="text">Mobile</div>
-                  <input type=text :placeholder="account.hmfmtdphn" class="input-large"/>
+                  <input type=text :placeholder="account?.hmfmtdphn" class="input-large"/>
                 </div>
               </div>
               <div class="object-large">
@@ -112,7 +112,7 @@
 
 
   async function loadHeader() {
-    console.log("loadAccount called");
+    console.log("loadHeader called");
     loading.value = true;
     error.value = "";
     
