@@ -1,10 +1,79 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { BookMarked, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next'
 
+import * as api from "@/services/owpAPI";
+
 const route = useRoute()
 const currentDate = ref(formatDate())
+
+// --- API STATE ---
+const pid = 458860; // later: come from auth/session
+
+const loading = ref(false);
+const error = ref("");
+
+const account = ref(null);
+const enrollments = ref([]);
+const grades = ref([]);
+const invoices = ref([]);
+const invoicedata = ref([]);
+
+async function loadDash() {
+  console.log("loadAccount called");
+  loading.value = true;
+  error.value = "";
+  
+  try {
+    const acc = await api.getAccountDetails(pid);
+    account.value = acc.response;
+    console.log("Account JSON:", acc);
+
+    const enr = await api.getActiveEnrollment(pid);
+    enrollments.value = enr.response;
+    console.log("Enrollments JSON:", enr);
+
+    for (const v of enr.response) {
+      const c = await api.getCourseGrades(v.enrollid);
+      grades.value[v.enrollid] = c.response ?? [];
+    }
+    console.log("Grades JSON:", grades);
+
+    const inv = await api.getInvoices(pid);
+    invoices.value = inv.response;
+    console.log("Invoices JSON:", inv);
+
+    for (const v of inv.response) {
+      const c = await api.getInvoiceData(v.invoicenum);
+      invoicedata.value[v.invoicenum] = c.response ?? [];
+    }
+    console.log("Invoice Data", invdata)
+
+  } catch (e) {
+    error.value = e?.message ?? String(e);
+  } finally {
+    loading.value = false;
+  }
+}
+
+const activeEnrollments = computed(() =>
+  enrollments.value.filter(active => active.statustxt === "Enrolled")
+);
+
+function getCourseCompletion(enrollid) {
+  const sections = grades.value[enrollid] ?? [];
+  const completed = sections.filter(section => section.grade != null).length
+  return Math.round((completed / sections.length) * 100);
+}
+
+function getInvoiceName(invoicenum) {
+  const item = invoicedata.value[invoicenum] ?? [];
+  const data = item.find(item => item.coursetitle != null)
+  return data.coursetitle;
+}
+
+onMounted(loadDash);
 
 // Helper function to format date based on user's local settings
 function formatDate() {
@@ -43,7 +112,7 @@ function scheduleNextUpdate() {
     <div class="dashboard-top">
       <div class="text">
         <div class="date">{{ currentDate }}</div>
-        <div class="welcome-message">Hello, User!</div>
+        <div class="welcome-message">Hello, {{ account?.firstname ?? "User" }}</div>
         <div class="dashboard-description">
           Here is a quick look at your active and completed enrollments.
           You can also view a snapshot of your previous purchases.
@@ -65,36 +134,19 @@ function scheduleNextUpdate() {
           </div>
           <div class="divider"></div>
           <div class="body">
-            <div class="object">
+            <div class="object" v-for="v in activeEnrollments">
               <div class="left">
                 <div class="icon"></div>
               </div>
               <div class="right">
-                <div class="title"><div class="text">Operation of Wastewater Treatment Plants, Vol 3</div></div>
+                <div class="title"><div class="text">{{ v.title }}</div></div>
                 <div class="data">
                   <div class="text">Completion</div>
-                  <div class="text">Enrollment expires: 10/11/2025</div>
+                  <div class="text">Enrollment expires: {{ v.expiredate }}</div>
                 </div>
                 <div class="progress">
-                  <div class="percent">
-                    <div class="text">30%</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="object">
-              <div class="left">
-                <div class="icon"></div>
-              </div>
-              <div class="right">
-                <div class="title"><div class="text">Operation of Wastewater Treatment Plants, Vol 2</div></div>
-                <div class="data">
-                  <div class="text">Completion</div>
-                  <div class="text">Enrollment expires: 10/11/2025</div>
-                </div>
-                <div class="progress">
-                  <div class="percent2">
-                    <div class="text">65%</div>
+                  <div class="percent" :style="{width: getCourseCompletion(v.enrollid) + '%'}">
+                    <div class="text">{{ getCourseCompletion(v.enrollid) + "%"}}</div>
                   </div>
                 </div>
               </div>
@@ -158,10 +210,8 @@ function scheduleNextUpdate() {
           </div>
           <div class="divider"></div>
           <div class="body">
-            <div class="object"><div class="text">Operation of Wastewater Treatment Plants, Vol 1</div></div>
-            <div class="object"><div class="text">Operation of Wastewater Treatment Plants, Vol 2</div></div>
-            <div class="object"><div class="text">Operation of Wastewater Treatment Plants, Vol 3</div></div>
-            <div class="object"><div class="text">Industrial Waste Treatment, Vol 1</div></div>
+            <div class="object" v-for="v in invoices">
+              <div class="text">Invoice: {{ v.invoicenum }} - {{ getInvoiceName(v.invoicenum) }}</div></div>
           </div>
           <div class="view-all">
             <router-link
@@ -380,7 +430,6 @@ function scheduleNextUpdate() {
 }
 
 .active-enrollments .body .object .right .progress .percent{
-  width: 30%;
   border-radius: 4rem;
   display: flex;
   justify-content: center;
@@ -388,17 +437,8 @@ function scheduleNextUpdate() {
   background-color: #00A5B5;
 }
 
-.active-enrollments .body .object .right .progress .percent2{
-  width: 65%;
-  border-radius: 4rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #00A5B5;
-}
 
-.active-enrollments .body .object .right .progress .percent .text,
-.active-enrollments .body .object .right .progress .percent2 .text {
+.active-enrollments .body .object .right .progress .percent .text {
   height: 13px;
   font-size: 14px;
   font-weight: 400;
