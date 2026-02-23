@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 .DS_Store
 dist
+dist/
+.vite/
 dist-ssr
 coverage
 *.local
@@ -26,11 +28,15 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+.DS_Store
+Thumbs.db
 
 *.tsbuildinfo
 
 test-results/
 playwright-report/
 
-#make the DB and frontend api-ing (calls) to backend secure, by not commiting it to the github repo 
+#make the DB and frontend api-ing (calls) to backend secure, do not commit, check redundancy?
 *.env
+.env
+.env.*
