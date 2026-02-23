@@ -1,0 +1,8 @@
+# Environment variables
+.env*
+
+# Local testing files
+test-db.js
+
+# Dependencies
+node_modules/

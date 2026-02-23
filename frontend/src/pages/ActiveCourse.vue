@@ -8,6 +8,10 @@
       </div>
     </div>
 
+    <p v-if="loadError" style="color:#9F3323; margin: 10px 0;">
+    {{ loadError }}
+    </p>
+
     <!-- Summary -->
     <div class="page-container">
       <div class="summary-tile">
@@ -45,19 +49,20 @@
 
             <div class="course-metrics">
               <div class="metric">
-                <div class="metric-value">5</div>
+                <div class="metric-value">{{ totalChapters }}</div>
                 <div class="metric-label">Total Chapters</div>
               </div>
+
               <div class="metric">
-                <div class="metric-value">B</div>
+                <div class="metric-value">{{ gradeAverage }}</div>
                 <div class="metric-label">Grade Average</div>
               </div>
               <div class="metric">
-                <div class="metric-value">--</div>
+                <div class="metric-value">{{ ceus }}</div>
                 <div class="metric-label">CEUs</div>
               </div>
               <div class="metric">
-                <div class="metric-value">--</div>
+                <div class="metric-value">{{ contactHours }}</div>
                 <div class="metric-label">Contact Hours</div>
               </div>
             </div>
@@ -101,7 +106,7 @@
             </div>
             <h2 class="card-title">Chapter Progress</h2>
           </div>
-<div class="divider"></div>
+        <div class="divider"></div>
           <div class="chapter-table">
             <div class="chapter-table-header">
               <div class="chapter-col">Chapter</div>
@@ -207,37 +212,47 @@
 <script>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { activeCourses } from "../data/coursesData.js";
+import { getEnrollmentRecord, getCourseGrades } from "@/services/owpAPI.js";
 
 export default {
   name: "ActiveCourse",
   setup() {
     const route = useRoute();
-    const courseId = Number(route.params.id);
 
-    const course = activeCourses.find(c => c.id === courseId);
+    
+    const enrollId = String(
+      route.params.id ??
+      route.params.enrollId ??
+      route.params.enrollmentId ??
+      ""
+    );
 
-    const courseTitle = course ? course.title : "Course Not Found";
-    const courseExpiration = "10/11/2025";
-    const courseCompleted = "--";
+    // headers
+    const courseTitle = ref("Loading...");
+    const courseExpiration = ref("—");
+    const courseCompleted = ref("—");
 
+    // metrics
+    const totalChapters = ref("—");
+    const gradeAverage = ref("—");
+    const ceus = ref("—");
+    const contactHours = ref("—");
 
-    const progressValue = course ? parseInt(course.progress) : 0;
+    // donut
     const animatedAngle = ref(0);
-    const animatedProgress = ref(0); 
+    const animatedProgress = ref(0);
 
-    const chapters = [
-        { title: "Introduction to Wastewater Treatment", date: "Sep 24, 2025", grade: "3% (1.0/40)" },
-        { title: "Effluent Discharge and Reuse", date: "Sep 24, 2025", grade: "3% (1.0/40)" },
-        { title: "Odor Control", date: "Sep 24, 2025", grade: "3% (1.0/40)" },
-        { title: "Instrumentation and Control" },
-        { title: "Introduction to Wastewater Utility Management" } 
-    ];
+    // chapter table
+    const chapters = ref([]);
 
-    onMounted(() => {
+    //debug & errors
+    const loadError = ref("");
+
+    // extra help
+    function animateToProgress(progressValue) {
       const targetAngle = (progressValue / 100) * 360;
-      const duration = 1000; 
-      const frameRate = 60; 
+      const duration = 1000;
+      const frameRate = 60;
       const steps = duration / (1000 / frameRate);
       const angleStep = targetAngle / steps;
       const progressStep = progressValue / steps;
@@ -258,15 +273,132 @@ export default {
         animatedAngle.value = currentAngle;
         animatedProgress.value = Math.round(currentProgress);
       }, 1000 / frameRate);
+    }
+
+    function calcAveragePctCompleted(sections) {
+      const nums = (Array.isArray(sections) ? sections : [])
+        .filter(
+          (s) =>
+            String(s?.attempted) === "1" ||
+            (s?.gradedate && s.gradedate !== "--")
+        )
+        .map((s) => Number(s?.pct))
+        .filter((n) => Number.isFinite(n));
+
+      if (nums.length === 0) return "—";
+
+      const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+      return `${Math.round(avg)}%`;
+    }
+
+    onMounted(async () => {
+      try {
+        loadError.value = "";
+
+        if (!enrollId) {
+          throw new Error("Missing route param (enrollId)");
+        }
+
+        //for enrollment record
+        const recordData = await getEnrollmentRecord(enrollId);
+        const record = Array.isArray(recordData?.response)
+          ? recordData.response[0]
+          : recordData?.response;
+
+        if (!record) {
+          throw new Error("No enrollment record found");
+        }
+
+        courseTitle.value = record.title ?? "Course";
+        courseExpiration.value = record.expiredate ?? "—";
+        courseCompleted.value = record.completedate ?? "—";
+        ceus.value = record.ceus ?? record.ceu ?? "—";
+        contactHours.value = record.contacthour ?? "—";
+
+        const editionId = String(
+          record.editionid ?? record.editionId ?? record.edition ?? ""
+        );
+        console.log("Enrollment record keys:", Object.keys(record || {}));
+        console.log("Enrollment record full:", record);
+
+        console.log("ActiveCourse IDs:", { enrollId, editionId });
+
+        //grades & chapters
+        let gradesData = await getCourseGrades(enrollId);
+        let sections = Array.isArray(gradesData?.response)
+          ? gradesData.response
+          : [];
+
+        if (sections.length === 0 && editionId) {
+          gradesData = await getCourseGrades(editionId);
+          sections = Array.isArray(gradesData?.response)
+            ? gradesData.response
+            : [];
+        }
+
+        console.log("sections length:", sections.length);
+
+        //metrics implement
+        totalChapters.value = sections.length;
+        gradeAverage.value = calcAveragePctCompleted(sections);
+
+        const completedCount = sections.filter((s) => {
+          const hasGradeDate = s?.gradedate && s.gradedate !== "--";
+          const hasGrade =
+            s?.grade !== null && s?.grade !== undefined && s?.grade !== "";
+          const attempted = String(s?.attempted) === "1";
+          return hasGradeDate || hasGrade || attempted;
+        }).length;
+
+        const percent =
+          sections.length === 0
+            ? 0
+            : Math.round((completedCount / sections.length) * 100);
+
+        animateToProgress(percent);
+
+        //tables
+        chapters.value = sections
+          .slice()
+          .sort((a, b) => Number(a?.ordinal ?? 0) - Number(b?.ordinal ?? 0))
+          .map((s) => {
+            const pctStr =
+              s?.pct !== null && s?.pct !== undefined && s?.pct !== ""
+                ? `${s.pct}%`
+                : "";
+
+            const fracStr = s?.gradefraction ?? "";
+
+            //for fraction & percent grade (aesthetic)
+            let gradeDisplay = "";
+            if (pctStr && fracStr) gradeDisplay = `${pctStr} (${fracStr})`;
+            else gradeDisplay = pctStr || fracStr || "";
+
+            return {
+              title: s?.examname ?? "",
+              date: s?.gradedate && s.gradedate !== "--" ? s.gradedate : "",
+              grade: gradeDisplay,
+            };
+          });
+      } catch (err) {
+        console.error(err);
+        loadError.value =
+          err?.message || "Failed to load active course data";
+      }
     });
 
     return {
       courseTitle,
       courseExpiration,
       courseCompleted,
+      totalChapters,
+      gradeAverage,
+      ceus,
+      contactHours,
       animatedAngle,
       animatedProgress,
-      chapters
+      chapters,
+      loadError,
     };
   },
 };

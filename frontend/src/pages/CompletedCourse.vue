@@ -7,6 +7,11 @@
       </div>
     </div>
 
+    <!-- debugtool -->
+    <p v-if="loadError" style="color:#9F3323; margin: 10px 0;">
+      {{ loadError }}
+    </p>
+
   <div class="page-container">
   <div class="summary-tile">
     <div class="card-header">
@@ -71,7 +76,7 @@
                 'conic-gradient(#6DBE4B ' + animatedAngle + 'deg, #7A7A7A 0deg)'
             }"
           ></div>
-          <div class="donut-inner">100%</div>
+          <div class="donut-inner">{{ animatedProgress }}%</div>
         </div>
       </div>
     </div>
@@ -115,7 +120,7 @@
             <div
               class="chapter-row"
               v-for="(chapter, index) in chapters"
-              :key="index"
+              :key="chapter.id"
             >
               <div class="chapter-col">
                 <span class="chapter-number">{{ index + 1 }}</span>
@@ -125,7 +130,7 @@
               <div class="date-col">{{ chapter.date }}</div>
               <div class="grade-col">{{ chapter.grade }}</div>
             </div>
-          </div>
+            </div>
         </div>
 
         <router-link to="/courses" class="back-link">← Back to Courses</router-link>
@@ -208,40 +213,192 @@
 <script>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { completedCourses } from "../data/coursesData.js";
+import { getEnrollmentRecord, getCourseGrades } from "@/services/owpAPI.js";
 
 export default {
   name: "CompletedCourse",
   setup() {
     const route = useRoute();
-    const courseId = Number(route.params.id);
 
-    const course = completedCourses.find(c => c.id === courseId);
+    const enrollId = String(
+      route.params.id ??
+      route.params.enrollId ??
+      route.params.enrollmentId ??
+      ""
+    );
 
-    const courseTitle = course ? course.title : "Course Not Found";
-    const courseCompletedDate = course ? course.completed : "--";
-    const courseGrade = course ? (course.status === "Pass" ? "A" : course.status) : "--";
+    //headers
+    const courseTitle = ref("Loading...");
+    const courseCompletedDate = ref("—");
+    const courseGrade = ref("—");
 
-    const chapters = [
-      { title: "Introduction to Wastewater Treatment", date: "Aug 20, 2025", grade: "83% (34.0/40)" },
-      { title: "Safety", date: "Aug 20, 2025", grade: "100% (25.0/25.0)" },
-      { title: "Preliminary Treatment", date: "Aug 20, 2025", grade: "100% (40.0/40.0)" },
-      { title: "Primary Treatment", date: "Aug 20, 2025", grade: "100% (40.0/40.0)" },
-      { title: "Lagoon Systems (Secondary Treatment)", date: "Sep 3, 2025", grade: "94% (42.2/45)" }
-    ];
+    //metrics
+    const totalChapters = ref("—");
+    const gradeAverage = ref("—");
+    const ceus = ref("—");
+    const contactHours = ref("—");
 
+    //donut
     const animatedAngle = ref(0);
-    onMounted(() => {
-      const target = 360;
-      const step = 6;
-      const interval = setInterval(() => {
-        animatedAngle.value += step;
-        if (animatedAngle.value >= target) clearInterval(interval);
-      }, 10);
+    const animatedProgress = ref(0);
+
+    //chapter table
+    const chapters = ref([]);
+
+    //debug help
+    const loadError = ref("");
+
+    let animInterval = null;
+
+    function animateToProgress(progressValue) {
+      if (animInterval) clearInterval(animInterval);
+
+      const targetAngle = (progressValue / 100) * 360;
+      const duration = 900;
+      const frameRate = 60;
+      const steps = duration / (1000 / frameRate);
+      const angleStep = targetAngle / steps;
+      const progressStep = progressValue / steps;
+
+      let currentAngle = 0;
+      let currentProgress = 0;
+
+      animInterval = setInterval(() => {
+        currentAngle += angleStep;
+        currentProgress += progressStep;
+
+        if (currentAngle >= targetAngle) {
+          currentAngle = targetAngle;
+          currentProgress = progressValue;
+          clearInterval(animInterval);
+          animInterval = null;
+        }
+
+        animatedAngle.value = currentAngle;
+        animatedProgress.value = Math.round(currentProgress);
+      }, 1000 / frameRate);
+    }
+
+    function calcAveragePctCompleted(sections) {
+      const nums = (Array.isArray(sections) ? sections : [])
+        .filter(
+          (s) =>
+            String(s?.attempted) === "1" ||
+            (s?.gradedate && s.gradedate !== "--")
+        )
+        .map((s) => Number(s?.pct))
+        .filter((n) => Number.isFinite(n));
+
+      if (nums.length === 0) return "—";
+      const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+      return `${Math.round(avg)}%`;
+    }
+
+    onMounted(async () => {
+      try {
+        loadError.value = "";
+        if (!enrollId) throw new Error("Missing route param (enrollId)");
+
+        const recordData = await getEnrollmentRecord(enrollId);
+        const record = Array.isArray(recordData?.response)
+          ? recordData.response[0]
+          : recordData?.response;
+
+        if (!record) throw new Error("No enrollment record found");
+
+        courseTitle.value = record.title ?? "Course";
+        courseCompletedDate.value = record.completedate ?? "—";
+
+       //null until completed (tweak for aesthetic preferance)
+        courseGrade.value = record.grade ?? "—";
+
+        ceus.value = record.ceus ?? record.ceu ?? "—";
+        contactHours.value = record.contacthour ?? "—";
+
+        const editionId = String(
+          record.editionid ?? record.editionId ?? record.edition ?? ""
+        );
+
+        //grade data
+        let gradesData = await getCourseGrades(enrollId);
+        let sections = Array.isArray(gradesData?.response)
+          ? gradesData.response
+          : [];
+
+        if (sections.length === 0 && editionId) {
+          gradesData = await getCourseGrades(editionId);
+          sections = Array.isArray(gradesData?.response)
+            ? gradesData.response
+            : [];
+        }
+
+        totalChapters.value = sections.length;
+        gradeAverage.value = calcAveragePctCompleted(sections);
+
+        // grade calculation
+        const completedCount = sections.filter((s) => {
+          const hasGradeDate = s?.gradedate && s.gradedate !== "--";
+          const hasGrade =
+            s?.grade !== null && s?.grade !== undefined && s?.grade !== "";
+          const attempted = String(s?.attempted) === "1";
+          return hasGradeDate || hasGrade || attempted;
+        }).length;
+
+        const percent =
+          sections.length === 0
+            ? 100 
+            : Math.round((completedCount / sections.length) * 100);
+
+        animateToProgress(percent);
+
+        chapters.value = sections
+          .slice()
+          .sort((a, b) => Number(a?.ordinal ?? 0) - Number(b?.ordinal ?? 0))
+          .map((s) => {
+            const pctStr =
+              s?.pct !== null && s?.pct !== undefined && s?.pct !== ""
+                ? `${s.pct}%`
+                : "";
+
+            const fracStr = s?.gradefraction ?? "";
+
+            let gradeDisplay = "";
+            if (pctStr && fracStr) gradeDisplay = `${pctStr} (${fracStr})`;
+            else gradeDisplay = pctStr || fracStr || "";
+
+            return {
+              id: s?.examid ?? `${s?.ordinal ?? ""}-${s?.examname ?? ""}`,
+              title: s?.examname ?? "",
+              date: s?.gradedate && s.gradedate !== "--" ? s.gradedate : "—",
+              grade: gradeDisplay || "—",
+            };
+          });
+
+        if (courseGrade.value === "—" && gradeAverage.value !== "—") {
+          courseGrade.value = gradeAverage.value;
+        }
+      } catch (err) {
+        console.error(err);
+        loadError.value = err?.message || "Failed to load completed course data";
+        //donut progress, check here if tweaked
+        animateToProgress(100);
+      }
     });
 
-    return { courseTitle, courseCompletedDate, courseGrade, chapters, animatedAngle };
-  }
+    return {
+      courseTitle,
+      courseCompletedDate,
+      courseGrade,
+      totalChapters,
+      gradeAverage,
+      ceus,
+      contactHours,
+      animatedAngle,
+      animatedProgress,
+      chapters,
+      loadError,
+    };
+  },
 };
 </script>
 
