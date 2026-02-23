@@ -1,5 +1,33 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+  //API Integrations
+  import * as api from "@/services/owpAPI"
+
+  const pid = 458860;
+  const error = ref("");
+  const loading = ref(false);
+
+  async function loadTable() {
+    console.log("loadTable called");
+    loading.value = true;
+    error.value = "";
+    
+    const nums = ref([]);
+
+    try {
+      const opNums = await api.getAccountDetails(pid);
+      nums.value = opNums.response;
+      console.log("Operator Numbers JSON:", opNums);
+
+    } catch (e) {
+      error.value = e?.message ?? String(e);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+
 
   const addPopup = ref(false)
   function openAdd() {
@@ -31,6 +59,9 @@
   import { useRoute } from 'vue-router'
   import { Award, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next';
   const route = useRoute()
+
+  onMounted(loadTable);
+
 </script>
 
 <template>
