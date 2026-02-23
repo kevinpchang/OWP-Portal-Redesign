@@ -21,8 +21,8 @@
             <div class="info">
               <div class="left"><SquareUserRound class="icon" color="#034750"/></div>
               <div class="right">
-                <div class="name"><div class="text">User</div></div>
-                <div class="email"><div class="text">User.Example@owp.csus.edu</div></div>
+                <div class="name"><div class="text">{{ account.firstname }}</div></div>
+                <div class="email"><div class="text">{{ account.prfdemailval }}</div></div>
               </div>
             </div>
           </div>
@@ -46,25 +46,25 @@
           <div class="dialog">
             <div class="header">
               <SquareUserRound class="icon" color="#034750"/>
-              <div class="text">User</div>
+              <div class="text">{{ account.fullname }}</div>
             </div>
             <div class="divider2"></div>
             <div class="body">
               <div class="object">
                 <div class="left">
                   <div class="text">Email</div>
-                  <input type=text placeholder="User.Example@owp.csus.edu" class="input-large"/>
+                  <input type=text :placeholder="account.prfdemailval" class="input-large"/>
                 </div>
                 <div class="right"></div>
               </div>
               <div class="object">
                 <div class="left">
                   <div class="text">Phone</div>
-                  <input type=text placeholder="(916) 278-8110" class="input-large"/>
+                  <input type=text :placeholder="account.hmfmtdphnlocal" class="input-large"/>
                 </div>
                 <div class="right">
                   <div class="text">Mobile</div>
-                  <input type=text placeholder="(916) 278-8116" class="input-large"/>
+                  <input type=text :placeholder="account.hmfmtdphn" class="input-large"/>
                 </div>
               </div>
               <div class="object-large">
@@ -97,27 +97,57 @@
 
 <script setup>
   import { CircleQuestionMark, Mail, Bell, SquareUserRound } from 'lucide-vue-next';
-  import { ref } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import { useRoute } from 'vue-router'
 
-  const route = useRoute()
+  import * as api from "@/services/owpAPI";
 
-  const accountDialog = ref(false)
+  // --- API STATE ---
+  const pid = 458860; // later: come from auth/session
+
+  const loading = ref(false);
+  const error = ref("");
+
+  const account = ref(null);
+
+
+  async function loadHeader() {
+    console.log("loadAccount called");
+    loading.value = true;
+    error.value = "";
+    
+    try {
+      const acc = await api.getAccountDetails(pid);
+      account.value = acc.response;
+      console.log("Account JSON:", acc);
+
+    } catch (e) {
+      error.value = e?.message ?? String(e);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  onMounted(loadHeader);
+
+  const route = useRoute();
+
+  const accountDialog = ref(false);
   function openAccountDialog() {
-    accountDialog.value = true
+    accountDialog.value = true;
   }
 
     function closeAccountDialog() {
-    accountDialog.value = false
+    accountDialog.value = false;
   }
 
-  const contactDialog = ref(false)
+  const contactDialog = ref(false);
   function openContactDialog() {
-    contactDialog.value = true
+    contactDialog.value = true;
   }
 
   function closeContactDialog() {
-    contactDialog.value = false
+    contactDialog.value = false;
   }
 </script>
 
