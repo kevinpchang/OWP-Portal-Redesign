@@ -16,7 +16,7 @@
     const nums = ref([]);
 
     try {
-      const opNums = await api.getAccountDetails(pid);
+      const opNums = await api.getOperatorList(pid);
       nums.value = opNums.response;
       console.log("Operator Numbers JSON:", opNums);
 
@@ -27,8 +27,42 @@
     }
   }
 
+  async function addNumber(payload){
+    console.log("addNumber called with payload:", payload);
+
+    try{
+      //payload needs to have: liccatid, countryid, state, status, operatornumber, ipAddr
+      api.addOperator(payload);
+    } catch (e) {
+      error.value = e?.message ?? String(e);
+    }
+  }
+
+  async function updateNumber(payload){
+    console.log("updateNumber called with payload:", payload);
+
+    try{
+      //payload needs to have: oprlicid, liccatid, countryid, state, status, operatornumber, ipAddr
+      api.updateOperatorNumber(payload);
+    } catch (e) {
+      error.value = e?.message ?? String(e);
+    }
+  }
+
+  async function deleteNumber(ip, id){
+    console.log("deleteNumber called with ip:", ip, "and id:", id);
+
+    try{
+      
+      api.deleteOperator(ip, id, pid);
+      console.log("Operator Number deleted successfully");
+    } catch (e) {
+      error.value = e?.message ?? String(e);
+    }
+  }
 
 
+  //hide/show popups
   const addPopup = ref(false)
   function openAdd() {
     addPopup.value = true
@@ -58,6 +92,7 @@
 
   import { useRoute } from 'vue-router'
   import { Award, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next';
+import { isParameter } from 'typescript';
   const route = useRoute()
 
   onMounted(loadTable);
