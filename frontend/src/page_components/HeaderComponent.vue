@@ -13,7 +13,7 @@
       <div class="divider"></div>
       <div class="account_button" tabindex="0" @focus="openAccountDialog" @blur="closeAccountDialog">
         <SquareUserRound class="icon" color="#FFFFFF"/>
-        <div class="text">User</div>
+        <div class="text">{{ account.fullname }}</div>
       </div>
       <transition name="fade">
         <div class="account-button-dialog" v-if="accountDialog">
