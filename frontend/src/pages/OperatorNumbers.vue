@@ -1,6 +1,68 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed, onMounted, onUnmounted } from 'vue'
 
+  //API Integrations
+  import * as api from "@/services/owpAPI"
+
+  const pid = 458860;
+  const error = ref("");
+  const loading = ref(false);
+
+  async function loadTable() {
+    console.log("loadTable called");
+    loading.value = true;
+    error.value = "";
+    
+    const nums = ref([]);
+
+    try {
+      const opNums = await api.getOperatorList(pid);
+      nums.value = opNums.response;
+      console.log("Operator Numbers JSON:", opNums);
+
+    } catch (e) {
+      error.value = e?.message ?? String(e);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function addNumber(payload){
+    console.log("addNumber called with payload:", payload);
+
+    try{
+      //payload needs to have: liccatid, countryid, state, status, operatornumber, ipAddr
+      api.addOperator(payload);
+    } catch (e) {
+      error.value = e?.message ?? String(e);
+    }
+  }
+
+  async function updateNumber(payload){
+    console.log("updateNumber called with payload:", payload);
+
+    try{
+      //payload needs to have: oprlicid, liccatid, countryid, state, status, operatornumber, ipAddr
+      api.updateOperatorNumber(payload);
+    } catch (e) {
+      error.value = e?.message ?? String(e);
+    }
+  }
+
+  async function deleteNumber(ip, id){
+    console.log("deleteNumber called with ip:", ip, "and id:", id);
+
+    try{
+      
+      api.deleteOperator(ip, id, pid);
+      console.log("Operator Number deleted successfully");
+    } catch (e) {
+      error.value = e?.message ?? String(e);
+    }
+  }
+
+
+  //hide/show popups
   const addPopup = ref(false)
   function openAdd() {
     addPopup.value = true
@@ -30,7 +92,11 @@
 
   import { useRoute } from 'vue-router'
   import { Award, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next';
+import { isParameter } from 'typescript';
   const route = useRoute()
+
+  onMounted(loadTable);
+
 </script>
 
 <template>
@@ -42,6 +108,7 @@
         <button class = add-button @click.left="openAdd">Add Operator Number</button>
       </div>
 
+      <!--Table needs to populate based on GET from database api/v1/account/getOperatorList/{pid}-->
       <div name="table">
         <table>
           <thead class="table-header">
@@ -133,6 +200,7 @@
             </h1>
             <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
             <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
+            <!-- Method=POST for button /api/v1/account/addOperator-->
             <button class = popup-button-left @click="closeAdd">Add</button>
 
           </div>
@@ -155,6 +223,7 @@
             </h1>
             <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
             <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
+            <!-- Method=POST for button /api/v1/account/updateOperatorNumber-->
             <button class = popup-button-left @click="closeEdit">Edit</button>
 
           </div>
@@ -176,6 +245,7 @@
               Remove Operator Number
             </h1>
             <p class="popup-text">Are you sure you want to remove the Operator Number?</p>
+            <!-- Method=GET for buttons api/v1/account/deleteOperator/{ip}/{id}/{pid}-->
             <button class = popup-button-left @click="closeDelete">Yes</button>
             <button class = popup-button-right @click="closeDelete">No</button>
 
