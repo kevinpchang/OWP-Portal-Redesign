@@ -46,7 +46,9 @@
           </div>
 
           <div class="right">
-            <button class="btn ghost" @click="printReceipt">Receipt</button>
+            <button class="btn ghost" @click="downloadAndOpenReceipt" :disabled="receiptLoading">
+              {{ receiptLoading ? "Loading…" : "Receipt" }}
+            </button>
             <button class="btn primary" @click="selected = null">
               Return to Purchase History
             </button>
@@ -67,7 +69,7 @@
             <div class="cell h">Shipped</div>
             <div class="cell">{{ selected!.shipped ? "Yes" : "No" }}</div>
             <div class="cell h">Balance Due</div>
-            <div class="cell">{{ fmtMoney(selected!.balanceDue) }}</div>
+            <div class="cell">{{ fmtMoneySigned(selected!.balanceDue) }}</div>
             <div class="cell h">Order Method</div>
             <div class="cell">{{ selected!.orderMethod }}</div>
           </div>
@@ -104,8 +106,8 @@
 
           <div v-for="(it, i) in selected!.items" :key="i" class="items-row">
             <div class="c product">{{ it.product }}</div>
-            <div class="c qty">{{ it.qty }}</div>
-            <div class="c total">{{ fmtMoney(it.total) }}</div>
+            <div class="c qty">{{ fmtQtySigned(it.qty) }}</div>
+            <div class="c total">{{ fmtMoneySigned(it.total) }}</div>
           </div>
 
           <div v-if="selected!.items.length === 0" class="items-row">
@@ -119,8 +121,8 @@
 
         <div class="payment">
           <div class="p-row">
-            <div class="p-h">Amount Paid</div>
-            <div class="p-v">{{ fmtMoney(selected!.payment.amountPaid) }}</div>
+            <div class="p-h">{{ selected!.payment.amountPaid < 0 ? "Amount Refunded" : "Amount Paid" }}</div>
+            <div class="p-v">{{ fmtMoneySigned(selected!.payment.amountPaid) }}</div>
 
             <div class="p-h">Pay Date</div>
             <div class="p-v">{{ fmtDate(selected!.payment.payDate) }}</div>
@@ -175,7 +177,7 @@ type Address = {
   phone?: string;
 };
 type Payment = {
-  amountPaid: number;
+  amountPaid: number; // keep SIGNED
   payDate: string;
   method: string;
   description: string;
@@ -188,11 +190,11 @@ type Payment = {
   zip: string;
 };
 type Invoice = {
-  id: number; // invoice number
+  id: number;
   invoiceDate: string;
   dueDate: string;
   shipped: boolean;
-  balanceDue: number;
+  balanceDue: number; // keep SIGNED (usually 0)
   placedBy: string;
   billing: Address;
   orderMethod: string;
@@ -205,6 +207,7 @@ const invoices = ref<Invoice[]>([]);
 const selected = ref<Invoice | null>(null);
 const loading = ref(false);
 const error = ref<string | null>(null);
+const receiptLoading = ref(false);
 
 // TODO later: come from login/store/session
 const pid = 458860;
@@ -212,14 +215,13 @@ const pid = 458860;
 function toStr(x: any) {
   return x == null ? "" : String(x);
 }
-function moneyAbs(x: any) {
-  // API returns strings like "-75.00" (refund). UI should show positive dollars.
+function toNum(x: any) {
   const n = Number(x);
-  return Number.isFinite(n) ? Math.abs(n) : 0;
+  return Number.isFinite(n) ? n : 0;
 }
-function intAbs(x: any) {
+function toInt(x: any) {
   const n = Number(x);
-  return Number.isFinite(n) ? Math.abs(Math.trunc(n)) : 0;
+  return Number.isFinite(n) ? Math.trunc(n) : 0;
 }
 
 function emptyBilling(): Address {
@@ -240,11 +242,6 @@ function emptyPayment(): Payment {
   };
 }
 
-/**
- * Parse formatted address strings like:
- * "SCRIBES, SILICON<br>6000 J ST<br>SACRAMENTO CA  95819<br>(123) 123-1234"
- * into { name, address1, city, state, zip }.
- */
 function parseFmtdAddr(html: any): Partial<Address> {
   const s = toStr(html);
   if (!s) return {};
@@ -255,52 +252,29 @@ function parseFmtdAddr(html: any): Partial<Address> {
     .map((x) => x.trim())
     .filter(Boolean);
 
-  // Expected:
-  // 0: name
-  // 1: street
-  // 2: "CITY ST  ZIP"
-  // 3: phone (sometimes)
   const name = lines[0] ?? "";
   const address1 = lines[1] ?? "";
   const cityStateZip = lines[2] ?? "";
 
-  // cityStateZip example: "SACRAMENTO CA  95819"
-const m = cityStateZip.match(/^(.+?)\s+([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/);
-
-const city = m?.[1]?.trim() ?? "";
-const state = m?.[2]?.trim() ?? "";
-const zip = m?.[3]?.trim() ?? "";
+  const m = cityStateZip.match(/^(.+?)\s+([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/);
+  const city = m?.[1]?.trim() ?? "";
+  const state = m?.[2]?.trim() ?? "";
+  const zip = m?.[3]?.trim() ?? "";
 
   return { name, address1, city, state, zip };
 }
 
-/**
- * Parse mm/dd/yyyy into yyyy-mm-dd so fmtDate works consistently.
- */
 function normalizeDate(s: any): string {
   const t = toStr(s).trim();
   if (!t) return "";
-
-  // already ISO?
   if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
 
-  // mm/dd/yyyy
   const m = t.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (m) {
-    const mm = m[1];
-    const dd = m[2];
-    const yyyy = m[3];
-    return `${yyyy}-${mm}-${dd}`;
-  }
+  if (m) return `${m[3]}-${m[1]}-${m[2]}`;
 
   return t;
 }
 
-/**
- * GET /api/getInvoices/:pid
- * Response:
- * { error:false, response:[ { invoicenum, invoicedate, balancedue }, ... ] }
- */
 async function loadInvoices() {
   loading.value = true;
   error.value = null;
@@ -317,10 +291,10 @@ async function loadInvoices() {
           invoiceDate: normalizeDate(x.invoicedate),
           dueDate: "",
           shipped: false,
-          balanceDue: moneyAbs(x.balancedue),
+          balanceDue: toNum(x.balancedue),
           placedBy: "",
           billing: emptyBilling(),
-          orderMethod: "OWP Website",
+          orderMethod: "—",
           status: "Paid",
           items: [],
           payment: emptyPayment(),
@@ -335,11 +309,20 @@ async function loadInvoices() {
   }
 }
 
-/**
- * GET /api/getInvoiceData/:invoiceNum
- * Response you provided:
- * { error:false, response:[ { ...line item... }, { ...line item... } ] }
- */
+function buildProductName(r: any): string {
+  const fee = toStr(r.feetypename).trim();
+  const comment = toStr(r.mstfeecomment).trim();
+  const course = toStr(r.coursetitle).trim();
+
+  // Examples:
+  // Sales Tax + City of Sacramento => "Sales Tax: City of Sacramento"
+  // Shipping + UPS Ground => "Shipping: UPS Ground"
+  // Enrollment + course title => "Enrollment: WTPO1 - ..."
+  const detail = course || comment;
+  if (fee && detail) return `${fee}: ${detail}`;
+  return detail || fee || "Item";
+}
+
 async function open(inv: Invoice) {
   loading.value = true;
   error.value = null;
@@ -348,27 +331,24 @@ async function open(inv: Invoice) {
     const raw: any = await api.getInvoiceData(inv.id);
     const rows: any[] = Array.isArray(raw?.response) ? raw.response : [];
 
-    // If API returned nothing, still show base invoice
     if (rows.length === 0) {
       selected.value = inv;
       return;
     }
 
-    const h = rows[0]; // header-like fields live here too
+    const h = rows[0];
 
-    // Billing address
     const billParsed = parseFmtdAddr(h.billfmtdaddr);
     const billing: Address = {
       ...emptyBilling(),
       ...billParsed,
-      phone: toStr(h.billfmtdphn) || toStr(h.billfmtdaddr).match(/\(?\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}/)?.[0] || "",
+      phone: toStr(h.billfmtdphn) || "",
     };
 
-    // Payment address
     const payParsed = parseFmtdAddr(h.pmtfmtdaddr);
     const payment: Payment = {
       ...emptyPayment(),
-      amountPaid: moneyAbs(h.payamt),
+      amountPaid: toNum(h.payamt), // KEEP SIGNED
       payDate: normalizeDate(h.paydate),
       method: toStr(h.paymethodname),
       description: toStr(h.description) || "—",
@@ -381,18 +361,12 @@ async function open(inv: Invoice) {
       zip: payParsed.zip ?? "",
     };
 
-    // Items: each row is a fee/item line
     const items: InvoiceItem[] = rows.map((r: any) => {
-      const product =
-        toStr(r.coursetitle) ||
-        toStr(r.mstfeecomment) ||
-        toStr(r.feetypename) ||
-        "Item";
-
-      const qty = intAbs(r.itmqty);
-      const total = moneyAbs(r.itmamt);
-
-      return { product, qty, total };
+      return {
+        product: buildProductName(r),
+        qty: toInt(r.itmqty),      // KEEP SIGNED (refunds are negative)
+        total: toNum(r.itmamt),    // KEEP SIGNED
+      };
     });
 
     selected.value = {
@@ -400,9 +374,9 @@ async function open(inv: Invoice) {
       invoiceDate: normalizeDate(h.invoicedate) || inv.invoiceDate,
       dueDate: normalizeDate(h.invoiceduedate) || "",
       shipped: toStr(h.shippedflag) === "1",
-      balanceDue: moneyAbs(h.balancedue),
-      placedBy: toStr(h.entityname), // best available field
-      orderMethod: "OWP Website",
+      balanceDue: toNum(h.balancedue),
+      placedBy: toStr(h.entityname),
+      orderMethod: toStr(h.cssagent) || "OWP Website", // ✅ use backend field
       status: "Paid",
       billing,
       items,
@@ -416,21 +390,56 @@ async function open(inv: Invoice) {
   }
 }
 
-function fmtMoney(n: number) {
-  return `$${n.toFixed(2)}`;
+function fmtMoneySigned(n: number) {
+  const abs = Math.abs(n);
+  const s = `$${abs.toFixed(2)}`;
+  return n < 0 ? `(${s})` : s; // ✅ PDF style for refunds
 }
+
+function fmtQtySigned(n: number) {
+  return String(n); // show -1 exactly as backend returns
+}
+
 function fmtDate(iso: string) {
   if (!iso) return "";
-  // iso is yyyy-mm-dd from normalizeDate()
   const d = new Date(iso + "T00:00:00");
-  return d.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "2-digit", day: "2-digit" });
 }
-function printReceipt() {
-  window.print();
+
+/** Receipt -> calls backend API and opens PDF in a new tab */
+async function downloadAndOpenReceipt() {
+  if (!selected.value) return;
+  receiptLoading.value = true;
+  error.value = null;
+
+  try {
+    // owp.js has: fetch(`${BASE}/receipt/download/${invoiceNum}`)
+    const raw: any = await api.downloadReceipt(selected.value.id);
+
+    const b64 = raw?.response;
+    if (!b64 || typeof b64 !== "string") throw new Error("Receipt API returned no PDF data.");
+
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const blob = new Blob([bytes], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+
+    window.open(url, "_blank", "noopener,noreferrer");
+
+    // ✅ Safari-friendly: download link
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `receipt-${selected.value.id}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    // optional: cleanup later
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (e: any) {
+    error.value = e?.message ?? String(e);
+  } finally {
+    receiptLoading.value = false;
+  }
 }
 
 onMounted(loadInvoices);
@@ -607,6 +616,11 @@ onMounted(loadInvoices);
   transform: translateY(-1px);
 }
 
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ===================== TABLES ===================== */
 
 .detail-table {
@@ -635,7 +649,7 @@ onMounted(loadInvoices);
 .cell.h {
   background: #f8fafc;
   font-weight: 700;
-  color: #034750; /* match scheme for header cells */
+  color: #034750;
 }
 
 .addr {
@@ -699,7 +713,7 @@ onMounted(loadInvoices);
   padding: 10px 12px;
   background: #f8fafc;
   font-weight: 700;
-  color: #034750; /* match scheme */
+  color: #034750;
 }
 
 .p-v {
