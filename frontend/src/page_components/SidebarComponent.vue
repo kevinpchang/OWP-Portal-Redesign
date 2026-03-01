@@ -10,6 +10,7 @@ import {
   Hash,
   LayoutGrid,
   LogOut,
+  Images,
 } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -56,6 +57,16 @@ const route = useRoute()
       >
         <BookOpen class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Slides</div>
+      </router-link>
+
+      <!-- Media -->
+      <router-link
+        to="/media"
+        class="media-button"
+        :class="{ active: route.name === 'MediaPage' }"
+      >
+        <Images class="button-icon" color="#034750" :size="20" />
+        <div class="button-text">Media</div>
       </router-link>
 
       <!-- Courses -->
@@ -184,6 +195,7 @@ const route = useRoute()
 .my-account-button,
 .my-tasks-button,
 .slides-button,
+.media-button,
 .courses-button,
 .operator-numbers-button,
 .certificates-button,
@@ -267,6 +279,7 @@ const route = useRoute()
 .my-account-button .button-text,
 .my-tasks-button .button-text,
 .slides-button .button-text,
+.media-button .button-text,
 .certificates-button .button-text,
 .courses-button .button-text {
   margin-left: 5px;

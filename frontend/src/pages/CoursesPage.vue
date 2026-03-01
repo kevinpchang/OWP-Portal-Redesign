@@ -39,6 +39,9 @@
             <div class="card-divider"></div>
 
             <div class="card-body">
+              <div v-if="loadingActive" style="padding: 8px 0; color:#707070;">Loading…</div>
+              <div v-else-if="activeError" style="padding: 8px 0; color:#9F3323;">{{ activeError }}</div>
+              <div v-else-if="activeCourses.length === 0" style="padding: 8px 0; color:#707070;">No active enrollments.</div>
               <router-link
                 v-for="course in activeCourses"
                 :key="course.id"
@@ -108,17 +111,21 @@
                     <div class="course-title">{{ course.title }}</div>
 
                     <div class="info-subrow">
-                      <div class="completion-label">Completed</div>
+                      <div class="completion-label">
+                        {{ course.dropped ? 'Dropped' : 'Completed' }}
+                      </div>
                       <div class="status-text" 
                           :class="course.status === 'Pass' ? 'status-pass' : 'status-fail'">
                         {{ course.status }}
                       </div>
                     </div>
 
-                    <div class="progress-bar">
-                      <div class="progress-fill"
-                          :class="course.status === 'Pass' ? 'completed-fill' : 'failed-fill'"
-                          style="width: 100%">
+                    <div class="progress-bar" v-if="!course.dropped">
+                      <div
+                        class="progress-fill"
+                        :class="course.status === 'Pass' ? 'completed-fill' : 'failed-fill'"
+                        style="width: 100%"
+                      >
                         <span class="progress-text">100%</span>
                       </div>
                     </div>
@@ -250,20 +257,74 @@
 </template>
 
 <script>
-import {
-  activeCourses,
-  completedCourses,
-  recommendedCourses,
-} from "../data/coursesData.js";
+import { getActiveEnrollment, getCourseGrades } from "@/services/owpAPI.js";
+import { completedCourses, recommendedCourses } from "../data/coursesData.js";
 
 export default {
   name: "CoursesPage",
   data() {
     return {
-      activeCourses,
-      completedCourses,
-      recommendedCourses,
+      activeCourses: [],
+      completedCourses,        
+      recommendedCourses,      // mock
+      pid: 458860,
+      loadingActive: true,
+      activeError: "",
     };
+  },
+  async mounted() {
+    try {
+      const data = await getActiveEnrollment(this.pid);
+      const rows = data?.response ?? [];
+
+      const activeRows = rows.filter(r => r.statustxt === "Enrolled");
+      const completedRows = rows.filter(r => r.statustxt === "Complete" || r.statustxt === "Dropped");
+
+      
+      this.activeCourses = await Promise.all(
+        activeRows.map(async (r) => {
+          const gradesData = await getCourseGrades(r.enrollid);
+          const sections = gradesData?.response ?? [];
+
+          const total = sections.length;
+          const graded = sections.filter(s => String(s.grade ?? "").trim() !== "").length;
+
+          const percent = total === 0 ? 0 : Math.round((graded / total) * 100);
+
+          return {
+            id: r.enrollid,
+            title: r.title,
+            expires: r.expiredate || "—",
+            progress: `${percent}%`,
+            extendEligible: r.extendeligible === "1",
+          };
+        })
+      );
+
+      // Completed
+      this.completedCourses = completedRows.map(r => {
+        if (r.statustxt === "Dropped") {
+          return {
+            id: r.enrollid,
+            title: r.title,
+            status: "",
+            dropped: true,
+          };
+        }
+        const grade = (r.grade || "").trim();
+        return {
+          id: r.enrollid,
+          title: r.title,
+          status: grade === "CR" ? "Pass" : "Fail",
+          dropped: false,
+        };
+      });
+
+    } catch (e) {
+      this.activeError = e.message || "Failed to load active enrollments";
+    } finally {
+      this.loadingActive = false;
+    }
   },
 };
 </script>

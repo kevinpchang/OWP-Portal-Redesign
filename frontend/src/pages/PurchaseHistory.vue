@@ -8,11 +8,16 @@
           View your invoices and payment details for your purchases.
         </p>
       </div>
-     
     </div>
 
     <!-- ===================== MAIN CONTENT (CENTERED) ===================== -->
     <div class="ph">
+      <!-- status -->
+      <div v-if="loading" style="padding: 12px; color: #555">Loading…</div>
+      <div v-else-if="error" style="padding: 12px; color: #b42318">
+        {{ error }}
+      </div>
+
       <!-- INVOICE LIST VIEW -->
       <section v-if="!selected" class="ph-grid">
         <article
@@ -29,7 +34,7 @@
             <div class="value">{{ fmtDate(inv.invoiceDate) }}</div>
           </div>
 
-          <div class="status paid">Paid</div>
+          <div class="status paid">{{ inv.status ?? "Paid" }}</div>
         </article>
       </section>
 
@@ -37,12 +42,13 @@
       <section v-else class="ph-detail">
         <div class="detail-header">
           <div class="left">
-            
             <div class="detail-title">Invoice Details</div>
           </div>
 
           <div class="right">
-            <button class="btn ghost" @click="printReceipt">Receipt</button>
+            <button class="btn ghost" @click="downloadAndOpenReceipt" :disabled="receiptLoading">
+              {{ receiptLoading ? "Loading…" : "Receipt" }}
+            </button>
             <button class="btn primary" @click="selected = null">
               Return to Purchase History
             </button>
@@ -61,9 +67,9 @@
 
           <div class="row">
             <div class="cell h">Shipped</div>
-            <div class="cell">{{ selected!.shipped ? 'Yes' : 'No' }}</div>
+            <div class="cell">{{ selected!.shipped ? "Yes" : "No" }}</div>
             <div class="cell h">Balance Due</div>
-            <div class="cell">{{ fmtMoney(selected!.balanceDue) }}</div>
+            <div class="cell">{{ fmtMoneySigned(selected!.balanceDue) }}</div>
             <div class="cell h">Order Method</div>
             <div class="cell">{{ selected!.orderMethod }}</div>
           </div>
@@ -98,14 +104,16 @@
             <div class="c total">Total Cost</div>
           </div>
 
-          <div
-            v-for="(it, i) in selected!.items"
-            :key="i"
-            class="items-row"
-          >
+          <div v-for="(it, i) in selected!.items" :key="i" class="items-row">
             <div class="c product">{{ it.product }}</div>
-            <div class="c qty">{{ it.qty }}</div>
-            <div class="c total">{{ fmtMoney(it.total) }}</div>
+            <div class="c qty">{{ fmtQtySigned(it.qty) }}</div>
+            <div class="c total">{{ fmtMoneySigned(it.total) }}</div>
+          </div>
+
+          <div v-if="selected!.items.length === 0" class="items-row">
+            <div class="c product" style="color:#64748b">No items returned.</div>
+            <div class="c qty"></div>
+            <div class="c total"></div>
           </div>
         </div>
 
@@ -113,8 +121,8 @@
 
         <div class="payment">
           <div class="p-row">
-            <div class="p-h">Amount Paid</div>
-            <div class="p-v">{{ fmtMoney(selected!.payment.amountPaid) }}</div>
+            <div class="p-h">{{ selected!.payment.amountPaid < 0 ? "Amount Refunded" : "Amount Paid" }}</div>
+            <div class="p-v">{{ fmtMoneySigned(selected!.payment.amountPaid) }}</div>
 
             <div class="p-h">Pay Date</div>
             <div class="p-v">{{ fmtDate(selected!.payment.payDate) }}</div>
@@ -155,7 +163,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import * as api from "@/services/owpAPI";
 
 type InvoiceItem = { product: string; qty: number; total: number };
 type Address = {
@@ -168,7 +177,7 @@ type Address = {
   phone?: string;
 };
 type Payment = {
-  amountPaid: number;
+  amountPaid: number; // keep SIGNED
   payDate: string;
   method: string;
   description: string;
@@ -185,7 +194,7 @@ type Invoice = {
   invoiceDate: string;
   dueDate: string;
   shipped: boolean;
-  balanceDue: number;
+  balanceDue: number; // keep SIGNED (usually 0)
   placedBy: string;
   billing: Address;
   orderMethod: string;
@@ -194,131 +203,253 @@ type Invoice = {
   payment: Payment;
 };
 
-const invoices = ref<Invoice[]>([
-  {
-    id: 901737,
-    invoiceDate: "2025-09-29",
-    dueDate: "2025-10-29",
-    shipped: false,
-    balanceDue: 0,
-    placedBy: "David Benjamin",
-    billing: {
-      name: "BENJAMIN, DAVID",
-      address1: "6000 J ST, MODOC HALL SUITE 1001",
-      city: "SACRAMENTO",
-      state: "CA",
-      zip: "95819",
-      phone: "(123) 234-1111",
-    },
-    orderMethod: "OWP Website",
-    status: "Paid",
-    items: [{ product: "Operation of Wastewater Treatment Plants, Vol 1", qty: 1, total: 40 }],
-    payment: {
-      amountPaid: 40,
-      payDate: "2025-09-29",
-      method: "Visa",
-      description: "—",
-      madeBy: "David Benjamin",
-      phone: "(123) 234-1111",
-      address1: "6000 J ST",
-      address2: "MODOC HALL SUITE 1001",
-      city: "SACRAMENTO",
-      state: "CA",
-      zip: "95819",
-    },
-  },
-  {
-    id: 901733,
-    invoiceDate: "2025-09-26",
-    dueDate: "2025-10-26",
-    shipped: false,
-    balanceDue: 0,
-    placedBy: "David Benjamin",
-    billing: {
-      name: "BENJAMIN, DAVID",
-      address1: "6000 J ST, MODOC HALL SUITE 1001",
-      city: "SACRAMENTO",
-      state: "CA",
-      zip: "95819",
-      phone: "(123) 234-1111",
-    },
-    orderMethod: "OWP Website",
-    status: "Paid",
-    items: [{ product: "Operation of Wastewater Treatment Plants, Vol 2", qty: 1, total: 45 }],
-    payment: {
-      amountPaid: 45,
-      payDate: "2025-09-26",
-      method: "Visa",
-      description: "—",
-      madeBy: "David Benjamin",
-      phone: "(123) 234-1111",
-      address1: "6000 J ST",
-      address2: "MODOC HALL SUITE 1001",
-      city: "SACRAMENTO",
-      state: "CA",
-      zip: "95819",
-    },
-  },
-  {
-    id: 901731,
-    invoiceDate: "2025-09-22",
-    dueDate: "2025-10-22",
-    shipped: false,
-    balanceDue: 0,
-    placedBy: "David Benjamin",
-    billing: {
-      name: "BENJAMIN, DAVID",
-      address1: "6000 J ST, MODOC HALL SUITE 1001",
-      city: "SACRAMENTO",
-      state: "CA",
-      zip: "95819",
-      phone: "(123) 234-1111",
-    },
-    orderMethod: "OWP Website",
-    status: "Paid",
-    items: [{ product: "Operation of Wastewater Treatment Plants, Vol 3", qty: 1, total: 45 }],
-    payment: {
-      amountPaid: 45,
-      payDate: "2025-09-22",
-      method: "Visa",
-      description: "—",
-      madeBy: "David Benjamin",
-      phone: "(123) 234-1111",
-      address1: "6000 J ST",
-      address2: "MODOC HALL SUITE 1001",
-      city: "SACRAMENTO",
-      state: "CA",
-      zip: "95819",
-    },
-  },
-]);
-
+const invoices = ref<Invoice[]>([]);
 const selected = ref<Invoice | null>(null);
+const loading = ref(false);
+const error = ref<string | null>(null);
+const receiptLoading = ref(false);
 
-function open(inv: Invoice) {
-  selected.value = inv;
+// TODO later: come from login/store/session
+const pid = 458860;
+
+function toStr(x: any) {
+  return x == null ? "" : String(x);
 }
-function fmtMoney(n: number) {
-  return `$${n.toFixed(2)}`;
+function toNum(x: any) {
+  const n = Number(x);
+  return Number.isFinite(n) ? n : 0;
 }
+function toInt(x: any) {
+  const n = Number(x);
+  return Number.isFinite(n) ? Math.trunc(n) : 0;
+}
+
+function emptyBilling(): Address {
+  return { name: "", address1: "", city: "", state: "", zip: "", phone: "" };
+}
+function emptyPayment(): Payment {
+  return {
+    amountPaid: 0,
+    payDate: "",
+    method: "",
+    description: "—",
+    madeBy: "",
+    phone: "",
+    address1: "",
+    city: "",
+    state: "",
+    zip: "",
+  };
+}
+
+function parseFmtdAddr(html: any): Partial<Address> {
+  const s = toStr(html);
+  if (!s) return {};
+
+  const lines = s
+    .replace(/<br\s*\/?>/gi, "\n")
+    .split("\n")
+    .map((x) => x.trim())
+    .filter(Boolean);
+
+  const name = lines[0] ?? "";
+  const address1 = lines[1] ?? "";
+  const cityStateZip = lines[2] ?? "";
+
+  const m = cityStateZip.match(/^(.+?)\s+([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/);
+  const city = m?.[1]?.trim() ?? "";
+  const state = m?.[2]?.trim() ?? "";
+  const zip = m?.[3]?.trim() ?? "";
+
+  return { name, address1, city, state, zip };
+}
+
+function normalizeDate(s: any): string {
+  const t = toStr(s).trim();
+  if (!t) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+
+  const m = t.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (m) return `${m[3]}-${m[1]}-${m[2]}`;
+
+  return t;
+}
+
+async function loadInvoices() {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const raw: any = await api.getInvoices(pid);
+    const list: any[] = Array.isArray(raw?.response) ? raw.response : [];
+
+    invoices.value = list
+      .map((x: any) => {
+        const id = Number(x.invoicenum);
+        return {
+          id,
+          invoiceDate: normalizeDate(x.invoicedate),
+          dueDate: "",
+          shipped: false,
+          balanceDue: toNum(x.balancedue),
+          placedBy: "",
+          billing: emptyBilling(),
+          orderMethod: "—",
+          status: "Paid",
+          items: [],
+          payment: emptyPayment(),
+        } as Invoice;
+      })
+      .filter((inv) => Number.isFinite(inv.id));
+  } catch (e: any) {
+    invoices.value = [];
+    error.value = e?.message ?? String(e);
+  } finally {
+    loading.value = false;
+  }
+}
+
+function buildProductName(r: any): string {
+  const fee = toStr(r.feetypename).trim();
+  const comment = toStr(r.mstfeecomment).trim();
+  const course = toStr(r.coursetitle).trim();
+
+  // Examples:
+  // Sales Tax + City of Sacramento => "Sales Tax: City of Sacramento"
+  // Shipping + UPS Ground => "Shipping: UPS Ground"
+  // Enrollment + course title => "Enrollment: WTPO1 - ..."
+  const detail = course || comment;
+  if (fee && detail) return `${fee}: ${detail}`;
+  return detail || fee || "Item";
+}
+
+async function open(inv: Invoice) {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const raw: any = await api.getInvoiceData(inv.id);
+    const rows: any[] = Array.isArray(raw?.response) ? raw.response : [];
+
+    if (rows.length === 0) {
+      selected.value = inv;
+      return;
+    }
+
+    const h = rows[0];
+
+    const billParsed = parseFmtdAddr(h.billfmtdaddr);
+    const billing: Address = {
+      ...emptyBilling(),
+      ...billParsed,
+      phone: toStr(h.billfmtdphn) || "",
+    };
+
+    const payParsed = parseFmtdAddr(h.pmtfmtdaddr);
+    const payment: Payment = {
+      ...emptyPayment(),
+      amountPaid: toNum(h.payamt), // KEEP SIGNED
+      payDate: normalizeDate(h.paydate),
+      method: toStr(h.paymethodname),
+      description: toStr(h.description) || "—",
+      madeBy: toStr(h.entityname),
+      phone: toStr(h.pmtfmtdphn),
+      address1: payParsed.address1 ?? "",
+      address2: "",
+      city: payParsed.city ?? "",
+      state: payParsed.state ?? "",
+      zip: payParsed.zip ?? "",
+    };
+
+    const items: InvoiceItem[] = rows.map((r: any) => {
+      return {
+        product: buildProductName(r),
+        qty: toInt(r.itmqty),      // KEEP SIGNED (refunds are negative)
+        total: toNum(r.itmamt),    // KEEP SIGNED
+      };
+    });
+
+    selected.value = {
+      ...inv,
+      invoiceDate: normalizeDate(h.invoicedate) || inv.invoiceDate,
+      dueDate: normalizeDate(h.invoiceduedate) || "",
+      shipped: toStr(h.shippedflag) === "1",
+      balanceDue: toNum(h.balancedue),
+      placedBy: toStr(h.entityname),
+      orderMethod: toStr(h.cssagent) || "OWP Website", // ✅ use backend field
+      status: "Paid",
+      billing,
+      items,
+      payment,
+    };
+  } catch (e: any) {
+    selected.value = null;
+    error.value = e?.message ?? String(e);
+  } finally {
+    loading.value = false;
+  }
+}
+
+function fmtMoneySigned(n: number) {
+  const abs = Math.abs(n);
+  const s = `$${abs.toFixed(2)}`;
+  return n < 0 ? `(${s})` : s; // ✅ PDF style for refunds
+}
+
+function fmtQtySigned(n: number) {
+  return String(n); // show -1 exactly as backend returns
+}
+
 function fmtDate(iso: string) {
+  if (!iso) return "";
   const d = new Date(iso + "T00:00:00");
-  return d.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "2-digit", day: "2-digit" });
 }
-function printReceipt() {
-  window.print();
+
+/** Receipt -> calls backend API and opens PDF in a new tab */
+async function downloadAndOpenReceipt() {
+  if (!selected.value) return;
+  receiptLoading.value = true;
+  error.value = null;
+
+  try {
+    // owp.js has: fetch(`${BASE}/receipt/download/${invoiceNum}`)
+    const raw: any = await api.downloadReceipt(selected.value.id);
+
+    const b64 = raw?.response;
+    if (!b64 || typeof b64 !== "string") throw new Error("Receipt API returned no PDF data.");
+
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const blob = new Blob([bytes], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+
+    window.open(url, "_blank", "noopener,noreferrer");
+
+    // ✅ Safari-friendly: download link
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `receipt-${selected.value.id}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    // optional: cleanup later
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (e: any) {
+    error.value = e?.message ?? String(e);
+  } finally {
+    receiptLoading.value = false;
+  }
 }
+
+onMounted(loadInvoices);
 </script>
 
 <style scoped>
 /* ===================== PAGE SHELL  ===================== */
 
 .purchase-history-page {
-  font-family: 'Myriad Pro', sans-serif;
+  font-family: "Myriad Pro", sans-serif;
   background-color: #fff;
   min-height: 100vh;
   display: flex;
@@ -344,7 +475,7 @@ function printReceipt() {
 .page-title {
   font-size: 32px;
   font-weight: 700;
-  color: #034750; 
+  color: #034750;
   margin: 0;
 }
 
@@ -353,7 +484,6 @@ function printReceipt() {
   color: #555;
   margin: 8px 0 0;
 }
-
 
 /* ===================== MAIN CONTENT (CENTERED WRAPPER) ===================== */
 
@@ -381,7 +511,8 @@ function printReceipt() {
   padding: 14px 16px;
   cursor: pointer;
   font-size: 14px;
-  transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+  transition: box-shadow 0.15s ease, transform 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .inv-card:hover {
@@ -485,6 +616,11 @@ function printReceipt() {
   transform: translateY(-1px);
 }
 
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ===================== TABLES ===================== */
 
 .detail-table {
@@ -513,7 +649,7 @@ function printReceipt() {
 .cell.h {
   background: #f8fafc;
   font-weight: 700;
-  color: #034750; /* match scheme for header cells */
+  color: #034750;
 }
 
 .addr {
@@ -577,7 +713,7 @@ function printReceipt() {
   padding: 10px 12px;
   background: #f8fafc;
   font-weight: 700;
-  color: #034750; /* match scheme */
+  color: #034750;
 }
 
 .p-v {

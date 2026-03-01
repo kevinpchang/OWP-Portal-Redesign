@@ -7,6 +7,7 @@ import CertificatesPage from '@/pages/CertificatesPage.vue'
 import PurchaseHistory from '../pages/PurchaseHistory.vue'
 import MyTasksPage from '../pages/MyTasksPage.vue'
 import SlidesPage from '../pages/SlidesPage.vue'
+import MediaPage from '../pages/MediaPage.vue'
 
 const routes = [
   { path: "/", name: 'DashboardPage', component: DashboardPage }, // KEVIN'S DASHBOARD
@@ -20,6 +21,7 @@ const routes = [
   { path: '/Certificates', name: 'CertificatesPage', component: CertificatesPage }, // UDAY KYAMA
   { path: '/purchase-history', name: 'PurchaseHistory', component: PurchaseHistory }, // VINCENT LAM
   { path: '/slides', name: 'SlidesPage', component: SlidesPage },
+  { path: '/media', name: 'MediaPage', component: MediaPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../pages/NotFoundPage.vue')
   }
 ]
