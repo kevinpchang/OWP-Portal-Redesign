@@ -6,12 +6,17 @@
 
   const pid = 458860;
   const error = ref("");
+  const opNum = ref("");
+  const state = ref("");
   const loading = ref(false);
 
   async function loadTable() {
     console.log("loadTable called");
     loading.value = true;
     error.value = "";
+
+    opNum.value = "";
+    state.value = "";
     
     const nums = ref([]);
 
@@ -19,6 +24,12 @@
       const opNums = await api.getOperatorList(pid);
       nums.value = opNums.response;
       console.log("Operator Numbers JSON:", opNums);
+
+      opNum.value = nums.value?.oprlicid ?? ""
+      state.value = nums.value?.state ?? ""
+z
+      console.log("Operator Number:", opNum.value);
+      console.log("State:", state.value);
 
     } catch (e) {
       error.value = e?.message ?? String(e);
