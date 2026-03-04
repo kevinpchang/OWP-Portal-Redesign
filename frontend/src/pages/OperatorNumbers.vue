@@ -34,13 +34,6 @@
       opNum.value = nums.value?.oprlicid ?? ""
       state.value = nums.value?.state ?? ""
 
-      /*
-      console.log("Operator Number:", opNum.value);
-      console.log(account?.fullname);
-      console.log("State:", state.value);
-      console.log(state.value);
-      */
-
     } catch (e) {
       error.value = e?.message ?? String(e);
     } finally {
@@ -58,7 +51,7 @@
       status: original.oprlicstatus,
       operatornumber: addOpNum.value,
       state: addState.value,
-      ipAddr: "localhost"  // or however you get it
+      ipAddr: "localhost" 
     };
 
     
@@ -90,7 +83,7 @@
       status: original.oprlicstatus,
       operatornumber: editOpNum.value,
       state: editState.value,
-      ipAddr: "127.0.0.1"
+      ipAddr: "localhost"
     }
 
     
