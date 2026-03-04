@@ -28,8 +28,8 @@
       //const data = await opNums.json();
       nums.value = opNums.response;
 
-      console.log("API Response:", opNums);
-      console.log("Operator Numbers JSON:", nums.value);
+      //console.log("API Response:", opNums);
+      //console.log("Operator Numbers JSON:", nums.value);
 
       opNum.value = nums.value?.oprlicid ?? ""
       state.value = nums.value?.state ?? ""
