@@ -10,26 +10,31 @@
   const state = ref("");
   const loading = ref(false);
 
+  const nums = ref([]);
+
   async function loadTable() {
     console.log("loadTable called");
     loading.value = true;
     error.value = "";
 
-    opNum.value = "";
-    state.value = "";
-    
-    const nums = ref([]);
 
     try {
       const opNums = await api.getOperatorList(pid);
+      //const data = await opNums.json();
       nums.value = opNums.response;
-      console.log("Operator Numbers JSON:", opNums);
+
+      console.log("API Response:", opNums);
+      console.log("Operator Numbers JSON:", nums.value);
 
       opNum.value = nums.value?.oprlicid ?? ""
       state.value = nums.value?.state ?? ""
-z
+
+      /*
       console.log("Operator Number:", opNum.value);
+      console.log(account?.fullname);
       console.log("State:", state.value);
+      console.log(state.value);
+      */
 
     } catch (e) {
       error.value = e?.message ?? String(e);
@@ -103,7 +108,7 @@ z
 
   import { useRoute } from 'vue-router'
   import { Award, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next';
-import { isParameter } from 'typescript';
+  import { isParameter } from 'typescript';
   const route = useRoute()
 
   onMounted(loadTable);
@@ -130,6 +135,15 @@ import { isParameter } from 'typescript';
             </tr>
           </thead>
           <tbody class="table-body">
+            <tr v-for="entry in nums" :key="entry.oprlicid">
+              <td>{{ entry.oprlicid }}</td>
+              <td>{{ entry.state }}</td>
+              <td>
+                <button class="edit-button" @click.left="openEdit">Edit</button>
+                <button class="remove-button" @click.left="openDelete">Remove</button>
+              </td>
+            </tr>
+          <!--
             <tr>
               <td>California</td>
               <td>12345</td>
@@ -155,6 +169,7 @@ import { isParameter } from 'typescript';
                 <button class="remove-button" @click.left="openDelete">Remove</button>
               </td>
             </tr>
+            -->
           </tbody>
         </table>
       </div>  
