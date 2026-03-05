@@ -1,3 +1,66 @@
+<script setup>
+import { ref, onMounted } from "vue";
+import { Award, Mail, FileText, History } from "lucide-vue-next";
+import { getAccountDetails } from "@/services/myAccountAPI.js";
+
+// PID: use localStorage if your app sets it, else fallback to test PID
+const pid = Number(localStorage.getItem("pid")) || 458860;
+
+// Live account info state
+const loadingAccount = ref(true);
+const accountError = ref("");
+const accountName = ref("");
+
+// Your existing mock certificates list (keep for now)
+const certificates = ref([
+  {
+    id: 1,
+    title: "Advanced Water Treatment",
+    grade: "90%",
+    downloadUrl: "https://example.com/certs/advanced.pdf",
+  },
+  {
+    id: 2,
+    title: "Operation and Maintenance of Wastewater Collection Systems, Vol 1",
+    grade: "95%",
+    downloadUrl: "https://example.com/certs/wastewater-vol1.pdf",
+  },
+  {
+    id: 3,
+    title: "Operation and Maintenance of Wastewater Collection Systems, Vol 2",
+    grade: "100%",
+    downloadUrl: "https://example.com/certs/wastewater-vol2.pdf",
+  },
+  {
+    id: 4,
+    title: "Water Distribution System Operation and Maintenance",
+    grade: "100%",
+    downloadUrl: "https://example.com/certs/distribution.pdf",
+  },
+]);
+
+const scrollToCertificate = (id) => {
+  console.log("View certificate:", id);
+};
+
+// Load account details (live data)
+async function loadAccount() {
+  loadingAccount.value = true;
+  accountError.value = "";
+
+  try {
+    const data = await getAccountDetails(pid);
+    accountName.value = data?.response?.fullname ?? "";
+  } catch (e) {
+    accountError.value = e?.message ?? String(e);
+  } finally {
+    loadingAccount.value = false;
+  }
+}
+
+onMounted(loadAccount);
+</script>
+
 <template>
   <div class="certificates-page">
     <!-- Top Section -->
@@ -5,7 +68,19 @@
       <div class="text-block">
         <h1 class="courses-header">Certificates</h1>
         <p class="page-description">View and download your earned certificates</p>
+
+        <!-- ✅ Live account status (added) -->
+        <div style="margin-top: 10px; font-size: 14px; color: #707070;">
+          <span v-if="loadingAccount">Loading account…</span>
+          <span v-else-if="accountError" style="color: #9F3323;">
+            {{ accountError }}
+          </span>
+          <span v-else>
+            Logged in as: <strong>{{ accountName }}</strong>
+          </span>
+        </div>
       </div>
+
       <div class="search-container">
         <input type="text" placeholder="Search certificates..." class="search-input" />
       </div>
@@ -23,6 +98,7 @@
               <h2 class="card-title">Earned Certificates</h2>
             </div>
             <div class="divider"></div>
+
             <div class="card-body">
               <div
                 v-for="cert in certificates"
@@ -35,7 +111,9 @@
                 </div>
                 <div class="cert-info">
                   <div class="cert-title">{{ cert.title }}</div>
-                  <div class="cert-grade">Grade Achieved: <strong>{{ cert.grade }}</strong></div>
+                  <div class="cert-grade">
+                    Grade Achieved: <strong>{{ cert.grade }}</strong>
+                  </div>
                   <div class="download-section">
                     Download Certificate:
                     <a :href="cert.downloadUrl" target="_blank" class="download-link">
@@ -45,6 +123,7 @@
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -101,45 +180,10 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { Award, Mail, FileText, History } from 'lucide-vue-next'
-
-const certificates = ref([
-  {
-    id: 1,
-    title: "Advanced Water Treatment",
-    grade: "90%",
-    downloadUrl: "https://example.com/certs/advanced.pdf"
-  },
-  {
-    id: 2,
-    title: "Operation and Maintenance of Wastewater Collection Systems, Vol 1",
-    grade: "95%",
-    downloadUrl: "https://example.com/certs/wastewater-vol1.pdf"
-  },
-  {
-    id: 3,
-    title: "Operation and Maintenance of Wastewater Collection Systems, Vol 2",
-    grade: "100%",
-    downloadUrl: "https://example.com/certs/wastewater-vol2.pdf"
-  },
-  {
-    id: 4,
-    title: "Water Distribution System Operation and Maintenance",
-    grade: "100%",
-    downloadUrl: "https://example.com/certs/distribution.pdf"
-  }
-])
-
-const scrollToCertificate = (id) => {
-  console.log('View certificate:', id)
-}
-</script>
-
 <style scoped>
+/* ✅ Your existing CSS unchanged */
 .certificates-page {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   background-color: #fff;
   min-height: 100vh;
   display: flex;
@@ -215,7 +259,7 @@ const scrollToCertificate = (id) => {
 }
 
 .course-card {
-  background-color: #F2F1F2;
+  background-color: #f2f1f2;
   border-radius: 14px;
   padding: 16px 20px 20px 20px;
   display: flex;
@@ -231,22 +275,23 @@ const scrollToCertificate = (id) => {
   margin-left: 20px;
 }
 
-.header-icon, .side-icon {
+.header-icon,
+.side-icon {
   width: 26px;
   height: 34px;
 }
 
-.card-title, .side-title {
+.card-title,
+.side-title {
   font-size: 20px;
   font-weight: 700;
   color: #034750;
   margin: 0;
 }
 
-/* WHITE DIVIDER — DASHBOARD STYLE */
 .divider {
   width: 100%;
-  border-top: 1px solid #FFFFFF;
+  border-top: 1px solid #ffffff;
   margin: 12px 0 8px 0;
 }
 
@@ -272,7 +317,6 @@ const scrollToCertificate = (id) => {
   border-radius: 3px;
 }
 
-/* EDGE-TO-EDGE HOVER */
 .certificate-item {
   display: grid;
   grid-template-columns: 70px 1fr;
@@ -285,25 +329,25 @@ const scrollToCertificate = (id) => {
 }
 
 .certificate-item:hover {
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
 }
 
 .cert-thumbnail {
   width: 70px;
   height: 90px;
-  background: linear-gradient(135deg, #5AA843 0%, #6DBE4B 100%);
+  background: linear-gradient(135deg, #5aa843 0%, #6dbe4b 100%);
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .owp-text {
   color: white;
   font-weight: bold;
   font-size: 18px;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 .cert-info {
@@ -333,7 +377,7 @@ const scrollToCertificate = (id) => {
 }
 
 .download-link {
-  color: #00A5B5;
+  color: #00a5b5;
   text-decoration: underline;
   font-weight: 600;
 }
@@ -349,9 +393,8 @@ const scrollToCertificate = (id) => {
   margin-top: 46px;
 }
 
-/* NO PADDING — MARGINS ONLY */
 .side-card {
-  background-color: #F2F1F2;
+  background-color: #f2f1f2;
   border-radius: 14px;
   display: flex;
   flex-direction: column;
@@ -381,9 +424,8 @@ const scrollToCertificate = (id) => {
   transition: background-color 0.2s ease;
 }
 
-/* EDGE-TO-EDGE HOVER IN SIDEBAR */
 .side-link:hover {
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
 }
 
 .side-footer {
@@ -401,7 +443,7 @@ const scrollToCertificate = (id) => {
 
 .side-footer:hover {
   text-decoration: underline;
-  color: #007C8A;
+  color: #007c8a;
 }
 
 @media (max-width: 768px) {
