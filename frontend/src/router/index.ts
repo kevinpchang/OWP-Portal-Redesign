@@ -8,6 +8,7 @@ import PurchaseHistory from '../pages/PurchaseHistory.vue'
 import MyTasksPage from '../pages/MyTasksPage.vue'
 import SlidesPage from '../pages/SlidesPage.vue'
 import MediaPage from '../pages/MediaPage.vue'
+import MessagingPage from '@/pages/MessagingPage.vue'
 
 const routes = [
   { path: "/", name: 'DashboardPage', component: DashboardPage }, // KEVIN'S DASHBOARD
@@ -23,7 +24,8 @@ const routes = [
   { path: '/slides', name: 'SlidesPage', component: SlidesPage },
   { path: '/media', name: 'MediaPage', component: MediaPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../pages/NotFoundPage.vue')
-  }
+  },
+  { path: '/messages', name: 'MessagingPage', component: MessagingPage },
 ]
 
 const router = createRouter({
