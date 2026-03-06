@@ -28,14 +28,17 @@
       //const data = await opNums.json();
       nums.value = opNums.response;
 
-      //console.log("API Response:", opNums);
-      //console.log("Operator Numbers JSON:", nums.value);
+      console.log("API Response:", opNums);
+      console.log("Operator Numbers JSON:", nums.value);
 
       opNum.value = nums.value?.oprlicid ?? ""
       state.value = nums.value?.state ?? ""
 
+      console.log("Numbers loaded");
+
     } catch (e) {
       error.value = e?.message ?? String(e);
+      console.log("Error loading operator numbers:", error.value);
     } finally {
       loading.value = false;
     }
@@ -48,7 +51,7 @@
     const payload = {
       liccatid: original.liccatid,
       countryid: original.countryid,
-      status: original.oprlicstatus,
+      oprlicstatus: original.oprlicstatus,
       operatornumber: addOpNum.value,
       state: addState.value,
       ipAddr: "localhost" 
@@ -80,7 +83,7 @@
       oprlicid: original.oprlicid,
       liccatid: original.liccatid,
       countryid: original.countryid,
-      status: original.oprlicstatus,
+      oprlicstatus: original.oprlicstatus,
       operatornumber: editOpNum.value,
       state: editState.value,
       ipAddr: "localhost"
