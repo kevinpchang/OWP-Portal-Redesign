@@ -51,7 +51,7 @@
     const payload = {
       liccatid: original.liccatid,
       countryid: original.countryid,
-      oprlicstatus: original.oprlicstatus,
+      status: original.oprlicstatus,
       operatornumber: addOpNum.value,
       state: addState.value,
       ipAddr: "localhost" 
@@ -83,7 +83,7 @@
       oprlicid: original.oprlicid,
       liccatid: original.liccatid,
       countryid: original.countryid,
-      oprlicstatus: original.oprlicstatus,
+      status: original.oprlicstatus,
       operatornumber: editOpNum.value,
       state: editState.value,
       ipAddr: "localhost"
