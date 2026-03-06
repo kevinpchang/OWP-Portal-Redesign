@@ -6,47 +6,100 @@
 
   const pid = 458860;
   const error = ref("");
+  const opNum = ref("");
+  const state = ref("");
   const loading = ref(false);
+  
+  const nums = ref([]);
+
+  const editState = ref("")
+  const editOpNum = ref("")
+  const addState = ref("")
+  const addOpNum = ref("")
 
   async function loadTable() {
     console.log("loadTable called");
     loading.value = true;
     error.value = "";
-    
-    const nums = ref([]);
+
 
     try {
       const opNums = await api.getOperatorList(pid);
+      //const data = await opNums.json();
       nums.value = opNums.response;
-      console.log("Operator Numbers JSON:", opNums);
+
+      console.log("API Response:", opNums);
+      console.log("Operator Numbers JSON:", nums.value);
+
+      opNum.value = nums.value?.oprlicid ?? ""
+      state.value = nums.value?.state ?? ""
+
+      console.log("Numbers loaded");
 
     } catch (e) {
       error.value = e?.message ?? String(e);
+      console.log("Error loading operator numbers:", error.value);
     } finally {
       loading.value = false;
     }
   }
 
-  async function addNumber(payload){
-    console.log("addNumber called with payload:", payload);
+  async function addNumber(){
+    
+    const original = nums.value[0]
+
+    const payload = {
+      liccatid: original.liccatid,
+      countryid: original.countryid,
+      status: original.oprlicstatus,
+      operatornumber: addOpNum.value,
+      state: addState.value,
+      ipAddr: "localhost" 
+    };
+
+    
 
     try{
       //payload needs to have: liccatid, countryid, state, status, operatornumber, ipAddr
       api.addOperator(payload);
+      console.log("addNumber called with payload:", payload);
     } catch (e) {
       error.value = e?.message ?? String(e);
+      console.log("Error adding operator number:", error.value);
     }
+
+    addPopup.value = false
   }
 
-  async function updateNumber(payload){
-    console.log("updateNumber called with payload:", payload);
+  async function updateNumber(){
 
+    const original = nums.value.find(
+      item => item.liccatid === selectedRow.value
+    )
+
+    if (!original) return
+
+    const payload = {
+      oprlicid: original.oprlicid,
+      liccatid: original.liccatid,
+      countryid: original.countryid,
+      status: original.oprlicstatus,
+      operatornumber: editOpNum.value,
+      state: editState.value,
+      ipAddr: "localhost"
+    }
+
+    
     try{
       //payload needs to have: oprlicid, liccatid, countryid, state, status, operatornumber, ipAddr
       api.updateOperatorNumber(payload);
+      console.log("updateNumber called with payload:", payload);
     } catch (e) {
       error.value = e?.message ?? String(e);
+      console.log("Error updating operator number:", error.value);
     }
+
+    editPopup.value = false
   }
 
   async function deleteNumber(ip, id){
@@ -73,7 +126,19 @@
   }
 
   const editPopup = ref(false)
-  function openEdit() {
+  const selectedRow = ref(null)
+  function openEdit(liccatid) {
+    selectedRow.value = liccatid
+
+    const entry = nums.value.find(
+      item => item.liccatid === liccatid
+    )
+
+    if (!entry) return
+
+    editState.value = entry.state
+    editOpNum.value = entry.operatornumber
+
     editPopup.value = true
   }
 
@@ -92,7 +157,7 @@
 
   import { useRoute } from 'vue-router'
   import { Award, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next';
-import { isParameter } from 'typescript';
+  import { isParameter } from 'typescript';
   const route = useRoute()
 
   onMounted(loadTable);
@@ -119,6 +184,15 @@ import { isParameter } from 'typescript';
             </tr>
           </thead>
           <tbody class="table-body">
+            <tr v-for="entry in nums" :key="entry.oprlicid">
+              <td>{{ entry.operatornumber }}</td>
+              <td>{{ entry.state }}</td>
+              <td>
+                <button class="edit-button" @click.left="openEdit(entry.liccatid)">Edit</button>
+                <button class="remove-button" @click.left="openDelete">Remove</button>
+              </td>
+            </tr>
+          <!--
             <tr>
               <td>California</td>
               <td>12345</td>
@@ -144,6 +218,7 @@ import { isParameter } from 'typescript';
                 <button class="remove-button" @click.left="openDelete">Remove</button>
               </td>
             </tr>
+            -->
           </tbody>
         </table>
       </div>  
@@ -198,10 +273,10 @@ import { isParameter } from 'typescript';
             <h1 class="popup-title">
               Add Operator Number
             </h1>
-            <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
-            <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
+            <input type="text" id="state" class="input-box" placeholder="State/Province" v-model="addState"><br><br>
+            <input type="text" id="opnum" class="input-box" placeholder="Operator Number" v-model="addOpNum"><br><br>
             <!-- Method=POST for button /api/v1/account/addOperator-->
-            <button class = popup-button-left @click="closeAdd">Add</button>
+            <button class = popup-button-left @click="addNumber">Add</button>
 
           </div>
         </div>
@@ -221,10 +296,10 @@ import { isParameter } from 'typescript';
             <h1 class="popup-title">
               Edit Operator Number
             </h1>
-            <input type="text" id="state" class="input-box" placeholder="State/Province"><br><br>
-            <input type="text" id="opnum" class="input-box" placeholder="Operator Number"><br><br>
+            <input type="text" id="state" class="input-box" placeholder="State/Province" v-model="editState"><br><br>
+            <input type="text" id="opnum" class="input-box" placeholder="Operator Number" v-model="editOpNum"><br><br>
             <!-- Method=POST for button /api/v1/account/updateOperatorNumber-->
-            <button class = popup-button-left @click="closeEdit">Edit</button>
+            <button class = popup-button-left @click="updateNumber">Edit</button>
 
           </div>
         </div>
