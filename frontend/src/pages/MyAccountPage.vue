@@ -9,7 +9,7 @@ import {
   getCourseGrades,
   getOperatorList,
   updateContactInfo
-} from "@/services/myAccountAPI";
+} from "@/services/owpAPI.js";
 
 const route = useRoute();
 
