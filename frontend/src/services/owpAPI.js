@@ -121,6 +121,9 @@ export async function updateContactInfo(payload) {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams(payload).toString(),
   });
-  if (!request.ok) throw new Error(await request.text());
-  return request.json();
+
+  const text = await request.text();
+  if (!request.ok) throw new Error(text);
+
+  try { return JSON.parse(text); } catch { return text; }
 }

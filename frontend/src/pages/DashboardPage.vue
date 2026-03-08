@@ -3,77 +3,76 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { BookMarked, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next'
 
-import * as api from "@/services/owpAPI";
+import * as api from '@/services/owpAPI'
 
 const route = useRoute()
 const currentDate = ref(formatDate())
 
 // --- API STATE ---
-const pid = 458860; // later: come from auth/session
+const pid = 458860 // later: come from auth/session
 
-const loading = ref(false);
-const error = ref("");
+const loading = ref(false)
+const error = ref('')
 
-const account = ref(null);
-const enrollments = ref([]);
-const grades = ref([]);
-const invoices = ref([]);
-const invoicedata = ref([]);
+const account = ref(null)
+const enrollments = ref([])
+const grades = ref([])
+const invoices = ref([])
+const invoicedata = ref([])
 
 async function loadDash() {
-  console.log("loadAccount called");
-  loading.value = true;
-  error.value = "";
-  
-  try {
-    const acc = await api.getAccountDetails(pid);
-    account.value = acc.response;
-    console.log("Account JSON:", acc);
+  console.log('loadAccount called')
+  loading.value = true
+  error.value = ''
 
-    const enr = await api.getActiveEnrollment(pid);
-    enrollments.value = enr.response;
-    console.log("Enrollments JSON:", enr);
+  try {
+    const acc = await api.getAccountDetails(pid)
+    account.value = acc.response
+    console.log('Account JSON:', acc)
+
+    const enr = await api.getActiveEnrollment(pid)
+    enrollments.value = enr.response
+    console.log('Enrollments JSON:', enr)
 
     for (const v of enr.response) {
-      const c = await api.getCourseGrades(v.enrollid);
-      grades.value[v.enrollid] = c.response ?? [];
+      const c = await api.getCourseGrades(v.enrollid)
+      grades.value[v.enrollid] = c.response ?? []
     }
-    console.log("Grades JSON:", grades);
+    console.log('Grades JSON:', grades)
 
-    const inv = await api.getInvoices(pid);
-    invoices.value = inv.response;
-    console.log("Invoices JSON:", inv);
+    const inv = await api.getInvoices(pid)
+    invoices.value = inv.response
+    console.log('Invoices JSON:', inv)
 
     for (const v of inv.response) {
-      const c = await api.getInvoiceData(v.invoicenum);
-      invoicedata.value[v.invoicenum] = c.response ?? [];
+      const c = await api.getInvoiceData(v.invoicenum)
+      invoicedata.value[v.invoicenum] = c.response ?? []
     }
-    console.log("Invoice Data", invdata)
-
+    console.log('Invoice Data', invdata)
   } catch (e) {
-    error.value = e?.message ?? String(e);
+    error.value = e?.message ?? String(e)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 const activeEnrollments = computed(() =>
-  enrollments.value.filter(active => active.statustxt === "Enrolled")
-);
+  enrollments.value.filter((active) => active.statustxt === 'Enrolled'),
+)
 
 function getCourseCompletion(enrollid) {
-  const sections = grades.value[enrollid] ?? [];
-  const completed = sections?.filter(section => section.grade != null).length
-  return Math.round((completed / sections.length) * 100);
+  const sections = grades.value[enrollid] ?? []
+  const completed = sections?.filter((section) => section.grade != null).length
+  return Math.round((completed / sections.length) * 100)
 }
 
 function getInvoiceName(invoicenum) {
-  const item = invoicedata.value[invoicenum] ?? [];
-  const data = item?.find(item => item.coursetitle != null)
-  return data?.coursetitle;
+  const item = invoicedata.value[invoicenum] ?? []
+  const data = item?.find((item) => item.coursetitle != null)
+  return data?.coursetitle
 }
 
-onMounted(loadDash);
+onMounted(loadDash)
 
 // Helper function to format date based on user's local settings
 function formatDate() {
@@ -81,7 +80,7 @@ function formatDate() {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
   })
 }
 
@@ -112,21 +111,20 @@ function scheduleNextUpdate() {
     <div class="dashboard-top">
       <div class="text">
         <div class="date">{{ currentDate }}</div>
-        <div class="welcome-message">Hello, {{ account?.firstname ?? "User" }}</div>
+        <div class="welcome-message">Hello, {{ account?.firstname ?? 'User' }}</div>
         <div class="dashboard-description">
-          Here is a quick look at your active and completed enrollments.
-          You can also view a snapshot of your previous purchases.
+          Here is a quick look at your active and completed enrollments. You can also view a
+          snapshot of your previous purchases.
         </div>
       </div>
 
       <div class="image">
-        <img src="../assets/owpart.png"/>
+        <img src="../assets/owpart.png" />
       </div>
     </div>
 
     <div class="dashboard-bottom">
       <div class="dashboard-left">
-
         <div class="active-enrollments">
           <div class="header">
             <BookMarked class="icon" color="#007C8A" />
@@ -139,14 +137,16 @@ function scheduleNextUpdate() {
                 <div class="icon"></div>
               </div>
               <div class="right">
-                <div class="title"><div class="text">{{ v.title }}</div></div>
+                <div class="title">
+                  <div class="text">{{ v.title }}</div>
+                </div>
                 <div class="data">
                   <div class="text">Completion</div>
                   <div class="text">Enrollment expires: {{ v.expiredate }}</div>
                 </div>
                 <div class="progress">
-                  <div class="percent" :style="{width: getCourseCompletion(v.enrollid) + '%'}">
-                    <div class="text">{{ getCourseCompletion(v.enrollid) + "%"}}</div>
+                  <div class="percent" :style="{ width: getCourseCompletion(v.enrollid) + '%' }">
+                    <div class="text">{{ getCourseCompletion(v.enrollid) + '%' }}</div>
                   </div>
                 </div>
               </div>
@@ -171,8 +171,16 @@ function scheduleNextUpdate() {
           <div class="divider"></div>
           <div class="body">
             <div class="object"><div class="text">Advanced Water Treatment</div></div>
-            <div class="object"><div class="text">Operation and Maintenance of Wastewater Collection Systems, Vol I</div></div>
-            <div class="object"><div class="text">Operation and Maintenance of Wastewater Collection Systems, Vol II</div></div>
+            <div class="object">
+              <div class="text">
+                Operation and Maintenance of Wastewater Collection Systems, Vol I
+              </div>
+            </div>
+            <div class="object">
+              <div class="text">
+                Operation and Maintenance of Wastewater Collection Systems, Vol II
+              </div>
+            </div>
           </div>
           <div class="view-all">
             <router-link
@@ -186,10 +194,9 @@ function scheduleNextUpdate() {
         </div>
       </div>
       <div class="dashboard-right">
-
         <div class="messages">
           <div class="header">
-            <Mail class="icon" color="#007C8A"/>
+            <Mail class="icon" color="#007C8A" />
             <div class="text">Messages</div>
           </div>
           <div class="divider"></div>
@@ -199,19 +206,24 @@ function scheduleNextUpdate() {
             <div class="object"><div class="text">Email message (4/03/2025)</div></div>
           </div>
           <div class="view-all">
-            <div class="text">(View all messages)</div>
+            <router-link to="/messages">
+              <div class="text">(View all messages)</div>
+            </router-link>
           </div>
         </div>
 
         <div class="purchase-history">
           <div class="header">
-            <History class="icon" color="#007C8A"/>
+            <History class="icon" color="#007C8A" />
             <div class="text">Purchase History</div>
           </div>
           <div class="divider"></div>
           <div class="body">
             <div class="object" v-for="v in invoices">
-              <div class="text">Invoice: {{ v.invoicenum }} - {{ getInvoiceName(v.invoicenum) }}</div></div>
+              <div class="text">
+                Invoice: {{ v.invoicenum }} - {{ getInvoiceName(v.invoicenum) }}
+              </div>
+            </div>
           </div>
           <div class="view-all">
             <router-link
@@ -278,7 +290,7 @@ function scheduleNextUpdate() {
 .welcome-message {
   font-size: 56px;
   font-weight: 700;
-  color: #00A5B5;
+  color: #00a5b5;
   margin-bottom: 16px;
   margin-left: 24px;
 }
@@ -311,7 +323,7 @@ function scheduleNextUpdate() {
 .divider {
   width: 100%;
   height: 0px;
-  border-top: 1px solid #FFFFFF;
+  border-top: 1px solid #ffffff;
 }
 
 .active-enrollments {
@@ -321,7 +333,7 @@ function scheduleNextUpdate() {
   flex-direction: column;
   justify-content: top;
   align-items: top;
-  background-color: #F2F1F2;
+  background-color: #f2f1f2;
 }
 
 .active-enrollments .header {
@@ -362,7 +374,7 @@ function scheduleNextUpdate() {
 
 .active-enrollments .body .object:hover {
   cursor: pointer;
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
 }
 
 .active-enrollments .body .object .left {
@@ -426,17 +438,16 @@ function scheduleNextUpdate() {
   margin-top: 8px;
   margin-left: 13px;
   margin-right: 24px;
-  background-color: #7A7A7A;
+  background-color: #7a7a7a;
 }
 
-.active-enrollments .body .object .right .progress .percent{
+.active-enrollments .body .object .right .progress .percent {
   border-radius: 4rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #00A5B5;
+  background-color: #00a5b5;
 }
-
 
 .active-enrollments .body .object .right .progress .percent .text {
   height: 13px;
@@ -444,7 +455,7 @@ function scheduleNextUpdate() {
   font-weight: 400;
   line-height: 1px;
   margin-top: 2px;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .view-all {
@@ -465,7 +476,7 @@ function scheduleNextUpdate() {
 
 .view-all .text:hover {
   text-decoration: underline;
-  color: #007C8A;
+  color: #007c8a;
 }
 
 .dashboard-button,
@@ -484,7 +495,7 @@ function scheduleNextUpdate() {
   border-radius: 14rem;
   display: flex;
   flex-direction: column;
-  background-color: #F2F1F2;
+  background-color: #f2f1f2;
 }
 
 .instructor-slides .header {
@@ -523,7 +534,7 @@ function scheduleNextUpdate() {
 }
 
 .instructor-slides .body .object:hover {
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
   cursor: pointer;
 }
 
@@ -533,7 +544,7 @@ function scheduleNextUpdate() {
   font-size: 16px;
   font-weight: 400;
   text-decoration: underline;
-  color: #007C8A;
+  color: #007c8a;
 }
 
 .dashboard-right {
@@ -548,7 +559,7 @@ function scheduleNextUpdate() {
   border-radius: 14rem;
   display: flex;
   flex-direction: column;
-  background-color: #F2F1F2;
+  background-color: #f2f1f2;
 }
 
 .messages .header {
@@ -587,7 +598,7 @@ function scheduleNextUpdate() {
 }
 
 .messages .body .object:hover {
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
   cursor: pointer;
 }
 
@@ -597,7 +608,7 @@ function scheduleNextUpdate() {
   font-size: 16px;
   font-weight: 400;
   text-decoration: underline;
-  color: #007C8A;
+  color: #007c8a;
 }
 
 .purchase-history {
@@ -605,7 +616,7 @@ function scheduleNextUpdate() {
   border-radius: 14rem;
   display: flex;
   flex-direction: column;
-  background-color: #F2F1F2;
+  background-color: #f2f1f2;
 }
 
 .purchase-history .header {
@@ -644,7 +655,7 @@ function scheduleNextUpdate() {
 }
 
 .purchase-history .body .object:hover {
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
   cursor: pointer;
 }
 
@@ -654,6 +665,11 @@ function scheduleNextUpdate() {
   font-size: 16px;
   font-weight: 400;
   text-decoration: underline;
-  color: #007C8A;
+  color: #007c8a;
+}
+
+.view-all a {
+  color: inherit;
+  text-decoration: inherit;
 }
 </style>
