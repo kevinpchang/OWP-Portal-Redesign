@@ -3,18 +3,18 @@
     <div class="left"><img src="../assets/owp_logo.png"/></div>
     <div class="center"></div>
     <div class="right">
-      <div class="search-bar">
-        <input type=text placeholder="Search" class="search"/>
-      </div>
-      <CircleQuestionMark class="help_button" color="#FFFFFF"/>
-      <div class="divider"></div>
-      <Mail class="messages_button" color="#FFFFFF"/>
-      <Bell class="notif_button" color="#FFFFFF"/>
-      <div class="divider"></div>
       <div class="account_button" tabindex="0" @focus="openAccountDialog" @blur="closeAccountDialog">
         <SquareUserRound class="icon" color="#FFFFFF"/>
         <div class="text">{{ account?.firstname ?? "Null" }}</div>
       </div>
+      <div class="divider"></div>
+      <a href="https://www.owp.csus.edu/helpful-links/" target="_blank">
+        <CircleQuestionMark class="help_button" color="#FFFFFF"/>
+      </a>
+      <router-link to="/messages">
+        <Mail class="messages_button" color="#FFFFFF"/>
+      </router-link>
+      <div class="divider"></div>
       <transition name="fade">
         <div class="account-button-dialog" v-if="accountDialog">
           <div class="top">
@@ -167,7 +167,6 @@
     width: 200px;
     border-radius: 4px;
     margin-top: 220px;
-    margin-left: 150px;
     display: flex;
     flex-direction: column;
     background-color: #FEFEFE;
@@ -499,27 +498,6 @@
     border: 1px, solid, #FFFFFF;
   }
 
-  .header .right .search-bar {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    border-radius: 4px;
-    background-color: white;
-  }
-
-  .header .right .search-bar .search {
-    width: 90px;
-    height: 24px;
-    border: none;
-    border-radius: 4px;
-    outline: none;
-    box-shadow: none;
-  }
-
-  .header .right .search-bar .search:focus {
-    width: 140px;
-  }
-
   .header .right .help_button {
     width: 24.05px;
     height: 24.05px;
@@ -528,13 +506,6 @@
   }
 
   .header .right .messages_button {
-    width: 24.05px;
-    height: 24.05px;
-    margin-left: 16.5px;
-    cursor: pointer;
-  }
-
-  .header .right .notif_button {
     width: 24.05px;
     height: 24.05px;
     margin-left: 16.5px;
