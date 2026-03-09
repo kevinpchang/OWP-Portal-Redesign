@@ -132,7 +132,7 @@ function scheduleNextUpdate() {
           </div>
           <div class="divider"></div>
           <div class="body">
-            <div class="object" v-for="v in activeEnrollments">
+            <router-link class="object" v-for="v in activeEnrollments.slice(0, 3)" :to="`/courses/${v.enrollid}`">
               <div class="left">
                 <div class="icon"></div>
               </div>
@@ -150,7 +150,7 @@ function scheduleNextUpdate() {
                   </div>
                 </div>
               </div>
-            </div>
+            </router-link>
           </div>
           <div class="view-all">
             <router-link
@@ -219,7 +219,7 @@ function scheduleNextUpdate() {
           </div>
           <div class="divider"></div>
           <div class="body">
-            <div class="object" v-for="v in invoices">
+            <div class="object" v-for="v in invoices.slice(0, 5)">
               <div class="text">
                 Invoice: {{ v.invoicenum }} - {{ getInvoiceName(v.invoicenum) }}
               </div>
@@ -352,7 +352,7 @@ function scheduleNextUpdate() {
 }
 
 .active-enrollments .header .text {
-  height: 20px;
+  height: 20rem;
   font-size: 20px;
   font-weight: 700;
   margin-left: 8px;
@@ -360,9 +360,10 @@ function scheduleNextUpdate() {
 }
 
 .active-enrollments .body {
-  height: 382px;
+  height: 382rem;
   display: flex;
   flex-direction: column;
+  overflow-y: hidden;
 }
 
 .active-enrollments .body .object {
@@ -370,6 +371,7 @@ function scheduleNextUpdate() {
   display: flex;
   flex-direction: row;
   margin-bottom: 4px;
+  text-decoration: none;
 }
 
 .active-enrollments .body .object:hover {
@@ -645,10 +647,13 @@ function scheduleNextUpdate() {
   height: 460px;
   display: flex;
   flex-direction: column;
+  overflow-y: hidden;
 }
 
 .purchase-history .body .object {
   height: 50px;
+  padding-top: 2%;
+  padding-bottom: 2%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -661,7 +666,8 @@ function scheduleNextUpdate() {
 
 .purchase-history .body .object .text {
   height: 14px;
-  margin-left: 24px;
+  padding-left: 24px;
+  padding-right: 24px;
   font-size: 16px;
   font-weight: 400;
   text-decoration: underline;
