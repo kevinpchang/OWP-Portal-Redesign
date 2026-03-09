@@ -39,9 +39,17 @@
             <div class="card-divider"></div>
 
             <div class="card-body">
-              <div v-if="loadingActive" style="padding: 8px 0; color:#707070;">Loading…</div>
-              <div v-else-if="activeError" style="padding: 8px 0; color:#9F3323;">{{ activeError }}</div>
-              <div v-else-if="activeCourses.length === 0" style="padding: 8px 0; color:#707070;">No active enrollments.</div>
+              <div v-if="loadingActive" class="state-message loading-message">
+                Loading Course Data…
+              </div>
+
+              <div v-else-if="activeError" class="state-message error-message">
+                We couldn’t load your course information right now.
+              </div>
+
+              <div v-else-if="activeCourses.length === 0" class="state-message empty-message">
+                No active enrollments.
+              </div>
               <router-link
                 v-for="course in activeCourses"
                 :key="course.id"
@@ -66,7 +74,7 @@
                       </div>
                     </div>
 
-                    <div class="card-action">
+                    <div class="card-action" v-if="course.extendEligible">
                       <button class="extend-button">Extend</button>
                     </div>
                 </div>
@@ -98,6 +106,19 @@
             <div class="card-divider"></div>
 
             <div class="card-body">
+
+              <div v-if="loadingCompleted" class="state-message loading-message">
+                Loading Course Data…
+              </div>
+
+              <div v-else-if="completedError" class="state-message error-message">
+                We couldn’t load your completed course information right now.
+              </div>
+
+              <div v-else-if="completedCourses.length === 0" class="state-message empty-message">
+                No completed enrollments.
+              </div>
+
               <router-link
                 v-for="course in completedCourses"
                 :key="course.id"
@@ -208,16 +229,36 @@
           <div class="divider"></div>
 
           <div class="side-body">
-            <div class="side-link">Email message (4/11/2025)</div>
-            <div class="side-link">Email message (4/07/2025)</div>
-            <div class="side-link">Email message (4/03/2025)</div>
-          </div>
+              <div v-if="loadingMessages" class="state-message loading-message">
+                Loading messages…
+              </div>
 
-          <div class="side-footer">(View all messages)</div>
+              <div v-else-if="messagesError" class="state-message error-message">
+                We couldn’t load your messages right now.
+              </div>
+
+              <div v-else-if="messages.length === 0" class="state-message empty-message">
+                No messages available.
+              </div>
+
+              <div
+                v-else
+                v-for="message in messages"
+                :key="message.id"
+                class="side-link"
+              >
+                {{ message.subject || "Message unavailable" }}
+                <span v-if="message.date">({{ message.date }})</span>
+              </div>
+            </div>
+
+          <router-link to="/messages" class="side-footer">
+            (View all messages)
+          </router-link>
         </div>
 
         <!-- Purchase History-->
-        <div class="side-card">
+       <div class="side-card">
           <div class="side-header">
             <div class="header-icon side-icon">
               <svg xmlns="http://www.w3.org/2000/svg" 
@@ -229,8 +270,7 @@
                 stroke-width="2" 
                 stroke-linecap="round" 
                 stroke-linejoin="round" 
-                class="lucide 
-                lucide-history-icon lucide-history">
+                class="lucide lucide-history-icon lucide-history">
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                 <path d="M3 3v5h5"/>
                 <path d="M12 7v5l4 2"/>
@@ -241,10 +281,27 @@
           <div class="divider"></div>
 
           <div class="side-body">
-            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 1</div>
-            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 2</div>
-            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 3</div>
-            <div class="side-link">Industrial Waste Treatment, Vol 1</div>
+            <div v-if="loadingSidebar" class="state-message loading-message">
+              Loading purchase history…
+            </div>
+
+            <div v-else-if="sidebarError" class="state-message error-message">
+              We couldn’t load your purchase history right now.
+            </div>
+
+            <div v-else-if="invoices.length === 0" class="state-message empty-message">
+              No purchase history available.
+            </div>
+
+            <div
+              v-else
+              v-for="invoice in invoices"
+              :key="invoice.invoicenum"
+              class="side-link"
+            >
+              Invoice: {{ invoice.invoicenum || "Unavailable" }} -
+               {{ getInvoiceName(invoice.invoicenum) }}
+            </div>
           </div>
 
           <router-link to="/purchase-history" class="side-footer">
@@ -257,22 +314,96 @@
 </template>
 
 <script>
-import { getActiveEnrollment, getCourseGrades } from "@/services/owpAPI.js";
-import { completedCourses, recommendedCourses } from "../data/coursesData.js";
+import {
+  getActiveEnrollment,
+  getCourseGrades,
+  getInvoices,
+  getInvoiceData,
+} from "@/services/owpAPI.js";
+import { recommendedCourses } from "../data/coursesData.js";
 
 export default {
   name: "CoursesPage",
   data() {
     return {
       activeCourses: [],
-      completedCourses,        
+      completedCourses: [],        
       recommendedCourses,      // mock
       pid: 458860,
+
       loadingActive: true,
       activeError: "",
+      loadingCompleted: true,
+      completedError: "",
+
+      loadingSidebar: true,
+      sidebarError: "",
+
+      messages: [],
+      loadingMessages: true,
+      messagesError: "",
+
+      invoices: [],
+      invoicedata: {},
     };
   },
+
+      methods: {
+        getInvoiceName(invoicenum) {
+          const items = this.invoicedata[invoicenum] ?? [];
+          const match = items.find((item) => item?.coursetitle != null);
+          return match?.coursetitle || "Course title unavailable";
+        },
+
+        async loadMessages() {
+          this.loadingMessages = true;
+          this.messagesError = "";
+
+          try {
+            this.messages = [];
+          } catch (e) {
+            console.error("Failed to load messages:", e);
+            this.messagesError = "load-failed";
+            this.messages = [];
+          } finally {
+            this.loadingMessages = false;
+          }
+        },
+
+        async loadSidebarData() {
+          this.loadingSidebar = true;
+          this.sidebarError = "";
+
+          try {
+            const inv = await getInvoices(this.pid);
+            console.log("Invoices response:", inv);
+
+            this.invoices = inv?.response ?? [];
+
+            await Promise.all(
+              this.invoices.map(async (invoice) => {
+                const details = await getInvoiceData(invoice.invoicenum);
+                console.log("Invoice details for", invoice.invoicenum, details);
+                this.invoicedata[invoice.invoicenum] = details?.response ?? [];
+              })
+            );
+          } catch (e) {
+            console.error("Failed to load sidebar purchase history:", e);
+            this.sidebarError = "load-failed";
+            this.invoices = [];
+          } finally {
+            this.loadingSidebar = false;
+          }
+        },
+      },
+
   async mounted() {
+
+    this.loadingActive = true;
+    this.loadingCompleted = true;
+    this.activeError = "";
+    this.completedError = "";
+
     try {
       const data = await getActiveEnrollment(this.pid);
       const rows = data?.response ?? [];
@@ -280,7 +411,7 @@ export default {
       const activeRows = rows.filter(r => r.statustxt === "Enrolled");
       const completedRows = rows.filter(r => r.statustxt === "Complete" || r.statustxt === "Dropped");
 
-      
+      //Active
       this.activeCourses = await Promise.all(
         activeRows.map(async (r) => {
           const gradesData = await getCourseGrades(r.enrollid);
@@ -306,7 +437,7 @@ export default {
         if (r.statustxt === "Dropped") {
           return {
             id: r.enrollid,
-            title: r.title,
+            title: r.title ||"Course title unavailable",
             status: "",
             dropped: true,
           };
@@ -314,17 +445,25 @@ export default {
         const grade = (r.grade || "").trim();
         return {
           id: r.enrollid,
-          title: r.title,
+          title: r.title || "Course title unavailable",
           status: grade === "CR" ? "Pass" : "Fail",
           dropped: false,
         };
       });
 
     } catch (e) {
-      this.activeError = e.message || "Failed to load active enrollments";
+      console.error("Failed to load course enrollments:", e);
+      this.activeError = "load-failed";
+      this.completedError = "load-failed";
     } finally {
       this.loadingActive = false;
+      this.loadingCompleted = false;
     }
+
+    await Promise.all([
+      this.loadMessages(),
+      this.loadSidebarData(),
+      ]);
   },
 };
 </script>
@@ -523,8 +662,8 @@ export default {
   background-color: #7A7A7A;
   border-radius: 4rem;
   height: 16px;
-  width: calc(100% + 77px);
-  margin-right: -30px;
+  width: 100%;
+  margin-right: 0;
 }
 
 .progress-bar {
@@ -706,6 +845,22 @@ export default {
 .purchase-history .body .object:hover {
   background-color: #D9D9D9;
   cursor: pointer;
+}
+
+.state-message {
+  padding: 8px 0;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.loading-message,
+.empty-message {
+  color: #707070;
+}
+
+.error-message {
+  color: #9F3323;
+  font-weight: 600;
 }
 
 </style>
