@@ -13,7 +13,22 @@ const completedMedia = {
   video: [
     { title: "Water Distribution Basics"},
     { title: "Water Treatment Operations"},
-    { title: "Water Treatment Operations 2"}
+    { title: "Water Treatment Operations"},
+    { title: "Water Treatment Operations"},
+    { title: "Water Treatment Operations"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
+    { title: "Water Treatment Operations 2"},
   ],
   etext: [
     { title: "Wastewater Collection Systems", file: "media_ww1.pdf" },
@@ -21,7 +36,7 @@ const completedMedia = {
   ],
   tool: [
     { title: "Utility Management Essentials", file: "media_mgmt1.pdf" },
-    { title: "Leadership in Operations", file: "media_mgmt2.pdf" }
+    { title: "Leadership in Operations", file: "media_mgmt2.pdf" },
   ]
 }
 
@@ -30,6 +45,12 @@ const activeCategory = ref('')
 activeCategory.value = 'video'  // Default to video category
 const toggleCategory = (id) => {
   activeCategory.value = activeCategory.value === id ? '' : id
+}
+
+// Toggle check for showing all videos
+const showAllVideos = ref(false)
+const toggleShowAllVideos = () => {
+  showAllVideos.value = !showAllVideos.value
 }
 </script>
 
@@ -63,22 +84,43 @@ const toggleCategory = (id) => {
       <transition name="fade">
         <div v-if="activeCategory" class="media-card dropdown">
           <div v-if="activeCategory === 'video'" class="video-card">
-            <video
-              controls
-              :src="completedMedia.video.file"
-              class="video-player"
-            >
-            </video>
-            <div class="video-selection">
-              <div
-                v-for="(media, index) in completedMedia[activeCategory]"
-                :key="index"
-                class="media-row video"
+            <div class="top">
+              <video
+                controls
+                :src="completedMedia.video.file"
+                class="video-player"
               >
-                <div class="video-thumb"></div>
-                <div class="media-title">{{ media.title }}</div>
+              </video>
+              <div class="video-selection">
+                <div class="body">
+                  <div
+                  v-for="(media, index) in completedMedia[activeCategory].slice(0,5)"
+                  :key="index"
+                  class="media-row video"
+                  >
+                    <div class="video-thumb"></div>
+                    <div class="media-title">{{ media.title }}</div>
+                  </div>
+                  <div class="view-all">
+                    <div class="text" @click="toggleShowAllVideos">
+                      (View all videos)
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+            <transition name="fade-bottom">
+              <div class="bottom" v-if="showAllVideos">
+                <div
+              v-for="(media, index) in completedMedia[activeCategory]"
+              :key="index"
+              class="media-row"
+            >
+            <div class="media-title">{{ media.title }}</div>
+            <a :href="media.file" class="media-link" target="_blank">View media</a>
+            </div>
+              </div>
+            </transition>
           </div>
           <div v-else>
             <div
@@ -90,7 +132,6 @@ const toggleCategory = (id) => {
             <a :href="media.file" class="media-link" target="_blank">View media</a>
             </div>
           </div>
-
         </div>
       </transition>
     </div>
@@ -164,18 +205,14 @@ const toggleCategory = (id) => {
   border-bottom: 1px solid #dcdcdc;
   padding: 10px 12px;
   border-radius: 8px;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
 /* Only highlight hovered row */
 .media-row:hover {
   background-color: #e5f7f9;
-  transform: translateY(-2px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.media-row:hover .media-title {
-  font-weight: 700;
 }
 
 .media-row:last-child {
@@ -184,7 +221,6 @@ const toggleCategory = (id) => {
 
 .media-title {
   font-size: 16px;
-  color: #034750;
 }
 
 .media-link {
@@ -196,8 +232,28 @@ const toggleCategory = (id) => {
 
 .video-card {
   display: flex;
+  flex-direction: column;
+  gap: 16rem;
+}
+
+.video-card .top {
+  display: flex;
   flex-direction: row;
   background-color: #F2F1F2;
+}
+
+.video-card .bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8rem;
+  background-color: #F2F1F2;
+}
+
+.video-card .bottom .videos{
+  display: flex;
+  background-color: #d9d9d9;
+  width: 100%;
+  height: 64rem;
 }
 
 .video-player {
@@ -212,6 +268,21 @@ const toggleCategory = (id) => {
   flex-direction: row;
   gap: 4px;
 }
+
+.video-selection {
+  display: flex;
+  flex-direction: column;
+  height: 25vw;
+  overflow-y: auto;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.video-selection .body {
+  display: flex;
+  flex-direction: column;
+}
+
 .video-thumb {
   width: 100%;
   height: 100%;
@@ -219,11 +290,25 @@ const toggleCategory = (id) => {
   border-radius: 8px;
 }
 
-.video-selection {
+.view-all {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-left: 12px;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.view-all .text {
+  height: 20rem;
+  font-size: 20px;
+  font-weight: 400;
+  margin-top: 12rem;
+  cursor: pointer;
+  color: #034750;
+  transition: color 0.2s ease;
+}
+
+.view-all .text:hover {
+  text-decoration: underline;
+  color: #007c8a;
 }
 
 .media-link:hover {
@@ -279,6 +364,17 @@ const toggleCategory = (id) => {
 
 .fade-enter-from,
 .fade-leave-to {
+  opacity: 0;
+}
+
+/* --- Fade-Bottom Transition --- */
+.fade-bottom-enter-active,
+.fade-bottom-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-bottom-enter-from,
+.fade-bottom-leave-to {
   opacity: 0;
 }
 </style>
