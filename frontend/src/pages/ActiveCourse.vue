@@ -8,10 +8,14 @@
       </div>
     </div>
 
-    <p v-if="loadError" style="color:#9F3323; margin: 10px 0;">
-    {{ loadError }}
-    </p>
+   <div v-if="loadingCourse" class="state-message loading-message">
+      Loading course data…
+    </div>
 
+    <div v-else-if="loadError" class="state-message error-message">
+      {{ loadError }}
+    </div>
+   
     <!-- Summary -->
     <div class="page-container">
       <div class="summary-tile">
@@ -44,7 +48,7 @@
               <h2 class="course-title">{{ courseTitle }}</h2>
               <p class="course-expiration">Expires: {{ courseExpiration }}</p>
               <p class="course-completed">Completed: {{ courseCompleted }}</p>
-              <button class="extend-button">Extend</button>
+              <button v-if="extendEligible" class="extend-button">Extend</button>
             </div>
 
             <div class="course-metrics">
@@ -64,8 +68,9 @@
               <div class="metric">
                 <div class="metric-value">{{ contactHours }}</div>
                 <div class="metric-label">Contact Hours</div>
-              </div>
+            
             </div>
+           </div>
           </div>
 
           <div class="course-progress">
@@ -106,31 +111,43 @@
             </div>
             <h2 class="card-title">Chapter Progress</h2>
           </div>
-        <div class="divider"></div>
-          <div class="chapter-table">
-            <div class="chapter-table-header">
-              <div class="chapter-col">Chapter</div>
-              <div class="date-col">Date</div>
-              <div class="grade-col">Grade</div>
+          <div class="divider"></div>
+            <div v-if="loadingCourse" class="state-message loading-message">
+                  Loading chapter progress…
+                </div>
+
+                <div v-else-if="loadError" class="state-message error-message">
+                  We couldn’t load this chapter data right now.
+                </div>
+
+                <div v-else-if="chapters.length === 0" class="state-message empty-message">
+                  No chapter data available.
+                </div>
+
+                <div v-else class="chapter-table">
+                  <div class="chapter-table-header">
+                    <div class="chapter-col">Chapter</div>
+                    <div class="date-col">Date</div>
+                    <div class="grade-col">Grade</div>
+                  </div>
+
+              <div class="chapter-row" v-for="(chapter, index) in chapters" :key="index">
+                <div class="chapter-col">
+                  <span class="chapter-number">{{ index + 1 }}</span>
+                  <span class="chapter-title">{{ chapter.title }}</span>
+                </div>
+
+                <div class="date-col">
+                  <span v-if="chapter.date">{{ chapter.date }}</span>
+                  <a v-else class="exam-link">Start online exam</a>
+                </div>
+
+                <div class="grade-col">
+                  <span v-if="chapter.grade">{{ chapter.grade }}</span>
+                  <span v-else>—</span>
+                </div>
+              </div>
             </div>
-
-            <div class="chapter-row" v-for="(chapter, index) in chapters" :key="index">
-              <div class="chapter-col">
-                <span class="chapter-number">{{ index + 1 }}</span>
-                <span class="chapter-title">{{ chapter.title }}</span>
-              </div>
-
-              <div class="date-col">
-                <span v-if="chapter.date">{{ chapter.date }}</span>
-                <a v-else class="exam-link">Start online exam</a>
-              </div>
-
-              <div class="grade-col">
-                <span v-if="chapter.grade">{{ chapter.grade }}</span>
-                <span v-else>—</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         <router-link to="/courses" class="back-link">← Back to Courses</router-link>
@@ -138,7 +155,7 @@
 
       <div class="courses-right">
   <!-- Messages -->
-  <div class="side-card">
+    <div class="side-card">
     <div class="side-header">
       <div class="side-icon">
         <svg xmlns="http://www.w3.org/2000/svg" 
@@ -160,51 +177,86 @@
     <div class="divider"></div>
 
     <div class="side-body">
-      <div class="side-link">Email message (5/5/2025)</div>
-      <div class="side-link">Email message (5/03/2025)</div>
-      <div class="side-link">Email message (4/21/2025)</div>
+      <div v-if="loadingMessages" class="state-message loading-message">
+        Loading messages…
+      </div>
+
+      <div v-else-if="messagesError" class="state-message error-message">
+        We couldn’t load your messages right now.
+      </div>
+
+      <div v-else-if="messages.length === 0" class="state-message empty-message">
+        No messages available.
+      </div>
+
+      <div
+        v-else
+        v-for="message in messages"
+        :key="message.id"
+        class="side-link"
+      >
+        {{ message.subject || "Message unavailable" }}
+        <span v-if="message.date">({{ message.date }})</span>
+      </div>
     </div>
 
-    <div class="side-footer">(View all messages)</div>
-  </div>
+      <router-link to="/messages" class="side-footer">
+        (View all messages)
+      </router-link>
+    </div>
 
   <!-- Purchase History -->
-  <div class="side-card">
-    <div class="side-header">
-      <div class="header-icon side-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" 
-          width="24" 
-          height="24" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          stroke-width="2" 
-          stroke-linecap="round" 
-          stroke-linejoin="round" 
-          class="lucide 
-          lucide-history-icon lucide-history">
-          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-          <path d="M3 3v5h5"/>
-          <path d="M12 7v5l4 2"/>
-        </svg>
+    <div class="side-card">
+      <div class="side-header">
+        <div class="header-icon side-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            stroke-width="2" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            class="lucide lucide-history-icon lucide-history">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M12 7v5l4 2"/>
+          </svg>
+        </div>
+        <div class="side-title">Purchase History</div>
       </div>
-      <div class="side-title">Purchase History</div>
-    </div>
-    <div class="divider"></div>
+      <div class="divider"></div>
 
-    <div class="side-body">
-      <div class="side-link">Operation of Wastewater Treatment Plants, Vol 1</div>
-      <div class="side-link">Operation of Wastewater Treatment Plants, Vol 2</div>
-      <div class="side-link">Operation of Wastewater Treatment Plants, Vol 3</div>
-      <div class="side-link">Industrial Waste Treatment, Vol 1</div>
-    </div>
+      <div class="side-body">
+        <div v-if="loadingSidebar" class="state-message loading-message">
+          Loading purchase history…
+        </div>
 
-    <router-link to="/purchase-history" class="side-footer">
-      (View all purchases)
-    </router-link>
-  </div>
+        <div v-else-if="sidebarError" class="state-message error-message">
+          We couldn’t load your purchase history right now.
+        </div>
+
+        <div v-else-if="invoices.length === 0" class="state-message empty-message">
+          No purchase history available.
+        </div>
+
+        <div
+          v-else
+          v-for="invoice in invoices"
+          :key="invoice.invoicenum"
+          class="side-link"
+        >
+          Invoice: {{ invoice.invoicenum || "Unavailable" }} -
+          {{ getInvoiceName(invoice.invoicenum) }}
+        </div>
+      </div>
+
+      <router-link to="/purchase-history" class="side-footer">
+        (View all purchases)
+      </router-link>
+    </div>
 </div>
-
     </div>
   </div>
 </template>
@@ -212,14 +264,18 @@
 <script>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { getEnrollmentRecord, getCourseGrades } from "@/services/owpAPI.js";
+import {
+  getEnrollmentRecord,
+  getCourseGrades,
+  getInvoices,
+  getInvoiceData,
+} from "@/services/owpAPI.js";
 
 export default {
   name: "ActiveCourse",
   setup() {
     const route = useRoute();
 
-    
     const enrollId = String(
       route.params.id ??
       route.params.enrollId ??
@@ -227,10 +283,15 @@ export default {
       ""
     );
 
+    // main page state
+    const loadingCourse = ref(true);
+    const loadError = ref("");
+
     // headers
-    const courseTitle = ref("Loading...");
+    const courseTitle = ref("Course title unavailable");
     const courseExpiration = ref("—");
     const courseCompleted = ref("—");
+    const extendEligible = ref(false);
 
     // metrics
     const totalChapters = ref("—");
@@ -245,10 +306,17 @@ export default {
     // chapter table
     const chapters = ref([]);
 
-    //debug & errors
-    const loadError = ref("");
+    // right side
+    const messages = ref([]);
+    const loadingMessages = ref(true);
+    const messagesError = ref("");
 
-    // extra help
+    const pid = ref(458860);
+    const invoices = ref([]);
+    const invoicedata = ref({});
+    const loadingSidebar = ref(true);
+    const sidebarError = ref("");
+
     function animateToProgress(progressValue) {
       const targetAngle = (progressValue / 100) * 360;
       const duration = 1000;
@@ -291,15 +359,59 @@ export default {
       return `${Math.round(avg)}%`;
     }
 
-    onMounted(async () => {
-      try {
-        loadError.value = "";
+    function getInvoiceName(invoicenum) {
+      const items = invoicedata.value[invoicenum] ?? [];
+      const match = items.find((item) => item?.coursetitle != null);
+      return match?.coursetitle || "Course title unavailable";
+    }
 
+    async function loadMessages() {
+      loadingMessages.value = true;
+      messagesError.value = "";
+
+      try {
+        messages.value = [];
+      } catch (err) {
+        console.error("Failed to load messages:", err);
+        messagesError.value = "load-failed";
+        messages.value = [];
+      } finally {
+        loadingMessages.value = false;
+      }
+    }
+
+    async function loadSidebarData() {
+      loadingSidebar.value = true;
+      sidebarError.value = "";
+
+      try {
+        const inv = await getInvoices(pid.value);
+        invoices.value = inv?.response ?? [];
+
+        await Promise.all(
+          invoices.value.map(async (invoice) => {
+            const details = await getInvoiceData(invoice.invoicenum);
+            invoicedata.value[invoice.invoicenum] = details?.response ?? [];
+          })
+        );
+      } catch (err) {
+        console.error("Failed to load purchase history:", err);
+        sidebarError.value = "load-failed";
+        invoices.value = [];
+      } finally {
+        loadingSidebar.value = false;
+      }
+    }
+
+    async function loadCourse() {
+      loadingCourse.value = true;
+      loadError.value = "";
+
+      try {
         if (!enrollId) {
           throw new Error("Missing route param (enrollId)");
         }
 
-        //for enrollment record
         const recordData = await getEnrollmentRecord(enrollId);
         const record = Array.isArray(recordData?.response)
           ? recordData.response[0]
@@ -309,21 +421,17 @@ export default {
           throw new Error("No enrollment record found");
         }
 
-        courseTitle.value = record.title ?? "Course";
-        courseExpiration.value = record.expiredate ?? "—";
-        courseCompleted.value = record.completedate ?? "—";
+        courseTitle.value = record.title || "Course title unavailable";
+        courseExpiration.value = record.expiredate || "—";
+        courseCompleted.value = record.completedate || "—";
         ceus.value = record.ceus ?? record.ceu ?? "—";
-        contactHours.value = record.contacthour ?? "—";
+        contactHours.value = record.contacthour ?? record.contacthours ?? "—";
+        extendEligible.value = String(record.extendeligible ?? "") === "1";
 
         const editionId = String(
           record.editionid ?? record.editionId ?? record.edition ?? ""
         );
-        console.log("Enrollment record keys:", Object.keys(record || {}));
-        console.log("Enrollment record full:", record);
 
-        console.log("ActiveCourse IDs:", { enrollId, editionId });
-
-        //grades & chapters
         let gradesData = await getCourseGrades(enrollId);
         let sections = Array.isArray(gradesData?.response)
           ? gradesData.response
@@ -336,10 +444,7 @@ export default {
             : [];
         }
 
-        console.log("sections length:", sections.length);
-
-        //metrics implement
-        totalChapters.value = sections.length;
+        totalChapters.value = sections.length || 0;
         gradeAverage.value = calcAveragePctCompleted(sections);
 
         const completedCount = sections.filter((s) => {
@@ -357,7 +462,6 @@ export default {
 
         animateToProgress(percent);
 
-        //tables
         chapters.value = sections
           .slice()
           .sort((a, b) => Number(a?.ordinal ?? 0) - Number(b?.ordinal ?? 0))
@@ -369,28 +473,44 @@ export default {
 
             const fracStr = s?.gradefraction ?? "";
 
-            //for fraction & percent grade (aesthetic)
             let gradeDisplay = "";
             if (pctStr && fracStr) gradeDisplay = `${pctStr} (${fracStr})`;
             else gradeDisplay = pctStr || fracStr || "";
 
             return {
-              title: s?.examname ?? "",
+              title: s?.examname || "Untitled chapter",
               date: s?.gradedate && s.gradedate !== "--" ? s.gradedate : "",
               grade: gradeDisplay,
             };
           });
       } catch (err) {
         console.error(err);
-        loadError.value =
-          err?.message || "Failed to load active course data";
+        loadError.value = err?.message || "Failed to load active course data";
+        chapters.value = [];
+        totalChapters.value = "—";
+        gradeAverage.value = "—";
+        animatedAngle.value = 0;
+        animatedProgress.value = 0;
+      } finally {
+        loadingCourse.value = false;
       }
+    }
+
+    onMounted(async () => {
+      await Promise.all([
+        loadCourse(),
+        loadMessages(),
+        loadSidebarData(),
+      ]);
     });
 
     return {
+      loadingCourse,
+      loadError,
       courseTitle,
       courseExpiration,
       courseCompleted,
+      extendEligible,
       totalChapters,
       gradeAverage,
       ceus,
@@ -398,7 +518,13 @@ export default {
       animatedAngle,
       animatedProgress,
       chapters,
-      loadError,
+      messages,
+      loadingMessages,
+      messagesError,
+      invoices,
+      loadingSidebar,
+      sidebarError,
+      getInvoiceName,
     };
   },
 };
@@ -809,6 +935,23 @@ export default {
   text-decoration: underline;
   color: #007C8A;
 }
+
+.state-message {
+  padding: 8px 0;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.loading-message,
+.empty-message {
+  color: #707070;
+}
+
+.error-message {
+  color: #9F3323;
+  font-weight: 600;
+}
+
 </style>
 
 
