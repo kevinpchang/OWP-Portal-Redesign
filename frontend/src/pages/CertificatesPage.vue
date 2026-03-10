@@ -1,53 +1,43 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { Award, Mail, FileText, History } from "lucide-vue-next";
-import { getAccountDetails } from "@/services/myAccountAPI.js";
+import {
+  getAccountDetails,
+  getActiveEnrollment,
+  getEnrollmentRecord,
+} from "@/services/owpAPI.js";
 
-// PID: use localStorage if your app sets it, else fallback to test PID
 const pid = Number(localStorage.getItem("pid")) || 458860;
 
-// Live account info state
+// --- Account state ---
 const loadingAccount = ref(true);
 const accountError = ref("");
 const accountName = ref("");
 
-// Your existing mock certificates list (keep for now)
-const certificates = ref([
-  {
-    id: 1,
-    title: "Advanced Water Treatment",
-    grade: "90%",
-    downloadUrl: "https://example.com/certs/advanced.pdf",
-  },
-  {
-    id: 2,
-    title: "Operation and Maintenance of Wastewater Collection Systems, Vol 1",
-    grade: "95%",
-    downloadUrl: "https://example.com/certs/wastewater-vol1.pdf",
-  },
-  {
-    id: 3,
-    title: "Operation and Maintenance of Wastewater Collection Systems, Vol 2",
-    grade: "100%",
-    downloadUrl: "https://example.com/certs/wastewater-vol2.pdf",
-  },
-  {
-    id: 4,
-    title: "Water Distribution System Operation and Maintenance",
-    grade: "100%",
-    downloadUrl: "https://example.com/certs/distribution.pdf",
-  },
-]);
+// --- Certificates state ---
+const loadingCerts = ref(true);
+const certsError = ref("");
+const certificates = ref([]);
 
-const scrollToCertificate = (id) => {
-  console.log("View certificate:", id);
-};
+// --- Search ---
+const searchQuery = ref("");
 
-// Load account details (live data)
+// --- Download loading tracker ---
+const downloadingId = ref(null);
+
+// --- Filtered certificates ---
+const filteredCertificates = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase();
+  if (!q) return certificates.value;
+  return certificates.value.filter((c) =>
+    c.title.toLowerCase().includes(q)
+  );
+});
+
+// --- Load account name ---
 async function loadAccount() {
   loadingAccount.value = true;
   accountError.value = "";
-
   try {
     const data = await getAccountDetails(pid);
     accountName.value = data?.response?.fullname ?? "";
@@ -58,7 +48,227 @@ async function loadAccount() {
   }
 }
 
-onMounted(loadAccount);
+// --- Load certificates from activeEnrollment ---
+// No dedicated /certificates endpoint exists in the OWP API.
+// We derive certificates from completed enrollments with grade "CR" (Credit = Pass).
+// CEUs and contact hours are fetched per-enrollment from enrollmentRecord.
+async function loadCertificates() {
+  loadingCerts.value = true;
+  certsError.value = "";
+  try {
+    const data = await getActiveEnrollment(pid);
+    const rows = data?.response ?? [];
+
+    const completed = rows.filter(
+      (r) =>
+        r.statustxt === "Complete" &&
+        String(r.grade ?? "").trim() === "CR"
+    );
+
+    // Fetch enrollmentRecord for CEUs + contact hours
+    const enriched = await Promise.all(
+      completed.map(async (r) => {
+        let ceus = "—";
+        let contactHours = "—";
+        try {
+          const rec = await getEnrollmentRecord(r.enrollid);
+          const record = Array.isArray(rec?.response)
+            ? rec.response[0]
+            : rec?.response;
+          if (record) {
+            const rawCeu = Number(record.ceus ?? record.ceu);
+            ceus = Number.isFinite(rawCeu) ? rawCeu.toFixed(1) : "—";
+            contactHours = record.contacthour ?? record.contacthours ?? "—";
+          }
+        } catch (_) {
+          // silently fallback — CEUs/hours not critical
+        }
+        return {
+          id: r.enrollid,
+          enrollId: r.enrollid,
+          title: r.title || "Course title unavailable",
+          completedDate: r.completedate || "—",
+          grade: "CR (Pass)",
+          ceus,
+          contactHours,
+        };
+      })
+    );
+
+    certificates.value = enriched;
+  } catch (e) {
+    certsError.value = e?.message ?? String(e);
+    certificates.value = [];
+  } finally {
+    loadingCerts.value = false;
+  }
+}
+
+// --- Generate and download a certificate PDF using jsPDF ---
+// jsPDF is loaded dynamically from CDN — no npm install needed.
+async function downloadCertificate(cert) {
+  if (downloadingId.value === cert.id) return;
+  downloadingId.value = cert.id;
+
+  try {
+    // Dynamically load jsPDF from CDN if not already present
+    if (!window.jspdf) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src =
+          "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+        script.onload = resolve;
+        script.onerror = () =>
+          reject(new Error("Failed to load PDF library. Check your connection."));
+        document.head.appendChild(script);
+      });
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+
+    const W = 297;
+    const H = 210;
+
+    // ── Background ──────────────────────────────────────────────
+    doc.setFillColor(3, 71, 80);           // #034750 deep teal
+    doc.rect(0, 0, W, H, "F");
+
+    // Light inner panel
+    doc.setFillColor(242, 241, 242);       // #F2F1F2
+    doc.roundedRect(14, 14, W - 28, H - 28, 6, 6, "F");
+
+    // Green accent bar on left
+    doc.setFillColor(109, 190, 75);        // #6DBE4B
+    doc.rect(14, 14, 8, H - 28, "F");
+
+    // Teal accent bar on top
+    doc.setFillColor(0, 165, 181);         // #00A5B5
+    doc.rect(22, 14, W - 36, 6, "F");
+
+    // ── OWP header ───────────────────────────────────────────────
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(3, 71, 80);
+    doc.text("OFFICE OF WATER PROGRAMS", 38, 34);
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(112, 112, 112);
+    doc.text("California State University, Sacramento", 38, 40);
+
+    // Horizontal rule
+    doc.setDrawColor(0, 165, 181);
+    doc.setLineWidth(0.5);
+    doc.line(38, 44, W - 22, 44);
+
+    // ── "Certificate of Completion" ──────────────────────────────
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(28);
+    doc.setTextColor(3, 71, 80);
+    doc.text("Certificate of Completion", W / 2, 68, { align: "center" });
+
+    // ── "This certifies that" ────────────────────────────────────
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.setTextColor(80, 80, 80);
+    doc.text("This certifies that", W / 2, 82, { align: "center" });
+
+    // ── Recipient name ───────────────────────────────────────────
+    const displayName = accountName.value || "Student";
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(0, 165, 181);
+    doc.text(displayName, W / 2, 96, { align: "center" });
+
+    // Underline name
+    const nameWidth = doc.getTextWidth(displayName);
+    doc.setDrawColor(0, 165, 181);
+    doc.setLineWidth(0.4);
+    doc.line(W / 2 - nameWidth / 2, 98, W / 2 + nameWidth / 2, 98);
+
+    // ── "has successfully completed" ─────────────────────────────
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.setTextColor(80, 80, 80);
+    doc.text("has successfully completed the course", W / 2, 108, { align: "center" });
+
+    // ── Course title ─────────────────────────────────────────────
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(15);
+    doc.setTextColor(3, 71, 80);
+    const titleLines = doc.splitTextToSize(cert.title, 200);
+    doc.text(titleLines, W / 2, 120, { align: "center" });
+
+    // ── Metadata row ─────────────────────────────────────────────
+    const metaY = 148;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    doc.line(38, metaY - 8, W - 22, metaY - 8);
+
+    const metaCols = [
+      { label: "Completion Date", value: cert.completedDate, x: 60 },
+      { label: "Grade",           value: cert.grade,          x: W / 2 - 30 },
+      { label: "CEUs",            value: String(cert.ceus),   x: W / 2 + 30 },
+      { label: "Contact Hours",   value: String(cert.contactHours), x: W - 52 },
+    ];
+
+    for (const col of metaCols) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(3, 71, 80);
+      doc.text(col.label, col.x, metaY, { align: "center" });
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(80, 80, 80);
+      doc.text(col.value, col.x, metaY + 7, { align: "center" });
+    }
+
+    // ── Signature line ───────────────────────────────────────────
+    doc.setDrawColor(3, 71, 80);
+    doc.setLineWidth(0.5);
+    doc.line(W / 2 - 40, 170, W / 2 + 40, 170);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(112, 112, 112);
+    doc.text("Director, Office of Water Programs", W / 2, 175, { align: "center" });
+
+    // ── Footer ───────────────────────────────────────────────────
+    doc.setFontSize(8);
+    doc.setTextColor(160, 160, 160);
+    doc.text(
+      `Certificate ID: OWP-${cert.enrollId}  ·  Issued by OWP Learning Portal  ·  owp.csus.edu`,
+      W / 2, H - 18, { align: "center" }
+    );
+
+    // ── Decorative seal ──────────────────────────────────────────
+    doc.setDrawColor(109, 190, 75);
+    doc.setLineWidth(1.5);
+    doc.circle(W - 45, 160, 18, "S");
+    doc.setLineWidth(0.5);
+    doc.circle(W - 45, 160, 15, "S");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(109, 190, 75);
+    doc.text("CERTIFIED", W - 45, 158, { align: "center" });
+    doc.text("OWP", W - 45, 164, { align: "center" });
+
+    // ── Save ─────────────────────────────────────────────────────
+    const safeName = cert.title
+      .replace(/[^a-z0-9]/gi, "_")
+      .replace(/_+/g, "_")
+      .slice(0, 40);
+    doc.save(`OWP_Certificate_${safeName}.pdf`);
+
+  } catch (e) {
+    alert(`Could not generate certificate: ${e?.message ?? String(e)}`);
+  } finally {
+    downloadingId.value = null;
+  }
+}
+
+onMounted(async () => {
+  await Promise.all([loadAccount(), loadCertificates()]);
+});
 </script>
 
 <template>
@@ -68,21 +278,20 @@ onMounted(loadAccount);
       <div class="text-block">
         <h1 class="courses-header">Certificates</h1>
         <p class="page-description">View and download your earned certificates</p>
-
-        <!-- ✅ Live account status (added) -->
         <div style="margin-top: 10px; font-size: 14px; color: #707070;">
           <span v-if="loadingAccount">Loading account…</span>
-          <span v-else-if="accountError" style="color: #9F3323;">
-            {{ accountError }}
-          </span>
-          <span v-else>
-            Logged in as: <strong>{{ accountName }}</strong>
-          </span>
+          <span v-else-if="accountError" style="color: #9F3323;">{{ accountError }}</span>
+          <span v-else>Logged in as: <strong>{{ accountName }}</strong></span>
         </div>
       </div>
 
       <div class="search-container">
-        <input type="text" placeholder="Search certificates..." class="search-input" />
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search certificates..."
+          class="search-input"
+        />
       </div>
     </div>
 
@@ -91,7 +300,6 @@ onMounted(loadAccount);
       <!-- Left: Certificates List -->
       <div class="courses-left">
         <div class="tiles-container">
-          <!-- Earned Certificates Card -->
           <div class="course-card">
             <div class="card-header">
               <Award class="header-icon" color="#6DBE4B" />
@@ -99,26 +307,48 @@ onMounted(loadAccount);
             </div>
             <div class="divider"></div>
 
-            <div class="card-body">
+            <div v-if="loadingCerts" class="state-message loading-message">
+              Loading certificates…
+            </div>
+            <div v-else-if="certsError" class="state-message error-message">
+              We couldn't load your certificates right now.
+            </div>
+            <div v-else-if="certificates.length === 0" class="state-message empty-message">
+              No earned certificates found.
+            </div>
+            <div v-else-if="filteredCertificates.length === 0" class="state-message empty-message">
+              No certificates match "{{ searchQuery }}".
+            </div>
+
+            <div v-else class="card-body">
               <div
-                v-for="cert in certificates"
+                v-for="cert in filteredCertificates"
                 :key="cert.id"
                 class="certificate-item"
-                @click="scrollToCertificate(cert.id)"
               >
                 <div class="cert-thumbnail">
                   <span class="owp-text">OWP</span>
                 </div>
+
                 <div class="cert-info">
                   <div class="cert-title">{{ cert.title }}</div>
-                  <div class="cert-grade">
-                    Grade Achieved: <strong>{{ cert.grade }}</strong>
+
+                  <div class="cert-meta-row">
+                    <span class="meta-chip">📅 Completed: <strong>{{ cert.completedDate }}</strong></span>
+                    <span class="meta-chip">🎓 Grade: <strong>{{ cert.grade }}</strong></span>
+                    <span class="meta-chip">CEUs: <strong>{{ cert.ceus }}</strong></span>
+                    <span class="meta-chip">Contact Hours: <strong>{{ cert.contactHours }}</strong></span>
                   </div>
+
                   <div class="download-section">
-                    Download Certificate:
-                    <a :href="cert.downloadUrl" target="_blank" class="download-link">
-                      certificate_{{ cert.id }}.pdf
-                    </a>
+                    <button
+                      class="download-btn"
+                      :disabled="downloadingId === cert.id"
+                      @click="downloadCertificate(cert)"
+                    >
+                      <span v-if="downloadingId === cert.id">Generating…</span>
+                      <span v-else>⬇ Download Certificate</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -130,8 +360,7 @@ onMounted(loadAccount);
 
       <!-- Right: Sidebar -->
       <div class="courses-right">
-        <!-- Messages -->
-        <div class="side-card messages">
+        <div class="side-card">
           <div class="side-header">
             <Mail class="side-icon" color="#00A5B5" />
             <div class="side-title">Messages</div>
@@ -142,11 +371,10 @@ onMounted(loadAccount);
             <div class="side-link">Email message (11/08/2025)</div>
             <div class="side-link">Email message (11/05/2025)</div>
           </div>
-          <div class="side-footer">(View all messages)</div>
+          <router-link to="/messages" class="side-footer">(View all messages)</router-link>
         </div>
 
-        <!-- Transcripts -->
-        <div class="side-card transcripts">
+        <div class="side-card">
           <div class="side-header">
             <FileText class="side-icon" color="#6DBE4B" />
             <div class="side-title">Transcripts</div>
@@ -159,8 +387,7 @@ onMounted(loadAccount);
           <div class="side-footer">(View all transcripts)</div>
         </div>
 
-        <!-- Purchase History -->
-        <div class="side-card purchase-history">
+        <div class="side-card">
           <div class="side-header">
             <History class="side-icon" color="#034750" />
             <div class="side-title">Purchase History</div>
@@ -171,9 +398,7 @@ onMounted(loadAccount);
             <div class="side-link">Advanced Water Treatment</div>
             <div class="side-link">Water Distribution System Operation</div>
           </div>
-          <router-link to="/purchase-history" class="side-footer">
-            (View all purchases)
-          </router-link>
+          <router-link to="/purchase-history" class="side-footer">(View all purchases)</router-link>
         </div>
       </div>
     </div>
@@ -181,7 +406,6 @@ onMounted(loadAccount);
 </template>
 
 <style scoped>
-/* ✅ Your existing CSS unchanged */
 .certificates-page {
   font-family: "Roboto", sans-serif;
   background-color: #fff;
@@ -206,22 +430,9 @@ onMounted(loadAccount);
   padding-bottom: 8px;
 }
 
-.courses-header {
-  font-size: 32px;
-  font-weight: 700;
-  color: #034750;
-  margin: 0;
-}
-
-.page-description {
-  font-size: 16px;
-  color: #555;
-  margin: 8px 0 0;
-}
-
-.search-container {
-  position: relative;
-}
+.courses-header { font-size: 32px; font-weight: 700; color: #034750; margin: 0; }
+.page-description { font-size: 16px; color: #555; margin: 8px 0 0; }
+.search-container { position: relative; }
 
 .search-input {
   padding: 10px 16px;
@@ -232,9 +443,12 @@ onMounted(loadAccount);
   outline: none;
 }
 
-.search-input::placeholder {
-  color: #999;
+.search-input:focus {
+  border-color: #00a5b5;
+  box-shadow: 0 0 0 3px rgba(0, 165, 181, 0.15);
 }
+
+.search-input::placeholder { color: #999; }
 
 .courses-bottom {
   max-width: 1000px;
@@ -246,10 +460,7 @@ onMounted(loadAccount);
   padding: 0 20px;
 }
 
-.courses-left {
-  display: flex;
-  flex-direction: column;
-}
+.courses-left { display: flex; flex-direction: column; }
 
 .tiles-container {
   margin-top: 46px;
@@ -275,47 +486,27 @@ onMounted(loadAccount);
   margin-left: 20px;
 }
 
-.header-icon,
-.side-icon {
-  width: 26px;
-  height: 34px;
-}
+.header-icon, .side-icon { width: 26px; height: 34px; }
+.card-title, .side-title { font-size: 20px; font-weight: 700; color: #034750; margin: 0; }
 
-.card-title,
-.side-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #034750;
-  margin: 0;
-}
+.divider { width: 100%; border-top: 1px solid #ffffff; margin: 12px 0 8px 0; }
 
-.divider {
-  width: 100%;
-  border-top: 1px solid #ffffff;
-  margin: 12px 0 8px 0;
-}
+.state-message { padding: 12px 20px; font-size: 16px; }
+.loading-message, .empty-message { color: #707070; }
+.error-message { color: #9f3323; font-weight: 600; }
 
 .card-body {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  max-height: 500px;
+  gap: 4px;
+  max-height: 520px;
   overflow-y: auto;
-  padding-right: 8px;
+  padding-right: 4px;
 }
 
-.card-body::-webkit-scrollbar {
-  width: 6px;
-}
-
-.card-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.card-body::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 3px;
-}
+.card-body::-webkit-scrollbar { width: 6px; }
+.card-body::-webkit-scrollbar-track { background: transparent; }
+.card-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
 
 .certificate-item {
   display: grid;
@@ -325,12 +516,9 @@ onMounted(loadAccount);
   margin: 0 -20px;
   width: calc(100% + 40px);
   transition: background-color 0.2s ease;
-  cursor: pointer;
 }
 
-.certificate-item:hover {
-  background-color: #d9d9d9;
-}
+.certificate-item:hover { background-color: #d9d9d9; }
 
 .cert-thumbnail {
   width: 70px;
@@ -341,19 +529,15 @@ onMounted(loadAccount);
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
-.owp-text {
-  color: white;
-  font-weight: bold;
-  font-size: 18px;
-  font-family: "Roboto", sans-serif;
-}
+.owp-text { color: white; font-weight: bold; font-size: 18px; }
 
 .cert-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
   justify-content: center;
 }
 
@@ -365,33 +549,47 @@ onMounted(loadAccount);
   line-height: 1.4;
 }
 
-.cert-grade {
-  font-size: 14px;
-  color: #707070;
-}
-
-.download-section {
-  font-size: 14px;
-  color: #555;
-  margin-top: 4px;
-}
-
-.download-link {
-  color: #00a5b5;
-  text-decoration: underline;
-  font-weight: 600;
-}
-
-.download-link:hover {
-  color: #034750;
-}
-
-.courses-right {
+.cert-meta-row {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-top: 46px;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
 }
+
+.meta-chip {
+  font-size: 13px;
+  color: #555;
+  background-color: #e8e8e8;
+  border-radius: 20px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.meta-chip strong { color: #034750; }
+
+.download-section { margin-top: 4px; }
+
+.download-btn {
+  background-color: #00a5b5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 16px;
+  font-size: 14px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.download-btn:hover:not(:disabled) {
+  background-color: #008c9a;
+  transform: translateY(-1px);
+}
+
+.download-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.courses-right { display: flex; flex-direction: column; gap: 16px; margin-top: 46px; }
 
 .side-card {
   background-color: #f2f1f2;
@@ -401,19 +599,8 @@ onMounted(loadAccount);
   gap: 12px;
 }
 
-.side-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 16px 20px 0 20px;
-}
-
-.side-body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin: 0 20px;
-}
+.side-header { display: flex; align-items: center; gap: 10px; margin: 16px 20px 0 20px; }
+.side-body { display: flex; flex-direction: column; gap: 14px; margin: 0 20px; }
 
 .side-link {
   font-size: 16px;
@@ -424,9 +611,7 @@ onMounted(loadAccount);
   transition: background-color 0.2s ease;
 }
 
-.side-link:hover {
-  background-color: #d9d9d9;
-}
+.side-link:hover { background-color: #d9d9d9; }
 
 .side-footer {
   height: 32px;
@@ -441,20 +626,11 @@ onMounted(loadAccount);
   text-decoration: none;
 }
 
-.side-footer:hover {
-  text-decoration: underline;
-  color: #007c8a;
-}
+.side-footer:hover { text-decoration: underline; color: #007c8a; }
 
 @media (max-width: 768px) {
-  .courses-bottom {
-    grid-template-columns: 1fr;
-  }
-  .courses-right {
-    margin-top: 20px;
-  }
-  .search-input {
-    width: 200px;
-  }
+  .courses-bottom { grid-template-columns: 1fr; }
+  .courses-right { margin-top: 20px; }
+  .search-input { width: 200px; }
 }
 </style>
