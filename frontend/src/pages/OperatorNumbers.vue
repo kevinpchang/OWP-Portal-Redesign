@@ -9,7 +9,7 @@
   const opNum = ref("");
   const state = ref("");
   const loading = ref(false);
-  
+
   const nums = ref([]);
 
   const editState = ref("")
@@ -45,7 +45,7 @@
   }
 
   async function addNumber(){
-    
+
     const original = nums.value[0]
 
     const payload = {
@@ -54,10 +54,10 @@
       status: original.oprlicstatus,
       operatornumber: addOpNum.value,
       state: addState.value,
-      ipAddr: "localhost" 
+      ipAddr: "localhost"
     };
 
-    
+
 
     try{
       //payload needs to have: liccatid, countryid, state, status, operatornumber, ipAddr
@@ -89,7 +89,7 @@
       ipAddr: "localhost"
     }
 
-    
+
     try{
       //payload needs to have: oprlicid, liccatid, countryid, state, status, operatornumber, ipAddr
       api.updateOperatorNumber(payload);
@@ -106,7 +106,7 @@
     console.log("deleteNumber called with ip:", ip, "and id:", id);
 
     try{
-      
+
       api.deleteOperator(ip, id, pid);
       console.log("Operator Number deleted successfully");
     } catch (e) {
@@ -221,9 +221,9 @@
             -->
           </tbody>
         </table>
-      </div>  
+      </div>
     </div>
-    
+
 
     <div class="quick-links">
       <div class="messages">
@@ -282,7 +282,7 @@
         </div>
       </div>
     </transition>
-    
+
     <transition name="fade">
       <div class="popup" v-if="editPopup">
         <div class="blur-overlay"></div>

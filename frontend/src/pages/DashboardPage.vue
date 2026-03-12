@@ -132,7 +132,7 @@ function scheduleNextUpdate() {
           </div>
           <div class="divider"></div>
           <div class="body">
-            <router-link class="object" v-for="v in activeEnrollments.slice(0, 3)" :to="`/courses/${v.enrollid}`">
+            <router-link class="object" v-for="v in activeEnrollments.slice(0, 3)" :key="v.enrollid" :to="`/courses/${v.enrollid}`">
               <div class="left">
                 <div class="icon"></div>
               </div>
@@ -219,7 +219,7 @@ function scheduleNextUpdate() {
           </div>
           <div class="divider"></div>
           <div class="body">
-            <div class="object" v-for="v in invoices.slice(0, 5)">
+            <div class="object" v-for="v in invoices.slice(0, 5)" :key="v.invoicenum">
               <div class="text">
                 Invoice: {{ v.invoicenum }} - {{ getInvoiceName(v.invoicenum) }}
               </div>
