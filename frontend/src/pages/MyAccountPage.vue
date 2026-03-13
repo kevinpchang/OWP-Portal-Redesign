@@ -3,13 +3,6 @@ import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { UserRound, NotebookText, Hash, FileText, History, SquareUserRound } from "lucide-vue-next";
 
-import {
-  getAccountDetails,
-  getActiveEnrollment,
-  getCourseGrades,
-  getOperatorList,
-} from "@/services/myAccountAPI";
-
 import * as api from "@/services/owpAPI";
 
 const route = useRoute();
