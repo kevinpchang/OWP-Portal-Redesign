@@ -25,6 +25,7 @@ $ch = curl_init($targetUrl);
 //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); //<-- these lines make an unsafe disable SSL verification in cURL (NOT secure) but for testing
 
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_CAINFO, __DIR__ . '/../../cacert.pem');
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
   "owp-guest-key: " . $OWP_GUEST_KEY,
