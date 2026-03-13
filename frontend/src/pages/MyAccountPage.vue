@@ -67,6 +67,7 @@ async function loadAccount() {
 
   } catch (e) {
     error.value = e?.message ?? String(e);
+    console.log("error loading account page data:", e);
   } finally {
     loading.value = false;
   }
