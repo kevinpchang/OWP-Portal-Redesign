@@ -20,6 +20,7 @@ const routes = [
   { path: '/recommended/:id', name: 'RecommendedCourse', component: () => import('../pages/RecommendedCourse.vue') },
   { path: '/Certificates', name: 'CertificatesPage', component: CertificatesPage }, // UDAY KYAMA
   { path: '/purchase-history', name: 'PurchaseHistory', component: PurchaseHistory }, // VINCENT LAM
+  //{ path: "/purchase-history/:invoiceId", name: "InvoiceDetails",component: () => import("@/pages/InvoiceDetails.vue"),props: true},
   { path: '/slides', name: 'SlidesPage', component: SlidesPage },
   { path: '/media', name: 'MediaPage', component: MediaPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../pages/NotFoundPage.vue')
