@@ -40,13 +40,13 @@ async function loadAccount() {
   loading.value = true;
   error.value = "";
   try {
-    const acc = await getAccountDetails(pid);
+    const acc = await api.getAccountDetails(pid);
     account.value = acc.response;
 
-    const enr = await getActiveEnrollment(pid);
+    const enr = await api.getActiveEnrollment(pid);
     enrollments.value = enr.response ?? [];
 
-    const op = await getOperatorList(pid);
+    const op = await api.getOperatorList(pid);
     operatorList.value = op.response ?? [];
 
     // pick an "Enrolled" one if possible, else first
@@ -55,7 +55,7 @@ async function loadAccount() {
 
     if (preferred?.enrollid) {
       selectedEnrollId.value = preferred.enrollid;
-      const g = await getCourseGrades(preferred.enrollid);
+      const g = await api.getCourseGrades(preferred.enrollid);
       grades.value = g.response ?? [];
     } else {
       grades.value = [];
