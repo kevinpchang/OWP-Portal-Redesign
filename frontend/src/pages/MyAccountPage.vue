@@ -8,8 +8,9 @@ import {
   getActiveEnrollment,
   getCourseGrades,
   getOperatorList,
-  updateContactInfo
 } from "@/services/myAccountAPI";
+
+import * as api from "@/services/owpAPI";
 
 const route = useRoute();
 
@@ -24,6 +25,23 @@ const enrollments = ref([]);        // will hold activeEnrollment response.respo
 const selectedEnrollId = ref(null);
 const grades = ref([]);             // will hold getCourseGrades response.response
 const operatorList = ref([]);       // will hold getOperatorList response.response
+
+// --- Transcripts preview (from enrollments) ---
+const loadingTranscripts = ref(false);
+const transcriptsError = ref("");
+const transcriptItems = ref([]); // [{ key, title, routeTo }]
+
+// --- Purchase history preview (invoices) ---
+const loadingPurchases = ref(false);
+const purchasesError = ref("");
+const invoices = ref([]);
+const invoiceDataByNum = ref({}); // { [invoicenum]: items[] }
+
+function getInvoiceName(invoicenum) {
+  const items = invoiceDataByNum.value?.[invoicenum] ?? [];
+  const match = items.find((item) => item?.coursetitle != null);
+  return match?.coursetitle || "Course title unavailable";
+}
 
 async function loadAccount() {
   loading.value = true;
@@ -49,6 +67,11 @@ async function loadAccount() {
     } else {
       grades.value = [];
     }
+    await Promise.all([
+      loadTranscriptsPreview(),
+      loadPurchaseHistoryPreview(),
+    ]);
+
   } catch (e) {
     error.value = e?.message ?? String(e);
   } finally {
@@ -56,80 +79,195 @@ async function loadAccount() {
   }
 }
 
+async function loadPurchaseHistoryPreview() {
+  loadingPurchases.value = true;
+  purchasesError.value = "";
+
+  try {
+    const inv = await api.getInvoices(pid);
+    invoices.value = inv?.response ?? [];
+
+    const pairs = await Promise.all(
+      invoices.value.map(async (invoice) => {
+        const details = await api.getInvoiceData(invoice.invoicenum);
+        return [invoice.invoicenum, details?.response ?? []];
+      })
+    );
+
+    invoiceDataByNum.value = Object.fromEntries(pairs);
+  } catch (e) {
+    console.error("Failed to load purchase history preview:", e);
+    purchasesError.value = e?.message ?? "load-failed";
+    invoices.value = [];
+    invoiceDataByNum.value = {};
+  } finally {
+    loadingPurchases.value = false;
+  }
+}
+
+async function loadTranscriptsPreview() {
+  loadingTranscripts.value = true;
+  transcriptsError.value = "";
+
+  try {
+    const rows = enrollments.value ?? [];
+
+    const transcriptRows = rows.filter(
+      (r) => r.statustxt === "Complete" || r.statustxt === "Dropped"
+    );
+
+    transcriptItems.value = transcriptRows.slice(0, 2).map((r) => ({
+      key: r.enrollid,
+      title: r.title || "Course title unavailable",
+      routeTo: "/Certificates",
+    }));
+  } catch (e) {
+    transcriptsError.value = e?.message ?? "load-failed";
+    transcriptItems.value = [];
+  } finally {
+    loadingTranscripts.value = false;
+  }
+}
+
 onMounted(loadAccount);
+
+function addressLine2(a) {
+  const city = (a?.hmcity ?? "").trim();
+  const state = (a?.hmstate ?? "").trim();
+  const zip = (a?.hmzip ?? "").trim();
+
+  const cityState = [city, state].filter(Boolean).join(", ");
+  return [cityState, zip].filter(Boolean).join(" ").trim();
+}
+
+const contactForm = reactive({
+  street_1: "",
+  street_2: "",
+  street_3: "",
+  city: "",
+  state: "",
+  postal_code: "",
+  country: "US",
+
+  // UI-only
+  phone_display: "",
+
+  // API fields
+  phone_area_code: "",
+  phone_local: "",
+  phone_extension: "",
+  fax_area_code: "",
+  fax_local: "",
+  ipAddr: "127.0.0.1",
+});
+
+function digitsOnly(v) {
+  return String(v ?? "").replace(/\D/g, "");
+}
+
+function formatPhoneDisplay(input) {
+  const d = digitsOnly(input).slice(0, 10);
+  const a = d.slice(0, 3);
+  const b = d.slice(3, 6);
+  const c = d.slice(6, 10);
+
+  if (d.length === 0) return "";
+  if (d.length < 4) return `(${a}`;
+  if (d.length < 7) return `(${a})-${b}`;
+  return `(${a})-${b}-${c}`;
+}
+
+function splitPhoneFromDisplay(display) {
+  const d = digitsOnly(display);
+  if (d.length < 10) return { area: "", local: "" };
+  return { area: d.slice(0, 3), local: d.slice(3, 10) }; // local = 7 digits
+}
+
+function onPhoneInput() {
+  contactForm.phone_display = formatPhoneDisplay(contactForm.phone_display);
+}
+
+function openContactDialogWithData() {
+  const a = account.value;
+
+  contactForm.street_1 = a?.hmstreet1 ?? "";
+  contactForm.street_2 = a?.hmstreet2 ?? "";
+  contactForm.street_3 = a?.hmstreet3 ?? "";
+  contactForm.city     = a?.hmcity ?? "";
+  contactForm.state    = a?.hmstate ?? "";
+  contactForm.postal_code = a?.hmzip ?? "";
+  contactForm.country  = "US";
+
+  // fill the UI display + api pieces
+  contactForm.phone_display = a?.hmfmtdphn ? formatPhoneDisplay(a.hmfmtdphn) : "";
+  const p = splitPhoneFromDisplay(contactForm.phone_display);
+
+  contactForm.phone_area_code = a?.hmphncity ?? p.area ?? "";
+  contactForm.phone_local     = a?.hmphnlocal ?? p.local ?? "";
+  contactForm.phone_extension = a?.hmphnext ?? "";
   
-  // form state for updateContactInfo
-  const contactForm = reactive({
-    street_1: "",
-    street_2: "",
-    street_3: "",
-    city: "",
-    state: "",
-    postal_code: "",
-    country: "US",
-    ipAddr: "127.0.0.1",
+  contactForm.ipAddr;
 
-    // ONE input box in the UI
-    phone_display: "",
-    mobile_display: "",
+  contactDialog.value = true;
+}
 
-    // what the API actually needs
-    phone_area_code: "",
-    phone_local: "",
-    phone_extension: "",
-    fax_area_code: "",
-    fax_local: "",
-  });
 
-  // helper: safely split "(415) 866-9053" into area/local if needed
-  function splitPhone(fmt) {
-    const digits = String(fmt ?? "").replace(/\D/g, "");
-    if (digits.length >= 10) {
-      return { area: digits.slice(0, 3), local: digits.slice(3, 10) };
-    }
-    return { area: "", local: "" };
+const contactDialog = ref(false)
+
+function closeContactDialog() {
+  contactDialog.value = false
+}
+
+const profileDialog = ref(false)
+
+function closeProfileDialog() {
+  profileDialog.value = false
+}
+
+const savingContact = ref(false);
+const contactError = ref("");
+
+async function saveContactInfo() {
+  savingContact.value = true;
+  contactError.value = "";
+
+  try {
+    const p = splitPhoneFromDisplay(contactForm.phone_display);
+
+    // IMPORTANT: include ALL keys every time (even if blank)
+    const payload = {
+      street_1: contactForm.street_1 ?? "",
+      street_2: contactForm.street_2 ?? "",
+      street_3: contactForm.street_3 ?? "",
+      city: contactForm.city ?? "",
+      state: contactForm.state ?? "",
+      postal_code: contactForm.postal_code ?? "",
+      country: contactForm.country ?? "US",
+
+      phone_area_code: p.area ?? "",
+      phone_local: p.local ?? "",
+      phone_extension: contactForm.phone_extension ?? "",
+
+      fax_area_code: contactForm.fax_area_code ?? "",
+      fax_local: contactForm.fax_local ?? "",
+
+      ipAddr: "localhost",
+    };
+
+    console.log("updateContactInfo payload:", payload);
+
+    const resp = await api.updateContactInfo(payload);
+    console.log("updateContactInfo response:", resp);
+
+    await loadAccount();
+    contactDialog.value = false;
+  } catch (e) {
+    console.error("updateContactInfo failed:", e);
+    contactError.value = e?.message ?? String(e);
+  } finally {
+    savingContact.value = false;
   }
-
-  function openContactDialogWithData() {
-    // fill the form from current account data so the dialog opens pre-populated
-    const a = account.value;
-
-    contactForm.street_1 = a?.hmstreet1 ?? "";
-    contactForm.street_2 = a?.hmstreet2 ?? "";
-    contactForm.street_3 = a?.hmstreet3 ?? "";
-    contactForm.city     = a?.hmcity ?? "";
-    contactForm.state    = a?.hmstate ?? "";
-    contactForm.postal_code = a?.hmzip ?? "";
-
-    // phone: prefer the formatted phone; otherwise use raw pieces if you have them
-    const p = splitPhone(a?.hmfmtdphn);
-    contactForm.phone_area_code = a?.hmphncity ?? p.area ?? "";
-    contactForm.phone_local     = a?.hmphnlocal ?? p.local ?? "";
-    contactForm.phone_extension = a?.hmphnext ?? "";
-    //contactForm.phone_display = a?.hmfmtdphn ?? "";
-    //contactForm.mobile_display = a?.hmmobilefmtdphn ?? a?.hmfmtdphn ?? ""; <--see-through phone numbers
-    contactDialog.value = true;
-  }
-
-  const contactDialog = ref(false)
-
-  function openContactDialog() {
-    contactDialog.value = true
-  }
-
-  function closeContactDialog() {
-    contactDialog.value = false
-  }
-
-  const profileDialog = ref(false)
-
-  function openProfileDialog() {
-    profileDialog.value = true
-  }
-
-  function closeProfileDialog() {
-    profileDialog.value = false
-  }
+}
   
 </script>
 
@@ -150,9 +288,7 @@ onMounted(loadAccount);
           <div class="user-name">{{ account?.fullname ?? "Loading..." }}</div>
           <div class="user-role">Student,<br />Office of Water Programs</div>
 
-          <!--<button class="btn xsmall" @click="openProfileDialog">Edit</button> -->
           <button class="btn xsmall" @click="openContactDialogWithData">Edit</button>
-          <!-- <button class="btn xsmall">Edit</button> -->
         </div>
       </div>
 
@@ -166,8 +302,6 @@ onMounted(loadAccount);
               <h2>Contact Info</h2>
             </div>
             <button class="btn xsmall" @click="openContactDialogWithData">Edit</button>
-            <!--<button class="btn xsmall" @click="openContactDialog">Edit</button>
-                <button class="btn xsmall">Edit</button> OLD UNEEDED "Edit" button functionality-->
           </header>
 
           <div class="divider"></div>
@@ -177,7 +311,7 @@ onMounted(loadAccount);
               <div class="field">
                 <div class="label">Email</div>
                 <div class="value">
-                  {{ account?.hmemail ?? account?.prfdemailval ?? "—" }}
+                  {{ account?.hmemail ?? account?.prfdemailval ?? "Loading..." }}
                 </div>
                 <!--<div class="value">User.Example@owp.csus.edu</div>  HARCODED DONT USE
                     <div class="value">(xxx) - xxx - xxxx</div>         HARDCODED DONT USE #nums-->
@@ -188,13 +322,13 @@ onMounted(loadAccount);
               <div class="field">
                 <div class="label">Phone</div>
                 <div class="value">
-                  {{ account?.hmfmtdphn ?? "—" }}
+                  {{ account?.hmfmtdphn ?? "Loading..." }}
                 </div>
               </div>
               <div class="field">
                 <div class="label">Mobile</div>
                 <div class="value">
-                  {{ account?.hmfmtdphn ?? "—" }}
+                  {{ account?.hmfmtdphn ?? "Loading..." }}
                 </div>
               </div>
             </div>
@@ -203,9 +337,18 @@ onMounted(loadAccount);
               <div class="field">
                 <div class="label">Address</div>
                 <div class="value">
-                  {{ account?.hmstreet1 ?? "—" }}<br />
-                  {{ account?.hmcity ?? "" }}{{ account?.hmstate ? ", " + account.hmstate : "" }}
-                  {{ account?.hmzip ?? "" }}
+                  <template v-if="loading">
+                    Loading...
+                  </template>
+
+                  <template v-else-if="!account?.hmstreet1 && !addressLine2(account)">
+                    Not found.
+                  </template>
+
+                  <template v-else>
+                    {{ account?.hmstreet1 || "" }}<br />
+                    {{ addressLine2(account) || "" }}
+                  </template>
                 </div>
               </div>
             </div>
@@ -242,7 +385,7 @@ onMounted(loadAccount);
             </span>
           </template>
 
-          <span v-else>—</span>
+          <span v-else>Loading...</span>
           </div>
         </div>
       </section>
@@ -257,15 +400,26 @@ onMounted(loadAccount);
         </header>
 
         <div class="divider"></div>
-        
-        
 
         <ul class="side-links">
-          <li><a href="#">View Transcript</a></li>
-          <li><a href="#">Purchase Transcript</a></li>
+          <li v-if="loadingTranscripts"><span class="muted">Loading transcripts…</span></li>
+          <li v-else-if="transcriptsError"><span class="muted">Couldn’t load transcripts.</span></li>
+          <li v-else-if="transcriptItems.length === 0"><span class="muted">No transcripts available.</span></li>
+
+          <li v-else v-for="t in transcriptItems" :key="t.key">
+            <router-link :to="t.routeTo" class="side-link">
+              {{ t.title }}
+            </router-link>
+          </li>
         </ul>
-            <div class="view-all">
+          <div class="view-all">
+            <router-link
+            to="/Certificates"
+            class="certificate-button"
+            :class="{ active: route.name === 'CertificatesPage'}"
+            >
             <div class="text">(View all transcripts)</div>
+          </router-link>
           </div>
         </div>
 
@@ -279,10 +433,15 @@ onMounted(loadAccount);
           <div class="divider"></div>
 
           <ul class="side-links">
-            <li><a href="#">Operation of Wastewater Treatment Plants, Vol 1</a></li>
-            <li><a href="#">Operation of Wastewater Treatment Plants, Vol 2</a></li>
-            <li><a href="#">Operation of Wastewater Treatment Plants, Vol 3</a></li>
-            <li><a href="#">Industrial Waste Treatment, Vol 1</a></li>
+            <li v-if="loadingPurchases"><span class="muted">Loading purchase history…</span></li>
+            <li v-else-if="purchasesError"><span class="muted">Couldn’t load purchase history.</span></li>
+            <li v-else-if="invoices.length === 0"><span class="muted">No purchase history available.</span></li>
+
+            <li v-else v-for="inv in invoices.slice(0, 4)" :key="inv.invoicenum">
+              <router-link to="/purchase-history" class="side-link">
+                Invoice: {{ inv.invoicenum }} - {{ getInvoiceName(inv.invoicenum) }}
+              </router-link>
+            </li>
           </ul>
 
           <div class="view-all">
@@ -319,13 +478,25 @@ onMounted(loadAccount);
           <div class="object">
             <div class="left">
               <div class="text">Phone</div>
-              <input type="text" v-model="contactForm.phone_area_code" class="input-medium" placeholder="415" />
-              <input type="text" v-model="contactForm.phone_local" class="input-large" placeholder="8669053" />
+              <input
+                type="text"
+                v-model="contactForm.phone_display"
+                class="input-large"
+                placeholder="(XXX)-XXX-XXXX"
+                inputmode="tel"
+                autocomplete="tel"
+                @input="onPhoneInput"
+              />
             </div>
+
             <div class="right">
               <div class="text">Mobile</div>
-              <input type="text" v-model="contactForm.phone_area_code" class="input-medium" placeholder="415" />
-              <input type="text" v-model="contactForm.phone_local" class="input-large" placeholder="8669053" />
+              <input
+                type="text"
+                :value="account?.hmmobilefmtdphn ?? '—'"
+                class="input-large"
+                disabled
+              />
             </div>
           </div>
           <div class="object-large">
@@ -349,7 +520,9 @@ onMounted(loadAccount);
         </div>
         <div class="bottom">
           <div class="cancel" @click="closeContactDialog">Cancel</div>
-          <div class="save" @click="closeContactDialog">Save</div>
+          <div class="save" @click="saveContactInfo">
+            {{ savingContact ? "Saving..." : "Save"}}
+          </div>
         </div>
       </div>
     </div>
@@ -378,7 +551,7 @@ onMounted(loadAccount);
           <div class="object">
             <div class="left">
               <div class="text">Role</div>
-              <input type="text" placeholder="Student" class="input-large"/>
+              <input type="text" placeholder="Loading..." class="input-large"/>
             </div>
             <div class="right">
               <div class="text">Department</div>
@@ -630,6 +803,22 @@ a:hover { text-decoration: underline; }
   font-size: 16px;           /* Makes Transcipt and Purchase History size match mockup */
 }
 .side-links a:hover{ color:#034750; }
+
+.muted {
+  color: #707070;
+}
+
+/* clickable list rows */
+.side-link {
+  display: block;
+  text-decoration: underline;
+  color: #007C8A;
+  font-size: 16px;
+}
+
+.side-link:hover {
+  color: #034750;
+}
 
 .view-all{
   display:flex; justify-content:center; align-items:flex-end;

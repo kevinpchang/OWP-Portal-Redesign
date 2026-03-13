@@ -10,159 +10,382 @@
       </div>
     </div>
 
-    <!-- ===================== MAIN CONTENT (CENTERED) ===================== -->
+    <!-- ===================== MAIN CONTENT ===================== -->
     <div class="ph">
-      <!-- status -->
-      <div v-if="loading" style="padding: 12px; color: #555">Loading…</div>
-      <div v-else-if="error" style="padding: 12px; color: #b42318">
+
+      <div v-if="loading" style="padding:12px;color:#555">
+        Loading…
+      </div>
+
+      <div v-else-if="error" style="padding:12px;color:#b42318">
         {{ error }}
       </div>
 
-      <!-- INVOICE LIST VIEW -->
+      <!-- ===================== INVOICE LIST ===================== -->
       <section v-if="!selected" class="ph-grid">
 
-        <!-- UPDATED NAVIGATION -->
-        <router-link
+        <article
           v-for="inv in invoices"
           :key="inv.id"
-          :to="`/purchase-history/${inv.id}`"
-          class="inv-card-link"
+          class="inv-card"
+          @click="open(inv)"
         >
-          <article class="inv-card">
-            <div class="inv-title">Invoice</div>
-            <div class="inv-number">#{{ inv.id }}</div>
+          <div class="inv-title">Invoice</div>
 
-            <div class="inv-meta">
-              <div class="label">Invoice Date:</div>
-              <div class="value">{{ fmtDate(inv.invoiceDate) }}</div>
+          <div class="inv-number">
+            #{{ inv.id }}
+          </div>
+
+          <div class="inv-meta">
+            <div class="label">Invoice Date:</div>
+            <div class="value">
+              {{ fmtDate(inv.invoiceDate) }}
             </div>
+          </div>
 
-            <div class="status paid">{{ inv.status ?? "Paid" }}</div>
-          </article>
-        </router-link>
+          <div class="status paid">
+            {{ inv.status ?? "Paid" }}
+          </div>
+
+        </article>
 
       </section>
 
-      <!-- INVOICE DETAIL VIEW -->
+
+      <!-- ===================== DETAIL VIEW ===================== -->
+
       <section v-else class="ph-detail">
+
         <div class="detail-header">
+
           <div class="left">
-            <div class="detail-title">Invoice Details</div>
+            <div class="detail-title">
+              Invoice Details
+            </div>
           </div>
 
           <div class="right">
-            <button class="btn ghost" @click="downloadAndOpenReceipt" :disabled="receiptLoading">
+
+            <button
+              class="btn ghost"
+              @click="downloadAndOpenReceipt"
+              :disabled="receiptLoading"
+            >
               {{ receiptLoading ? "Loading…" : "Receipt" }}
             </button>
-            <button class="btn primary" @click="selected = null">
+
+            <button
+              class="btn primary"
+              @click="goBack"
+            >
               Return to Purchase History
             </button>
+
           </div>
+
         </div>
+
 
         <div class="detail-table">
-          <div class="row">
-            <div class="cell h">Invoice Num</div>
-            <div class="cell">#{{ selected!.id }}</div>
-            <div class="cell h">Invoice Date</div>
-            <div class="cell">{{ fmtDate(selected!.invoiceDate) }}</div>
-            <div class="cell h">Invoice Due Date</div>
-            <div class="cell">{{ fmtDate(selected!.dueDate) }}</div>
-          </div>
 
           <div class="row">
-            <div class="cell h">Shipped</div>
-            <div class="cell">{{ selected!.shipped ? "Yes" : "No" }}</div>
-            <div class="cell h">Balance Due</div>
-            <div class="cell">{{ fmtMoneySigned(selected!.balanceDue) }}</div>
-            <div class="cell h">Order Method</div>
-            <div class="cell">{{ selected!.orderMethod }}</div>
-          </div>
 
-          <div class="row multi">
-            <div class="cell h">Order Placed By</div>
-            <div class="cell">{{ selected!.placedBy }}</div>
+            <div class="cell h">
+              Invoice Num
+            </div>
 
-            <div class="cell h">Billing Address & Phone</div>
             <div class="cell">
-              <div class="addr">{{ selected!.billing.name }}</div>
-              <div class="addr">{{ selected!.billing.address1 }}</div>
-              <div class="addr" v-if="selected!.billing.address2">
-                {{ selected!.billing.address2 }}
-              </div>
-              <div class="addr">
-                {{ selected!.billing.city }},
-                {{ selected!.billing.state }}
-                {{ selected!.billing.zip }}
-              </div>
-              <div class="addr">{{ selected!.billing.phone }}</div>
+              #{{ selected!.id }}
             </div>
-          </div>
-        </div>
 
-        <div class="section-heading">Invoice Items</div>
-
-        <div class="items">
-          <div class="items-row head">
-            <div class="c product">Product Name</div>
-            <div class="c qty">Item Quantity</div>
-            <div class="c total">Total Cost</div>
-          </div>
-
-          <div v-for="(it, i) in selected!.items" :key="i" class="items-row">
-            <div class="c product">{{ it.product }}</div>
-            <div class="c qty">{{ fmtQtySigned(it.qty) }}</div>
-            <div class="c total">{{ fmtMoneySigned(it.total) }}</div>
-          </div>
-
-          <div v-if="selected!.items.length === 0" class="items-row">
-            <div class="c product" style="color:#64748b">No items returned.</div>
-            <div class="c qty"></div>
-            <div class="c total"></div>
-          </div>
-        </div>
-
-        <div class="section-heading">Payment</div>
-
-        <div class="payment">
-          <div class="p-row">
-            <div class="p-h">{{ selected!.payment.amountPaid < 0 ? "Amount Refunded" : "Amount Paid" }}</div>
-            <div class="p-v">{{ fmtMoneySigned(selected!.payment.amountPaid) }}</div>
-
-            <div class="p-h">Pay Date</div>
-            <div class="p-v">{{ fmtDate(selected!.payment.payDate) }}</div>
-
-            <div class="p-h">Pay Method</div>
-            <div class="p-v">{{ selected!.payment.method }}</div>
-          </div>
-
-          <div class="p-row">
-            <div class="p-h">Description</div>
-            <div class="p-v">{{ selected!.payment.description }}</div>
-
-            <div class="p-h">Payment Made By</div>
-            <div class="p-v">{{ selected!.payment.madeBy }}</div>
-
-            <div class="p-h">Payment Phone</div>
-            <div class="p-v">{{ selected!.payment.phone }}</div>
-          </div>
-
-          <div class="p-row">
-            <div class="p-h">Payment Address</div>
-            <div class="p-v">
-              <div>{{ selected!.payment.address1 }}</div>
-              <div v-if="selected!.payment.address2">
-                {{ selected!.payment.address2 }}
-              </div>
-              <div>
-                {{ selected!.payment.city }},
-                {{ selected!.payment.state }}
-                {{ selected!.payment.zip }}
-              </div>
+            <div class="cell h">
+              Invoice Date
             </div>
+
+            <div class="cell">
+              {{ fmtDate(selected!.invoiceDate) }}
+            </div>
+
+            <div class="cell h">
+              Invoice Due Date
+            </div>
+
+            <div class="cell">
+              {{ fmtDate(selected!.dueDate) }}
+            </div>
+
           </div>
+
         </div>
+
       </section>
+
     </div>
   </div>
 </template>
+
+
+
+<script setup lang="ts">
+
+import { onMounted, ref, watch } from "vue"
+import { useRouter, useRoute } from "vue-router"
+import * as api from "@/services/owpAPI"
+
+const router = useRouter()
+const route = useRoute()
+
+
+type Invoice = {
+  id:number
+  invoiceDate:string
+  dueDate:string
+  shipped:boolean
+  balanceDue:number
+  placedBy:string
+  billing:any
+  orderMethod:string
+  status:"Paid"|"Unpaid"
+  items:any[]
+  payment:any
+}
+
+
+const invoices = ref<Invoice[]>([])
+const selected = ref<Invoice|null>(null)
+
+const loading = ref(false)
+const error = ref<string|null>(null)
+const receiptLoading = ref(false)
+
+
+const pid = 458860
+
+
+
+/* ===================== OPEN INVOICE ===================== */
+
+async function open(inv:Invoice){
+
+  router.push(`/purchase-history/${inv.id}`)
+
+  await loadInvoiceDetails(inv)
+
+}
+
+
+
+/* ===================== RETURN ===================== */
+
+async function goBack(){
+
+  selected.value = null
+
+  router.push("/purchase-history")
+
+}
+
+
+
+/* ===================== DATE FORMAT ===================== */
+
+function fmtDate(iso:string){
+
+  if(!iso) return ""
+
+  const d = new Date(iso+"T00:00:00")
+
+  return d.toLocaleDateString(undefined,{
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit"
+  })
+
+}
+
+
+
+/* ===================== LOAD INVOICE LIST ===================== */
+
+async function loadInvoices(){
+
+  loading.value = true
+  error.value = null
+
+  try{
+
+    const raw:any = await api.getInvoices(pid)
+
+    const list:any[] =
+      Array.isArray(raw?.response)
+      ? raw.response
+      : []
+
+    invoices.value = list.map((x:any)=>({
+
+      id:Number(x.invoicenum),
+      invoiceDate:x.invoicedate,
+      dueDate:"",
+      shipped:false,
+      balanceDue:Number(x.balancedue),
+      placedBy:"",
+      billing:{},
+      orderMethod:"",
+      status:"Paid",
+      items:[],
+      payment:{}
+
+    }))
+
+  }
+  catch(e:any){
+
+    invoices.value = []
+    error.value = e?.message ?? String(e)
+
+  }
+  finally{
+
+    loading.value = false
+
+  }
+
+}
+
+
+
+/* ===================== LOAD DETAILS ===================== */
+
+async function loadInvoiceDetails(inv:Invoice){
+
+  loading.value = true
+
+  try{
+
+    const raw:any = await api.getInvoiceData(inv.id)
+
+    const rows:any[] =
+      Array.isArray(raw?.response)
+      ? raw.response
+      : []
+
+    selected.value = {
+
+      ...inv,
+      items:rows
+
+    }
+
+  }
+  catch(e:any){
+
+    error.value = e?.message ?? String(e)
+
+  }
+  finally{
+
+    loading.value = false
+
+  }
+
+}
+
+
+
+/* ===================== LOAD FROM URL ===================== */
+
+async function loadInvoiceFromRoute() {
+
+  const id = route.params.id;
+
+  if (!id) {
+    selected.value = null;
+    return;
+  }
+
+  const inv = invoices.value.find(i => i.id === Number(id));
+
+  if (!inv) {
+    selected.value = null;
+    return;
+  }
+
+  await loadInvoiceDetails(inv);
+
+}
+
+
+/* ===================== RECEIPT ===================== */
+
+async function downloadAndOpenReceipt(){
+
+  if(!selected.value) return
+
+  receiptLoading.value = true
+
+  try{
+
+    const raw:any =
+      await api.downloadReceipt(selected.value.id)
+
+    const b64 = raw?.response
+
+    const bytes =
+      Uint8Array.from(atob(b64),(c)=>c.charCodeAt(0))
+
+    const blob =
+      new Blob([bytes],{type:"application/pdf"})
+
+    const url =
+      URL.createObjectURL(blob)
+
+    window.open(url,"_blank")
+
+  }
+  catch(e:any){
+
+    error.value = e?.message ?? String(e)
+
+  }
+  finally{
+
+    receiptLoading.value = false
+
+  }
+
+}
+
+
+
+/* ===================== INIT ===================== */
+
+onMounted(async () => {
+
+  await loadInvoices();
+
+  if (route.params.id) {
+    await loadInvoiceFromRoute();
+  }
+
+});
+
+
+
+watch(
+  ()=>route.params.id,
+  async ()=>{
+
+    await loadInvoiceFromRoute()
+
+  }
+)
+
+</script>
+
+
+
+<style scoped>
+
+/* KEEP ALL YOUR EXISTING CSS EXACTLY THE SAME */
+
+</style>

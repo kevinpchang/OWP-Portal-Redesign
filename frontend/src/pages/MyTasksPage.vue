@@ -1,44 +1,145 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from "vue";
+import { getActiveEnrollment, getCourseGrades } from "@/services/owpAPI.js";
 
-/* ----------------------------------
-   TASK DATA WITH CHAPTER NUMBERS
------------------------------------*/
-const chapters = [
-  { id: 1, chapter: "Ch-1", title: "Introduction to Wastewater Treatment", status: "completed", date: "11/1/2025" },
-  { id: 2, chapter: "Ch-2", title: "Effluent Discharge and Reuse", status: "completed", date: "11/1/2025" },
-  { id: 3, chapter: "Ch-3", title: "Odor Control", status: "overdue", overdueDays: 5 },
-  { id: 4, chapter: "Ch-4", title: "Instrumentation and Control", status: "upcoming" },
-  { id: 5, chapter: "Ch-5", title: "Introduction to Wastewater Utility Management", status: "upcoming" }
-]
+/**
+ * For now: Silicon Scribes PID (or use localStorage if you set it elsewhere)
+ */
+const pid = Number(localStorage.getItem("pid")) || 458860;
 
-/* ------------------------------
-   DYNAMIC PROGRESS CALCULATION
---------------------------------*/
-const total = chapters.length
-const completed = chapters.filter(c => c.status === "completed").length
-const progressValue = computed(() => Math.round((completed / total) * 100))
+const loading = ref(false);
+const error = ref("");
+const chapters = ref([]);
 
 /* ------------------------------
    PROGRESS RING VARIABLES
 --------------------------------*/
-const progressStroke = 10
-const radius = 70
-const circumference = 2 * Math.PI * radius
+const progressStroke = 10;
+const radius = 70;
+const circumference = 2 * Math.PI * radius;
+
+const completedChapters = computed(() =>
+  chapters.value.filter((c) => c.status === "completed")
+);
+const upcomingChapters = computed(() =>
+  chapters.value.filter((c) => c.status === "upcoming")
+);
+const overdueChapters = computed(() =>
+  chapters.value.filter((c) => c.status === "overdue")
+);
+
+const progressValue = computed(() => {
+  const total = chapters.value.length;
+  if (!total) return 0;
+  return Math.round((completedChapters.value.length / total) * 100);
+});
 
 const progressOffset = computed(() => {
-  return circumference - (progressValue.value / 100) * circumference
-})
+  return circumference - (progressValue.value / 100) * circumference;
+});
+
+/* ------------------------------
+   HELPERS
+--------------------------------*/
+// IMPORTANT: do NOT use "attempted" to decide completion (it shows "1" a lot).
+function isActuallyCompleted(item) {
+  return item?.gradedate && item.gradedate !== "--" && String(item.gradedate).trim() !== "";
+}
+
+/* ------------------------------
+   LOAD TASKS
+--------------------------------*/
+async function loadTasks() {
+  loading.value = true;
+  error.value = "";
+
+  try {
+    // 1) Active enrollments
+    const enr = await getActiveEnrollment(pid);
+    const enrollments = enr?.response ?? [];
+
+    if (!enrollments.length) {
+      chapters.value = [];
+      return;
+    }
+
+    const active =
+      enrollments.find((e) => String(e?.statustxt || "").toLowerCase().includes("enroll")) ??
+      enrollments[0];
+
+    const enrollId = active?.enrollid;
+    if (!enrollId) {
+      chapters.value = [];
+      return;
+    }
+
+    // 2) Grades list (these become your tasks/chapters)
+    const gradesRes = await getCourseGrades(enrollId);
+    const gradeItems = gradesRes?.response ?? [];
+
+    // Sort by ordinal so Ch-1..Ch-7..Final is stable
+    const sorted = gradeItems
+      .slice()
+      .sort((a, b) => Number(a?.ordinal ?? 0) - Number(b?.ordinal ?? 0));
+
+    const normalized = sorted.map((it, idx) => {
+      const ord = Number(it?.ordinal ?? idx + 1);
+      const title = it?.examname ?? `Chapter ${ord}`;
+      const isFinal = String(it?.examtypeid) === "3";
+
+      // Labels:
+      // - regular chapters: "Ch-1", "Ch-2", ...
+      // - final: "Final Exam" ONLY
+      const chapterLabel = isFinal ? "Final Exam" : `Ch-${ord}`;
+
+      // --- STATUS RULES (your requested layout) ---
+      // Completed: Ch-1..Ch-5
+      // Overdue: Ch-6
+      // Upcoming: Ch-7 + Final Exam
+      let status = "upcoming";
+
+      if (!isFinal) {
+        if (ord >= 1 && ord <= 5) status = "completed";
+        else if (ord === 6) status = "overdue";
+        else if (ord === 7) status = "upcoming";
+        else status = "upcoming";
+      } else {
+        status = "upcoming";
+      }
+
+      // If the API says it is NOT actually completed (no gradedate),
+      // we still keep your layout, but we won't show a completed date.
+      const completedDate = isActuallyCompleted(it) ? it.gradedate : "";
+
+      return {
+        id: `exam-${it?.examid ?? ord}-${idx}`,
+        ordinal: ord,
+        chapter: chapterLabel,
+        title,
+        status,
+        date: completedDate,
+        overdueDays: status === "overdue" ? 5 : null, // placeholder; real overdue requires due dates API
+      };
+    });
+
+    chapters.value = normalized;
+
+    console.log("Tasks normalized:", normalized);
+  } catch (e) {
+    error.value = e?.message ?? String(e);
+    chapters.value = [];
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(loadTasks);
 </script>
 
 <template>
-  <!-- OUTER WRAPPER (centers the whole page like My Account / Certificates) -->
   <div class="page-content">
-
-    <!-- INNER WRAPPER (your existing tasks-page layout) -->
     <div class="tasks-page">
-
-      <!-- PAGE HEADER -->
+      <!-- HEADER -->
       <div class="header-section">
         <div class="title">Tasks Overview</div>
         <div class="subtitle">
@@ -46,10 +147,15 @@ const progressOffset = computed(() => {
         </div>
       </div>
 
-      <!-- TASK GRID -->
-      <div class="task-grid">
+      <!-- LOADING / ERROR -->
+      <div v-if="loading" class="status-text">Loading tasks…</div>
+      <div v-else-if="error" class="error-text">
+        {{ error }}
+      </div>
 
-        <!-- Completed Tasks -->
+      <!-- GRID -->
+      <div class="task-grid" v-if="!loading && !error">
+        <!-- Completed -->
         <div class="task-box">
           <div class="task-header">
             <div class="dot green"></div>
@@ -57,19 +163,24 @@ const progressOffset = computed(() => {
           </div>
           <div class="divider"></div>
 
-          <div class="body">
+          <div class="scroll-body">
             <div
-              v-for="chapter in chapters.filter(c => c.status === 'completed')"
+              v-for="chapter in completedChapters"
               :key="chapter.id"
               class="task-item"
             >
               <div class="item-title">{{ chapter.chapter }} {{ chapter.title }}</div>
-              <div class="sub">Completed on {{ chapter.date }}</div>
+              <div class="sub" v-if="chapter.date">Completed on {{ chapter.date }}</div>
+              <div class="sub" v-else>Completed</div>
+            </div>
+
+            <div v-if="completedChapters.length === 0" class="sub">
+              No completed tasks yet.
             </div>
           </div>
         </div>
 
-        <!-- PROGRESS -->
+        <!-- Progress -->
         <div class="task-box progress-box">
           <div class="task-header">
             <div class="dot blue"></div>
@@ -105,29 +216,36 @@ const progressOffset = computed(() => {
           </div>
         </div>
 
-        <!-- UPCOMING TASKS -->
+        <!-- Upcoming -->
         <div class="task-box">
           <div class="task-header">
             <div class="dot yellow"></div>
-            <div>Upcoming Tasks</div>
+            <span>Upcoming Tasks</span>
           </div>
 
           <div class="divider"></div>
 
-          <div class="body">
-            <div class="task-item">
-              <div class="item-title">Ch-4 Instrumentation and Control</div>
-              <div class="sub">Due on 11/20/2025</div>
+          <div class="scroll-body">
+            <div
+              v-for="chapter in upcomingChapters"
+              :key="chapter.id"
+              class="task-item"
+            >
+              <div class="item-title">
+                <!-- If it's Final Exam, don't show extra title prefix -->
+                <span v-if="chapter.chapter === 'Final Exam'">Final Exam</span>
+                <span v-else>{{ chapter.chapter }} {{ chapter.title }}</span>
+              </div>
+              <div class="sub">Not started</div>
             </div>
 
-            <div class="task-item">
-              <div class="item-title">Ch-5 Introduction to Wastewater Utility Management</div>
-              <div class="sub">Due on 11/28/2025</div>
+            <div v-if="upcomingChapters.length === 0" class="sub">
+              No upcoming tasks.
             </div>
           </div>
         </div>
 
-        <!-- OVERDUE TASKS -->
+        <!-- Overdue -->
         <div class="task-box">
           <div class="task-header">
             <div class="dot red"></div>
@@ -135,57 +253,31 @@ const progressOffset = computed(() => {
           </div>
           <div class="divider"></div>
 
-          <div class="body">
+          <div class="scroll-body">
             <div
-              v-for="chapter in chapters.filter(c => c.status === 'overdue')"
+              v-for="chapter in overdueChapters"
               :key="chapter.id"
               class="task-item"
             >
               <div class="item-title">{{ chapter.chapter }} {{ chapter.title }}</div>
-              <div class="sub">{{ chapter.overdueDays }} days overdue</div>
+              <div class="sub">
+                {{ chapter.overdueDays ?? 0 }} days overdue
+              </div>
+            </div>
+
+            <div v-if="overdueChapters.length === 0" class="sub">
+              No overdue tasks.
             </div>
           </div>
         </div>
-
-      </div> <!-- END GRID -->
-
-    </div> <!-- END tasks-page -->
-
-  </div> <!-- END page-content -->
+      </div>
+    </div>
+  </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      chapters: [
-        { id: 1, chapter: 'Ch-1', title: 'Introduction to Wastewater Treatment', status: 'completed', date: '11/1/2025' },
-        { id: 2, chapter: 'Ch-2', title: 'Effluent Discharge and Reuse', status: 'completed', date: '11/1/2025' },
-        { id: 3, chapter: 'Ch-3', title: 'Odor Control', status: 'overdue', overdueDays: 5 }
-      ],
-      progressValue: 40,
-      radius: 80,
-      progressStroke: 12
-    };
-  },
-  computed: {
-    circumference() {
-      return 2 * Math.PI * this.radius;
-    },
-    progressOffset() {
-      return this.circumference - (this.progressValue / 100) * this.circumference;
-    }
-  }
-};
-</script>
-
 <style scoped>
-/* Reset box-sizing for consistency */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-/* MAIN WRAPPER - This centers everything */
 .page-content {
   width: 100%;
   max-width: 1200px;
@@ -193,7 +285,6 @@ export default {
   padding: 40px 32px;
 }
 
-/* INNER WRAPPER */
 .tasks-page {
   width: 100%;
   font-family: "Roboto", sans-serif;
@@ -202,10 +293,7 @@ export default {
   flex-direction: column;
 }
 
-/* HEADER */
-.header-section {
-  margin-bottom: 30px;
-}
+.header-section { margin-bottom: 18px; }
 
 .title {
   font-size: 42px;
@@ -219,21 +307,26 @@ export default {
   color: #747474;
 }
 
-/* GRID */
+.status-text { margin: 8px 0 14px; color: #707070; }
+.error-text { margin: 8px 0 14px; color: #9F3323; white-space: pre-wrap; }
+
+/* Grid: all 4 equal size */
 .task-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
 
-/* CARD */
 .task-box {
   background: #F2F1F2;
   border-radius: 14px;
   padding: 20px;
+
+  height: 320px;
+  display: flex;
+  flex-direction: column;
 }
 
-/* HEADER ROW */
 .task-header {
   display: flex;
   align-items: center;
@@ -258,77 +351,63 @@ export default {
 .yellow { background: #FFD54F; }
 .red { background: #E57373; }
 
-/* FULL-WIDTH DIVIDER */
 .divider {
   border-top: 2px solid white;
   margin-left: -20px;
   margin-right: -20px;
   margin-top: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
-/* TASK ITEMS */
-.body {
-  overflow: hidden;
+.scroll-body {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
-.body .task-item {
-  margin-bottom: 16px;
+.scroll-body::-webkit-scrollbar { width: 8px; }
+.scroll-body::-webkit-scrollbar-thumb {
+  background: #CFCFCF;
+  border-radius: 10px;
+}
+.scroll-body::-webkit-scrollbar-track { background: transparent; }
+
+.task-item {
+  margin-bottom: 12px;
   padding: 10px;
   border-radius: 10px;
   transition: 0.2s ease;
 }
 
-.body .task-item:last-child {
-  margin-bottom: 0;
-}
+.task-item:hover { background: #D9D9D9; cursor: pointer; }
 
-.body .task-item:hover {
-  background: #D9D9D9;
-  cursor: pointer;
-}
-
-.task-item .item-title {
+.item-title {
   font-size: 16px;
   font-weight: 600;
   color: #034750;
 }
 
-.task-item .sub {
+.sub {
   font-size: 14px;
   color: #707070;
   margin-top: 4px;
 }
 
-/* PROGRESS RING */
-.progress-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 280px;
-}
+/* Progress */
+.progress-box { align-items: center; justify-content: center; }
 
 .circle-wrapper {
   position: relative;
-  width: 200px;   /* increased to give SVG breathing room */
+  width: 200px;
   height: 200px;
-  margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.progress-ring {
-  transform: rotate(-90deg);
-  display: block;
-}
+.progress-ring { transform: rotate(-90deg); display: block; }
 
-.ring-bg {
-  fill: transparent;
-  stroke: #dcdcdc;
-}
-
+.ring-bg { fill: transparent; stroke: #dcdcdc; }
 .ring-progress {
   fill: transparent;
   stroke: #00A5B5;
@@ -340,30 +419,18 @@ export default {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* TRUE perfect center now */
+  transform: translate(-50%, -50%);
   font-size: 32px;
   font-weight: 700;
   color: #00A5B5;
   pointer-events: none;
 }
 
-
-/* RESPONSIVE */
 @media (max-width: 768px) {
-  .task-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .page-content {
-    padding: 20px 16px;
-  }
-  
-  .title {
-    font-size: 32px;
-  }
-  
-  .subtitle {
-    font-size: 16px;
-  }
+  .task-grid { grid-template-columns: 1fr; }
+  .page-content { padding: 20px 16px; }
+  .title { font-size: 32px; }
+  .subtitle { font-size: 16px; }
+  .task-box { height: auto; min-height: 300px; }
 }
 </style>

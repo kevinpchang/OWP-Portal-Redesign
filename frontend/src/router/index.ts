@@ -8,6 +8,7 @@ import PurchaseHistory from '../pages/PurchaseHistory.vue'
 import MyTasksPage from '../pages/MyTasksPage.vue'
 import SlidesPage from '../pages/SlidesPage.vue'
 import MediaPage from '../pages/MediaPage.vue'
+import MessagingPage from '@/pages/MessagingPage.vue'
 
 const routes = [
   { path: "/", name: 'DashboardPage', component: DashboardPage }, // KEVIN'S DASHBOARD
@@ -19,12 +20,12 @@ const routes = [
   { path: '/completed/:id', name: 'CompletedCourse', component: () => import('../pages/CompletedCourse.vue') },
   { path: '/recommended/:id', name: 'RecommendedCourse', component: () => import('../pages/RecommendedCourse.vue') },
   { path: '/Certificates', name: 'CertificatesPage', component: CertificatesPage }, // UDAY KYAMA
-  { path: '/purchase-history', name: 'PurchaseHistory', component: PurchaseHistory }, // VINCENT LAM
-  //{ path: "/purchase-history/:invoiceId", name: "InvoiceDetails",component: () => import("@/pages/InvoiceDetails.vue"),props: true},
+  {path: "/purchase-history/:id?",name: "PurchaseHistory",component: PurchaseHistory},
   { path: '/slides', name: 'SlidesPage', component: SlidesPage },
   { path: '/media', name: 'MediaPage', component: MediaPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../pages/NotFoundPage.vue')
-  }
+  },
+  { path: '/messages', name: 'MessagingPage', component: MessagingPage },
 ]
 
 const router = createRouter({
