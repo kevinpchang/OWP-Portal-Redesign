@@ -19,24 +19,25 @@
       </div>
 
       <!-- INVOICE LIST VIEW -->
-      <section v-if="!selected" class="ph-grid">
-        <article
-          v-for="inv in invoices"
-          :key="inv.id"
-          class="inv-card"
-          @click="open(inv)"
-        >
-          <div class="inv-title">Invoice</div>
-          <div class="inv-number">#{{ inv.id }}</div>
+ <section v-if="!selected" class="ph-grid">
+  <router-link
+    v-for="inv in invoices"
+    :key="inv.id"
+    :to="`/purchase-history/${inv.id}`"
+    class="inv-card"
+    @click="open(inv)"
+  >
+    <div class="inv-title">Invoice</div>
+    <div class="inv-number">#{{ inv.id }}</div>
 
-          <div class="inv-meta">
-            <div class="label">Invoice Date:</div>
-            <div class="value">{{ fmtDate(inv.invoiceDate) }}</div>
-          </div>
+    <div class="inv-meta">
+      <div class="label">Invoice Date:</div>
+      <div class="value">{{ fmtDate(inv.invoiceDate) }}</div>
+    </div>
 
-          <div class="status paid">{{ inv.status ?? "Paid" }}</div>
-        </article>
-      </section>
+    <div class="status paid">{{ inv.status ?? "Paid" }}</div>
+  </router-link>
+</section>
 
       <!-- INVOICE DETAIL VIEW -->
       <section v-else class="ph-detail">
@@ -49,8 +50,8 @@
             <button class="btn ghost" @click="downloadAndOpenReceipt" :disabled="receiptLoading">
               {{ receiptLoading ? "Loading…" : "Receipt" }}
             </button>
-            <button class="btn primary" @click="selected = null">
-              Return to Purchase History
+            <button class="btn primary" @click="goBack">
+            Return to Purchase History
             </button>
           </div>
         </div>
@@ -163,7 +164,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import * as api from "@/services/owpAPI";
 
 type InvoiceItem = { product: string; qty: number; total: number };
@@ -211,6 +213,8 @@ const receiptLoading = ref(false);
 
 // TODO later: come from login/store/session
 const pid = 458860;
+const router = useRouter();
+const route = useRoute();
 
 function toStr(x: any) {
   return x == null ? "" : String(x);
@@ -275,6 +279,11 @@ function normalizeDate(s: any): string {
   return t;
 }
 
+function goBack() {
+  selected.value = null
+  router.push("/purchase-history")
+}
+
 async function loadInvoices() {
   loading.value = true;
   error.value = null;
@@ -324,6 +333,8 @@ function buildProductName(r: any): string {
 }
 
 async function open(inv: Invoice) {
+
+  router.push(`/purchase-history/${inv.id}`);
   loading.value = true;
   error.value = null;
 
@@ -390,6 +401,25 @@ async function open(inv: Invoice) {
   }
 }
 
+async function loadInvoiceFromRoute() {
+
+  const id = route.params.id;
+
+  if (!id) {
+    selected.value = null;
+    return;
+  }
+
+  const inv = invoices.value.find(i => i.id === Number(id));
+
+  if (!inv) return;
+
+  await open(inv);
+
+}
+
+
+
 function fmtMoneySigned(n: number) {
   const abs = Math.abs(n);
   const s = `$${abs.toFixed(2)}`;
@@ -442,7 +472,24 @@ async function downloadAndOpenReceipt() {
   }
 }
 
-onMounted(loadInvoices);
+onMounted(async () => {
+
+  await loadInvoices();
+
+  if (route.params.id) {
+    await loadInvoiceFromRoute();
+  }
+
+});
+
+
+
+watch(
+  () => route.params.id,
+  async () => {
+    await loadInvoiceFromRoute();
+  }
+);
 </script>
 
 <style scoped>
