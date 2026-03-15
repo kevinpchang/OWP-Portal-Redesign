@@ -48,7 +48,7 @@ async function loadDash() {
       const c = await api.getInvoiceData(v.invoicenum)
       invoicedata.value[v.invoicenum] = c.response ?? []
     }
-    console.log('Invoice Data', invdata)
+    console.log('Invoice Data', invoicedata)
   } catch (e) {
     error.value = e?.message ?? String(e)
   } finally {
@@ -132,7 +132,7 @@ function scheduleNextUpdate() {
           </div>
           <div class="divider"></div>
           <div class="body">
-            <router-link class="object" v-for="v in activeEnrollments.slice(0, 3)" :to="`/courses/${v.enrollid}`">
+            <router-link class="object" v-for="v in activeEnrollments.slice(0, 3)" :key="v.enrollid" :to="`/courses/${v.enrollid}`">
               <div class="left">
                 <div class="icon"></div>
               </div>
@@ -219,11 +219,11 @@ function scheduleNextUpdate() {
           </div>
           <div class="divider"></div>
           <div class="body">
-            <div class="object" v-for="v in invoices.slice(0, 5)">
+            <router-link class="object" v-for="v in invoices.slice(0, 3)" :key="v.invoicenum" :to="`/purchase-history/${v.invoicenum}`">
               <div class="text">
                 Invoice: {{ v.invoicenum }} - {{ getInvoiceName(v.invoicenum) }}
               </div>
-            </div>
+            </router-link>
           </div>
           <div class="view-all">
             <router-link
