@@ -4,6 +4,9 @@
   //API Integrations
   import * as api from "@/services/owpAPI"
 
+  import mail from '@/assets/icons/owp-2color/mail-icon.svg'
+  import certificate from '@/assets/icons/owp-2color/certificate-icon.svg'
+
   const pid = 458860;
   const error = ref("");
   const opNum = ref("");
@@ -228,7 +231,7 @@
     <div class="quick-links">
       <div class="messages">
         <div class="header">
-          <Mail class="icon" color="#007C8A"/>
+          <img :src="mail" class="icon" />
           <div class="text">Messages</div>
         </div>
         <div class="divider"></div>
@@ -244,7 +247,7 @@
 
       <div class="purchase-history">
         <div class="header">
-          <Award class="icon" color="#007C8A"/>
+          <img :src="certificate" class="icon" />
           <div class="text">Certificates</div>
         </div>
         <div class="divider"></div>

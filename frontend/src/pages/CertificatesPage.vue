@@ -7,6 +7,11 @@ import {
   getEnrollmentRecord,
 } from "@/services/owpAPI.js";
 
+import certificate from '@/assets/icons/owp-2color/certificate-icon.svg'
+import transcript from '@/assets/icons/owp-2color/transcipt-icon.svg'
+import history from '@/assets/icons/owp-2color/history-icon.svg'
+import mail from '@/assets/icons/owp-2color/mail-icon.svg'
+
 const pid = Number(localStorage.getItem("pid")) || 458860;
 
 // --- Account state ---
@@ -302,7 +307,9 @@ onMounted(async () => {
         <div class="tiles-container">
           <div class="course-card">
             <div class="card-header">
-              <Award class="header-icon" color="#6DBE4B" />
+              <div class="header-icon">
+                <img :src="certificate" alt="Certificate icon"/>
+              </div>
               <h2 class="card-title">Earned Certificates</h2>
             </div>
             <div class="divider"></div>
@@ -362,7 +369,9 @@ onMounted(async () => {
       <div class="courses-right">
         <div class="side-card">
           <div class="side-header">
-            <Mail class="side-icon" color="#00A5B5" />
+            <div class="side-icon">
+              <img :src="mail" alt="Messages icon" />
+            </div>
             <div class="side-title">Messages</div>
           </div>
           <div class="divider"></div>
@@ -376,7 +385,9 @@ onMounted(async () => {
 
         <div class="side-card">
           <div class="side-header">
-            <FileText class="side-icon" color="#6DBE4B" />
+            <div class="side-icon">
+              <img :src="mail" alt="Transcript icon" />
+            </div>
             <div class="side-title">Transcripts</div>
           </div>
           <div class="divider"></div>
@@ -389,7 +400,9 @@ onMounted(async () => {
 
         <div class="side-card">
           <div class="side-header">
-            <History class="side-icon" color="#034750" />
+            <div class="side-icon">
+              <img :src="history" alt="History icon" />
+            </div>
             <div class="side-title">Purchase History</div>
           </div>
           <div class="divider"></div>
