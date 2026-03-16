@@ -1,3 +1,176 @@
+<script setup>
+import { ref, onMounted } from "vue";
+import {
+  getActiveEnrollment,
+  getCourseGrades,
+  getInvoices,
+  getInvoiceData,
+} from "@/services/owpAPI.js";
+import { recommendedCourses } from "../data/coursesData.js";
+
+import book from "@/assets/icons/owp-2color/book-icon.svg";
+import pass from "@/assets/icons/1color/check-mark-filled.svg";
+import fail from "@/assets/icons/1color/fail-icon-filled.svg";
+import history from "@/assets/icons/owp-2color/history-icon.svg";
+import mail from "@/assets/icons/owp-2color/mail-icon.svg";
+
+//course images
+import MBR2nd from "@/assets/manual-imgs/MBR-2nd-cvr.png";
+import owtp1st8th from "@/assets/manual-imgs/owtp-1-8th-cvr.jpg";
+import owtp2nd8th from "@/assets/manual-imgs/owtp-2-8th-cvr.jpg";
+import owtp3rd8th from "@/assets/manual-imgs/owtp-3-8th-cvr.jpg";
+import um3rd from "@/assets/manual-imgs/um-3rd-cvr.jpg";
+import wtpo1st7th from "@/assets/manual-imgs/wtpo-1-7th-cvr.jpg";
+import wtpo2nd7th from "@/assets/manual-imgs/wtpo-2-7th-cvr.jpg";
+
+//course image map
+const courseImageMap = {
+  UM: um3rd,
+  WTPO1: wtpo1st7th,
+  WTPO2: wtpo2nd7th,
+  OWTP1: owtp1st8th,
+  OWTP2: owtp2nd8th,
+  OWTP3: owtp3rd8th,
+  MBR: MBR2nd,
+};
+
+const pid = 458860;
+
+const activeCourses = ref([]);
+const completedCourses = ref([]);
+
+const loadingActive = ref(true);
+const activeError = ref("");
+
+const loadingCompleted = ref(true);
+const completedError = ref("");
+
+const loadingSidebar = ref(true);
+const sidebarError = ref("");
+
+const messages = ref([]);
+const loadingMessages = ref(true);
+const messagesError = ref("");
+
+const invoices = ref([]);
+const invoicedata = ref({});
+
+function getInvoiceName(invoicenum) {
+  const items = invoicedata.value[invoicenum] ?? [];
+  const match = items.find((item) => item?.coursetitle != null);
+  return match?.coursetitle || "Course title unavailable";
+}
+
+async function loadMessages() {
+  loadingMessages.value = true;
+  messagesError.value = "";
+
+  try {
+    messages.value = [];
+  } catch (e) {
+    console.error("Failed to load messages:", e);
+    messagesError.value = "load-failed";
+    messages.value = [];
+  } finally {
+    loadingMessages.value = false;
+  }
+}
+
+async function loadSidebarData() {
+  loadingSidebar.value = true;
+  sidebarError.value = "";
+
+  try {
+    const inv = await getInvoices(pid);
+    invoices.value = inv?.response ?? [];
+
+    await Promise.all(
+      invoices.value.map(async (invoice) => {
+        const details = await getInvoiceData(invoice.invoicenum);
+        invoicedata.value[invoice.invoicenum] = details?.response ?? [];
+      })
+    );
+  } catch (e) {
+    console.error("Failed to load sidebar purchase history:", e);
+    sidebarError.value = "load-failed";
+    invoices.value = [];
+  } finally {
+    loadingSidebar.value = false;
+  }
+}
+
+onMounted(async () => {
+  loadingActive.value = true;
+  loadingCompleted.value = true;
+  activeError.value = "";
+  completedError.value = "";
+
+  try {
+    const data = await getActiveEnrollment(pid);
+    const rows = data?.response ?? [];
+
+    const activeRows = rows.filter((r) => r.statustxt === "Enrolled");
+    const completedRows = rows.filter(
+      (r) => r.statustxt === "Complete" || r.statustxt === "Dropped"
+    );
+
+    activeCourses.value = await Promise.all(
+      activeRows.map(async (r) => {
+        const gradesData = await getCourseGrades(r.enrollid);
+        const sections = gradesData?.response ?? [];
+
+        const total = sections.length;
+        const graded = sections.filter(
+          (s) => String(s.grade ?? "").trim() !== ""
+        ).length;
+
+        const percent = total === 0 ? 0 : Math.round((graded / total) * 100);
+
+        return {
+          id: r.enrollid,
+          title: r.title || "Course title unavailable",
+          expires: r.expiredate || "—",
+          progress: `${percent}%`,
+          extendEligible: r.extendeligible === "1",
+          image: courseImageMap[r.owpabbr] || null,
+        };
+      })
+    );
+
+    completedCourses.value = completedRows.map((r) => {
+      if (r.statustxt === "Dropped") {
+        return {
+          id: r.enrollid,
+          title: r.title || "Course title unavailable",
+          status: "",
+          dropped: true,
+          image: courseImageMap[r.owpabbr] || null,
+        };
+      }
+
+      const grade = (r.grade || "").trim();
+
+      return {
+        id: r.enrollid,
+        title: r.title || "Course title unavailable",
+        status: grade === "CR" ? "Pass" : "Fail",
+        dropped: false,
+        image: courseImageMap[r.owpabbr] || null,
+      };
+    });
+  } catch (e) {
+    console.error("Failed to load course enrollments:", e);
+    activeError.value = "load-failed";
+    completedError.value = "load-failed";
+  } finally {
+    loadingActive.value = false;
+    loadingCompleted.value = false;
+  }
+
+  await Promise.all([loadMessages(), loadSidebarData()]);
+});
+</script>
+
 <template>
   <div class="courses-page">
 
@@ -20,19 +193,7 @@
           <div class="course-card active-card">
             <div class="card-header">
               <div class="header-icon">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                  width="32" 
-                  height="40"
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="#007C8A" 
-                  stroke-width="2" 
-                  stroke-linecap="round" 
-                  stroke-linejoin="round" 
-                  class="lucide lucide-book-marked-icon lucide-book-marked">
-                  <path d="M10 2v8l3-3 3 3V2"/>
-                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
-                </svg>
+                <img :src="book" alt="Active enrollments icon" />
               </div>
               <h2 class="card-title">Active Enrollments</h2>
             </div>
@@ -57,8 +218,13 @@
                 class="course-row-link"
               >
               <div class="course-row">
-                  <div class="course-image"></div>
-
+                    <img
+                      v-if="course.image"
+                      :src="course.image"
+                      alt="Course image"
+                      class="course-image"
+                    />
+                    <div v-else class="course-image fallback-image"></div>
                   <div class="course-info">
                       <div class="course-title">{{ course.title }}</div>
 
@@ -87,19 +253,7 @@
           <div class="course-card">
             <div class="card-header">
               <div class="header-icon completed-icon">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                  width="32" 
-                  height="40"
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="#007C8A" 
-                  stroke-width="2" 
-                  stroke-linecap="round" 
-                  stroke-linejoin="round" 
-                  class="lucide lucide-book-marked-icon lucide-book-marked">
-                  <path d="M10 2v8l3-3 3 3V2"/>
-                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
-                </svg>
+               <img :src="book" alt="Completed enrollments icon" />
               </div>
               <h2 class="card-title">Completed Enrollments</h2>
             </div>
@@ -126,8 +280,13 @@
                 class="course-row-link"
               >
                 <div class="course-row">
-                  <div class="course-image completed-image"></div>
-
+                    <img
+                      v-if="course.image"
+                      :src="course.image"
+                      alt="Course image"
+                      class="course-image completed-image"
+                    />
+                    <div v-else class="course-image completed-image fallback-image"></div>
                   <div class="course-info">
                     <div class="course-title">{{ course.title }}</div>
 
@@ -135,9 +294,18 @@
                       <div class="completion-label">
                         {{ course.dropped ? 'Dropped' : 'Completed' }}
                       </div>
-                      <div class="status-text" 
-                          :class="course.status === 'Pass' ? 'status-pass' : 'status-fail'">
+                      <div
+                        class="status-text"
+                        :class="course.status === 'Pass' ? 'status-pass' : 'status-fail'"
+                      >
                         {{ course.status }}
+
+                        <img
+                          v-if="!course.dropped"
+                          :src="course.status === 'Pass' ? pass : fail"
+                          class="status-icon"
+                          alt="status icon"
+                        />
                       </div>
                     </div>
 
@@ -161,19 +329,7 @@
           <div class="course-card">
             <div class="card-header">
               <div class="header-icon recommended-icon">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                  width="32" 
-                  height="40"
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="#007C8A" 
-                  stroke-width="2" 
-                  stroke-linecap="round" 
-                  stroke-linejoin="round" 
-                  class="lucide lucide-book-marked-icon lucide-book-marked">
-                  <path d="M10 2v8l3-3 3 3V2"/>
-                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
-                </svg>
+               <img :src="book" alt="Recommended enrollments icon" /> 
               </div>
               <h2 class="card-title">Recommended Courses</h2>
             </div>
@@ -210,19 +366,7 @@
         <div class="side-card">
           <div class="side-header">
             <div class="header-icon side-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" 
-                width="24" 
-                height="24" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                stroke-width="2" 
-                stroke-linecap="round" 
-                stroke-linejoin="round" 
-                class="lucide lucide-mail-icon lucide-mail">
-                <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/>
-                <rect x="2" y="4" width="20" height="16" rx="2"/>
-              </svg>
+              <img :src="mail" class="icon" />
             </div>
             <div class="side-title">Messages</div>
           </div>
@@ -261,20 +405,7 @@
        <div class="side-card">
           <div class="side-header">
             <div class="header-icon side-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" 
-                width="24" 
-                height="24" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                stroke-width="2" 
-                stroke-linecap="round" 
-                stroke-linejoin="round" 
-                class="lucide lucide-history-icon lucide-history">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                <path d="M3 3v5h5"/>
-                <path d="M12 7v5l4 2"/>
-              </svg>
+              <img :src="history" class="icon" />
             </div>
             <div class="side-title">Purchase History</div>
           </div>
@@ -312,161 +443,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import {
-  getActiveEnrollment,
-  getCourseGrades,
-  getInvoices,
-  getInvoiceData,
-} from "@/services/owpAPI.js";
-import { recommendedCourses } from "../data/coursesData.js";
-
-export default {
-  name: "CoursesPage",
-  data() {
-    return {
-      activeCourses: [],
-      completedCourses: [],        
-      recommendedCourses,      // mock
-      pid: 458860,
-
-      loadingActive: true,
-      activeError: "",
-      loadingCompleted: true,
-      completedError: "",
-
-      loadingSidebar: true,
-      sidebarError: "",
-
-      messages: [],
-      loadingMessages: true,
-      messagesError: "",
-
-      invoices: [],
-      invoicedata: {},
-    };
-  },
-
-      methods: {
-        getInvoiceName(invoicenum) {
-          const items = this.invoicedata[invoicenum] ?? [];
-          const match = items.find((item) => item?.coursetitle != null);
-          return match?.coursetitle || "Course title unavailable";
-        },
-
-        async loadMessages() {
-          this.loadingMessages = true;
-          this.messagesError = "";
-
-          try {
-            this.messages = [];
-          } catch (e) {
-            console.error("Failed to load messages:", e);
-            this.messagesError = "load-failed";
-            this.messages = [];
-          } finally {
-            this.loadingMessages = false;
-          }
-        },
-
-        async loadSidebarData() {
-          this.loadingSidebar = true;
-          this.sidebarError = "";
-
-          try {
-            const inv = await getInvoices(this.pid);
-            console.log("Invoices response:", inv);
-
-            this.invoices = inv?.response ?? [];
-
-            await Promise.all(
-              this.invoices.map(async (invoice) => {
-                const details = await getInvoiceData(invoice.invoicenum);
-                console.log("Invoice details for", invoice.invoicenum, details);
-                this.invoicedata[invoice.invoicenum] = details?.response ?? [];
-              })
-            );
-          } catch (e) {
-            console.error("Failed to load sidebar purchase history:", e);
-            this.sidebarError = "load-failed";
-            this.invoices = [];
-          } finally {
-            this.loadingSidebar = false;
-          }
-        },
-      },
-
-  async mounted() {
-
-    this.loadingActive = true;
-    this.loadingCompleted = true;
-    this.activeError = "";
-    this.completedError = "";
-
-    try {
-      const data = await getActiveEnrollment(this.pid);
-      const rows = data?.response ?? [];
-
-      const activeRows = rows.filter(r => r.statustxt === "Enrolled");
-      const completedRows = rows.filter(r => r.statustxt === "Complete" || r.statustxt === "Dropped");
-
-      //Active
-      this.activeCourses = await Promise.all(
-        activeRows.map(async (r) => {
-          const gradesData = await getCourseGrades(r.enrollid);
-          const sections = gradesData?.response ?? [];
-
-          const total = sections.length;
-          const graded = sections.filter(s => String(s.grade ?? "").trim() !== "").length;
-
-          const percent = total === 0 ? 0 : Math.round((graded / total) * 100);
-
-          return {
-            id: r.enrollid,
-            title: r.title,
-            expires: r.expiredate || "—",
-            progress: `${percent}%`,
-            extendEligible: r.extendeligible === "1",
-          };
-        })
-      );
-
-      // Completed
-      this.completedCourses = completedRows.map(r => {
-        if (r.statustxt === "Dropped") {
-          return {
-            id: r.enrollid,
-            title: r.title ||"Course title unavailable",
-            status: "",
-            dropped: true,
-          };
-        }
-        const grade = (r.grade || "").trim();
-        return {
-          id: r.enrollid,
-          title: r.title || "Course title unavailable",
-          status: grade === "CR" ? "Pass" : "Fail",
-          dropped: false,
-        };
-      });
-
-    } catch (e) {
-      console.error("Failed to load course enrollments:", e);
-      this.activeError = "load-failed";
-      this.completedError = "load-failed";
-    } finally {
-      this.loadingActive = false;
-      this.loadingCompleted = false;
-    }
-
-    await Promise.all([
-      this.loadMessages(),
-      this.loadSidebarData(),
-      ]);
-  },
-};
-</script>
 
 <style scoped>
 .courses-page {
@@ -629,14 +605,6 @@ export default {
   margin-left: -2px;
 }
 
-.course-image {
-  width: 59px;
-  height: 70px;
-  background-color: #6DBE4B;
-  border-radius: 4px;
-}
-
-
 .info-subrow {
   display: flex;
   justify-content: space-between;
@@ -746,6 +714,25 @@ export default {
   flex-direction:column;
   gap: 16px;
 }
+
+
+.header-icon img {
+  width: 28px;
+  height: 28px;
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.side-icon img {
+  width: 24px;
+  height: 24px;
+  display: block;
+  object-fit: contain;
+}
+
+
+
 
 .header-icon-svg {
   width: 30px;
@@ -861,6 +848,33 @@ export default {
 .error-message {
   color: #9F3323;
   font-weight: 600;
+}
+
+.status-text {
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.course-image {
+  width: 59px;
+  height: 70px;
+  border-radius: 4px;
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
+}
+
+.fallback-image {
+  background-color: #6DBE4B;
 }
 
 </style>
