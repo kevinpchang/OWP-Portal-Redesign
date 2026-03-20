@@ -1,3 +1,272 @@
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import {
+  getEnrollmentRecord,
+  getCourseGrades,
+  getInvoices,
+  getInvoiceData,
+} from "@/services/owpAPI.js";
+
+import book from '@/assets/icons/owp-2color/book-icon.svg'
+import history from '@/assets/icons/owp-2color/history-icon.svg'
+import mail from '@/assets/icons/owp-2color/mail-icon.svg'
+
+//course images
+import MBR2nd from "@/assets/manual-imgs/MBR-2nd-cvr.png";
+import owtp1st8th from "@/assets/manual-imgs/owtp-1-8th-cvr.jpg";
+import owtp2nd8th from "@/assets/manual-imgs/owtp-2-8th-cvr.jpg";
+import owtp3rd8th from "@/assets/manual-imgs/owtp-3-8th-cvr.jpg";
+import um3rd from "@/assets/manual-imgs/um-3rd-cvr.jpg";
+import wtpo1st7th from "@/assets/manual-imgs/wtpo-1-7th-cvr.jpg";
+import wtpo2nd7th from "@/assets/manual-imgs/wtpo-2-7th-cvr.jpg";
+
+//course image map
+const courseImageMap = {
+  UM: um3rd,
+  WTPO1: wtpo1st7th,
+  WTPO2: wtpo2nd7th,
+  OWTP1: owtp1st8th,
+  OWTP2: owtp2nd8th,
+  OWTP3: owtp3rd8th,
+  MBR: MBR2nd,
+};
+
+const courseImage = ref(null);
+
+const route = useRoute();
+
+const enrollId = String(
+  route.params.id ??
+  route.params.enrollId ??
+  route.params.enrollmentId ??
+  ""
+);
+
+// main page state
+const loadingCourse = ref(true);
+const loadError = ref("");
+
+// headers
+const courseTitle = ref("Course title unavailable");
+const courseExpiration = ref("—");
+const courseCompleted = ref("—");
+const extendEligible = ref(false);
+
+// metrics
+const totalChapters = ref("—");
+const gradeAverage = ref("—");
+const ceus = ref("—");
+const contactHours = ref("—");
+
+// donut
+const animatedAngle = ref(0);
+const animatedProgress = ref(0);
+
+// chapter table
+const chapters = ref([]);
+
+// right side
+const messages = ref([]);
+const loadingMessages = ref(true);
+const messagesError = ref("");
+
+const pid = ref(458860);
+const invoices = ref([]);
+const invoicedata = ref({});
+const loadingSidebar = ref(true);
+const sidebarError = ref("");
+
+function animateToProgress(progressValue) {
+  const targetAngle = (progressValue / 100) * 360;
+  const duration = 1000;
+  const frameRate = 60;
+  const steps = duration / (1000 / frameRate);
+  const angleStep = targetAngle / steps;
+  const progressStep = progressValue / steps;
+
+  let currentAngle = 0;
+  let currentProgress = 0;
+
+  const interval = setInterval(() => {
+    currentAngle += angleStep;
+    currentProgress += progressStep;
+
+    if (currentAngle >= targetAngle) {
+      currentAngle = targetAngle;
+      currentProgress = progressValue;
+      clearInterval(interval);
+    }
+
+    animatedAngle.value = currentAngle;
+    animatedProgress.value = Math.round(currentProgress);
+  }, 1000 / frameRate);
+}
+
+function calcAveragePctCompleted(sections) {
+  const nums = (Array.isArray(sections) ? sections : [])
+    .filter(
+      (s) =>
+        String(s?.attempted) === "1" ||
+        (s?.gradedate && s.gradedate !== "--")
+    )
+    .map((s) => Number(s?.pct))
+    .filter((n) => Number.isFinite(n));
+
+  if (nums.length === 0) return "—";
+
+  const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+  return `${Math.round(avg)}%`;
+}
+
+function getInvoiceName(invoicenum) {
+  const items = invoicedata.value[invoicenum] ?? [];
+  const match = items.find((item) => item?.coursetitle != null);
+  return match?.coursetitle || "Course title unavailable";
+}
+
+async function loadMessages() {
+  loadingMessages.value = true;
+  messagesError.value = "";
+
+  try {
+    messages.value = [];
+  } catch (err) {
+    console.error("Failed to load messages:", err);
+    messagesError.value = "load-failed";
+    messages.value = [];
+  } finally {
+    loadingMessages.value = false;
+  }
+}
+
+async function loadSidebarData() {
+  loadingSidebar.value = true;
+  sidebarError.value = "";
+
+  try {
+    const inv = await getInvoices(pid.value);
+    invoices.value = inv?.response ?? [];
+
+    await Promise.all(
+      invoices.value.map(async (invoice) => {
+        const details = await getInvoiceData(invoice.invoicenum);
+        invoicedata.value[invoice.invoicenum] = details?.response ?? [];
+      })
+    );
+  } catch (err) {
+    console.error("Failed to load purchase history:", err);
+    sidebarError.value = "load-failed";
+    invoices.value = [];
+  } finally {
+    loadingSidebar.value = false;
+  }
+}
+
+async function loadCourse() {
+  loadingCourse.value = true;
+  loadError.value = "";
+
+  try {
+    if (!enrollId) {
+      throw new Error("Missing route param (enrollId)");
+    }
+
+    const recordData = await getEnrollmentRecord(enrollId);
+    const record = Array.isArray(recordData?.response)
+      ? recordData.response[0]
+      : recordData?.response;
+
+    if (!record) {
+      throw new Error("No enrollment record found");
+    }
+
+    courseTitle.value = record.title || "Course title unavailable";
+    courseExpiration.value = record.expiredate || "—";
+    courseCompleted.value = record.completedate || "—";
+    ceus.value = record.ceus ?? record.ceu ?? "—";
+    contactHours.value = record.contacthour ?? record.contacthours ?? "—";
+    extendEligible.value = String(record.extendeligible ?? "") === "1";
+    courseImage.value = courseImageMap[record?.owpabbr] || null;
+
+    const editionId = String(
+      record.editionid ?? record.editionId ?? record.edition ?? ""
+    );
+
+    let gradesData = await getCourseGrades(enrollId);
+    let sections = Array.isArray(gradesData?.response)
+      ? gradesData.response
+      : [];
+
+    if (sections.length === 0 && editionId) {
+      gradesData = await getCourseGrades(editionId);
+      sections = Array.isArray(gradesData?.response)
+        ? gradesData.response
+        : [];
+    }
+
+    totalChapters.value = sections.length || 0;
+    gradeAverage.value = calcAveragePctCompleted(sections);
+
+    const completedCount = sections.filter((s) => {
+      const hasGradeDate = s?.gradedate && s.gradedate !== "--";
+      const hasGrade =
+        s?.grade !== null && s?.grade !== undefined && s?.grade !== "";
+      const attempted = String(s?.attempted) === "1";
+      return hasGradeDate || hasGrade || attempted;
+    }).length;
+
+    const percent =
+      sections.length === 0
+        ? 0
+        : Math.round((completedCount / sections.length) * 100);
+
+    animateToProgress(percent);
+
+    chapters.value = sections
+      .slice()
+      .sort((a, b) => Number(a?.ordinal ?? 0) - Number(b?.ordinal ?? 0))
+      .map((s) => {
+        const pctStr =
+          s?.pct !== null && s?.pct !== undefined && s?.pct !== ""
+            ? `${s.pct}%`
+            : "";
+
+        const fracStr = s?.gradefraction ?? "";
+
+        let gradeDisplay = "";
+        if (pctStr && fracStr) gradeDisplay = `${pctStr} (${fracStr})`;
+        else gradeDisplay = pctStr || fracStr || "";
+
+        return {
+          title: s?.examname || "Untitled chapter",
+          date: s?.gradedate && s.gradedate !== "--" ? s.gradedate : "",
+          grade: gradeDisplay,
+        };
+      });
+  } catch (err) {
+    console.error(err);
+    loadError.value = err?.message || "Failed to load active course data";
+    chapters.value = [];
+    totalChapters.value = "—";
+    gradeAverage.value = "—";
+    animatedAngle.value = 0;
+    animatedProgress.value = 0;
+    courseImage.value = null;
+  } finally {
+    loadingCourse.value = false;
+  }
+}
+
+onMounted(async () => {
+  await Promise.all([
+    loadCourse(),
+    loadMessages(),
+    loadSidebarData(),
+  ]);
+});
+</script>
+
 <template>
   <div class="active-course-page">
 
@@ -21,19 +290,7 @@
       <div class="summary-tile">
         <div class="card-header">
           <div class="header-icon">
-            <svg xmlns="http://www.w3.org/2000/svg"
-              width="32" 
-              height="40"
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="#007C8A" 
-              stroke-width="2" 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              class="lucide lucide-book-marked-icon lucide-book-marked">
-              <path d="M10 2v8l3-3 3 3V2"/>
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
-            </svg>
+            <img :src="book" alt="Active enrollments icon" />
           </div>
           <h2 class="card-title">Active Enrollments</h2>
         </div>
@@ -42,7 +299,15 @@
 
         <div class="summary-body">
           <div class="summary-left">
-            <div class="course-image-large"></div>
+            <img
+                v-if="courseImage"
+                :src="courseImage"
+                alt="Course image"
+                class="course-image-large"
+              />
+              <div v-else class="course-image-large fallback-image">
+                <span class="fallback-text-large">NO IMAGE AVAILABLE</span>
+              </div>
 
             <div class="course-header-info">
               <h2 class="course-title">{{ courseTitle }}</h2>
@@ -95,19 +360,7 @@
         <div class="chapter-progress-tile">
           <div class="card-header">
             <div class="header-icon">
-              <svg xmlns="http://www.w3.org/2000/svg"
-                width="32" 
-                height="40"
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="#007C8A" 
-                stroke-width="2" 
-                stroke-linecap="round" 
-                stroke-linejoin="round" 
-                class="lucide lucide-book-marked-icon lucide-book-marked">
-                <path d="M10 2v8l3-3 3 3V2"/>
-                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
-              </svg> 
+               <img :src="book" alt="Chapter progress icon" />
             </div>
             <h2 class="card-title">Chapter Progress</h2>
           </div>
@@ -158,19 +411,7 @@
     <div class="side-card">
     <div class="side-header">
       <div class="side-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" 
-          width="24" 
-          height="24" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          stroke-width="2" 
-          stroke-linecap="round" 
-          stroke-linejoin="round" 
-          class="lucide lucide-mail-icon lucide-mail">
-          <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/>
-          <rect x="2" y="4" width="20" height="16" rx="2"/>
-        </svg>
+        <img :src="mail" class="icon" />
       </div>
       <div class="side-title">Messages</div>
     </div>
@@ -209,20 +450,7 @@
     <div class="side-card">
       <div class="side-header">
         <div class="header-icon side-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" 
-            width="24" 
-            height="24" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            stroke-width="2" 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            class="lucide lucide-history-icon lucide-history">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-            <path d="M3 3v5h5"/>
-            <path d="M12 7v5l4 2"/>
-          </svg>
+          <img :src="history" class="icon" />
         </div>
         <div class="side-title">Purchase History</div>
       </div>
@@ -257,278 +485,11 @@
       </router-link>
     </div>
 </div>
+</div>
     </div>
-  </div>
 </template>
 
-<script>
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import {
-  getEnrollmentRecord,
-  getCourseGrades,
-  getInvoices,
-  getInvoiceData,
-} from "@/services/owpAPI.js";
 
-export default {
-  name: "ActiveCourse",
-  setup() {
-    const route = useRoute();
-
-    const enrollId = String(
-      route.params.id ??
-      route.params.enrollId ??
-      route.params.enrollmentId ??
-      ""
-    );
-
-    // main page state
-    const loadingCourse = ref(true);
-    const loadError = ref("");
-
-    // headers
-    const courseTitle = ref("Course title unavailable");
-    const courseExpiration = ref("—");
-    const courseCompleted = ref("—");
-    const extendEligible = ref(false);
-
-    // metrics
-    const totalChapters = ref("—");
-    const gradeAverage = ref("—");
-    const ceus = ref("—");
-    const contactHours = ref("—");
-
-    // donut
-    const animatedAngle = ref(0);
-    const animatedProgress = ref(0);
-
-    // chapter table
-    const chapters = ref([]);
-
-    // right side
-    const messages = ref([]);
-    const loadingMessages = ref(true);
-    const messagesError = ref("");
-
-    const pid = ref(458860);
-    const invoices = ref([]);
-    const invoicedata = ref({});
-    const loadingSidebar = ref(true);
-    const sidebarError = ref("");
-
-    function animateToProgress(progressValue) {
-      const targetAngle = (progressValue / 100) * 360;
-      const duration = 1000;
-      const frameRate = 60;
-      const steps = duration / (1000 / frameRate);
-      const angleStep = targetAngle / steps;
-      const progressStep = progressValue / steps;
-
-      let currentAngle = 0;
-      let currentProgress = 0;
-
-      const interval = setInterval(() => {
-        currentAngle += angleStep;
-        currentProgress += progressStep;
-
-        if (currentAngle >= targetAngle) {
-          currentAngle = targetAngle;
-          currentProgress = progressValue;
-          clearInterval(interval);
-        }
-
-        animatedAngle.value = currentAngle;
-        animatedProgress.value = Math.round(currentProgress);
-      }, 1000 / frameRate);
-    }
-
-    function calcAveragePctCompleted(sections) {
-      const nums = (Array.isArray(sections) ? sections : [])
-        .filter(
-          (s) =>
-            String(s?.attempted) === "1" ||
-            (s?.gradedate && s.gradedate !== "--")
-        )
-        .map((s) => Number(s?.pct))
-        .filter((n) => Number.isFinite(n));
-
-      if (nums.length === 0) return "—";
-
-      const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
-      return `${Math.round(avg)}%`;
-    }
-
-    function getInvoiceName(invoicenum) {
-      const items = invoicedata.value[invoicenum] ?? [];
-      const match = items.find((item) => item?.coursetitle != null);
-      return match?.coursetitle || "Course title unavailable";
-    }
-
-    async function loadMessages() {
-      loadingMessages.value = true;
-      messagesError.value = "";
-
-      try {
-        messages.value = [];
-      } catch (err) {
-        console.error("Failed to load messages:", err);
-        messagesError.value = "load-failed";
-        messages.value = [];
-      } finally {
-        loadingMessages.value = false;
-      }
-    }
-
-    async function loadSidebarData() {
-      loadingSidebar.value = true;
-      sidebarError.value = "";
-
-      try {
-        const inv = await getInvoices(pid.value);
-        invoices.value = inv?.response ?? [];
-
-        await Promise.all(
-          invoices.value.map(async (invoice) => {
-            const details = await getInvoiceData(invoice.invoicenum);
-            invoicedata.value[invoice.invoicenum] = details?.response ?? [];
-          })
-        );
-      } catch (err) {
-        console.error("Failed to load purchase history:", err);
-        sidebarError.value = "load-failed";
-        invoices.value = [];
-      } finally {
-        loadingSidebar.value = false;
-      }
-    }
-
-    async function loadCourse() {
-      loadingCourse.value = true;
-      loadError.value = "";
-
-      try {
-        if (!enrollId) {
-          throw new Error("Missing route param (enrollId)");
-        }
-
-        const recordData = await getEnrollmentRecord(enrollId);
-        const record = Array.isArray(recordData?.response)
-          ? recordData.response[0]
-          : recordData?.response;
-
-        if (!record) {
-          throw new Error("No enrollment record found");
-        }
-
-        courseTitle.value = record.title || "Course title unavailable";
-        courseExpiration.value = record.expiredate || "—";
-        courseCompleted.value = record.completedate || "—";
-        ceus.value = record.ceus ?? record.ceu ?? "—";
-        contactHours.value = record.contacthour ?? record.contacthours ?? "—";
-        extendEligible.value = String(record.extendeligible ?? "") === "1";
-
-        const editionId = String(
-          record.editionid ?? record.editionId ?? record.edition ?? ""
-        );
-
-        let gradesData = await getCourseGrades(enrollId);
-        let sections = Array.isArray(gradesData?.response)
-          ? gradesData.response
-          : [];
-
-        if (sections.length === 0 && editionId) {
-          gradesData = await getCourseGrades(editionId);
-          sections = Array.isArray(gradesData?.response)
-            ? gradesData.response
-            : [];
-        }
-
-        totalChapters.value = sections.length || 0;
-        gradeAverage.value = calcAveragePctCompleted(sections);
-
-        const completedCount = sections.filter((s) => {
-          const hasGradeDate = s?.gradedate && s.gradedate !== "--";
-          const hasGrade =
-            s?.grade !== null && s?.grade !== undefined && s?.grade !== "";
-          const attempted = String(s?.attempted) === "1";
-          return hasGradeDate || hasGrade || attempted;
-        }).length;
-
-        const percent =
-          sections.length === 0
-            ? 0
-            : Math.round((completedCount / sections.length) * 100);
-
-        animateToProgress(percent);
-
-        chapters.value = sections
-          .slice()
-          .sort((a, b) => Number(a?.ordinal ?? 0) - Number(b?.ordinal ?? 0))
-          .map((s) => {
-            const pctStr =
-              s?.pct !== null && s?.pct !== undefined && s?.pct !== ""
-                ? `${s.pct}%`
-                : "";
-
-            const fracStr = s?.gradefraction ?? "";
-
-            let gradeDisplay = "";
-            if (pctStr && fracStr) gradeDisplay = `${pctStr} (${fracStr})`;
-            else gradeDisplay = pctStr || fracStr || "";
-
-            return {
-              title: s?.examname || "Untitled chapter",
-              date: s?.gradedate && s.gradedate !== "--" ? s.gradedate : "",
-              grade: gradeDisplay,
-            };
-          });
-      } catch (err) {
-        console.error(err);
-        loadError.value = err?.message || "Failed to load active course data";
-        chapters.value = [];
-        totalChapters.value = "—";
-        gradeAverage.value = "—";
-        animatedAngle.value = 0;
-        animatedProgress.value = 0;
-      } finally {
-        loadingCourse.value = false;
-      }
-    }
-
-    onMounted(async () => {
-      await Promise.all([
-        loadCourse(),
-        loadMessages(),
-        loadSidebarData(),
-      ]);
-    });
-
-    return {
-      loadingCourse,
-      loadError,
-      courseTitle,
-      courseExpiration,
-      courseCompleted,
-      extendEligible,
-      totalChapters,
-      gradeAverage,
-      ceus,
-      contactHours,
-      animatedAngle,
-      animatedProgress,
-      chapters,
-      messages,
-      loadingMessages,
-      messagesError,
-      invoices,
-      loadingSidebar,
-      sidebarError,
-      getInvoiceName,
-    };
-  },
-};
-</script>
 
 <style scoped>
 .active-course-page {
@@ -603,10 +564,9 @@ export default {
   padding: 0;
 }
 
-.side-icon svg {
+.side-icon img {
   width: 28px;
   height: 28px;
-  stroke: #007C8A;
 }
 
 .card-title {
@@ -646,8 +606,10 @@ export default {
 .course-image-large {
   width: 100px;
   height: 120px;
-  background-color: #6DBE4B;
   border-radius: 4px;
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
 }
 
 .course-header-info {
@@ -950,6 +912,21 @@ export default {
 .error-message {
   color: #9F3323;
   font-weight: 600;
+}
+
+.fallback-image {
+  background-color: #6DBE4B;
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  text-align: center;
+}
+
+.fallback-text-large {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
 }
 
 </style>

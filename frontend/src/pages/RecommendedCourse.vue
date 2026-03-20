@@ -1,3 +1,114 @@
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import {
+  getInvoices,
+  getInvoiceData,
+} from "@/services/owpAPI.js";
+
+// keep this only if you still want placeholder recommended data for testing
+import { recommendedCourses } from "../data/coursesData.js";
+
+const route = useRoute();
+const pid = 458860;
+
+const invoices = ref([]);
+const invoicedata = ref({});
+const loadingSidebar = ref(true);
+const sidebarError = ref("");
+
+const messages = ref([]);
+const loadingMessages = ref(true);
+const messagesError = ref("");
+
+const courseTitle = ref("No Recommended Course");
+const courseDescription = ref("There is no recommended course available at this time.");
+const courseLongDescription = ref(
+  "Browse the course catalog to explore available offerings."
+);
+const chapters = ref([
+  "No course content available."
+]);
+
+function getInvoiceName(invoicenum) {
+  const items = invoicedata.value[invoicenum] ?? [];
+  const match = items.find((item) => item?.coursetitle != null);
+  return match?.coursetitle || "Course title unavailable";
+}
+
+async function loadMessages() {
+  loadingMessages.value = true;
+  messagesError.value = "";
+
+  try {
+    // placeholder for future integration
+    messages.value = [];
+  } catch (e) {
+    console.error("Failed to load messages:", e);
+    messagesError.value = "load-failed";
+    messages.value = [];
+  } finally {
+    loadingMessages.value = false;
+  }
+}
+
+async function loadSidebarData() {
+  loadingSidebar.value = true;
+  sidebarError.value = "";
+
+  try {
+    const inv = await getInvoices(pid);
+    invoices.value = inv?.response ?? [];
+
+    await Promise.all(
+      invoices.value.map(async (invoice) => {
+        const details = await getInvoiceData(invoice.invoicenum);
+        invoicedata.value[invoice.invoicenum] = details?.response ?? [];
+      })
+    );
+  } catch (e) {
+    console.error("Failed to load sidebar purchase history:", e);
+    sidebarError.value = "load-failed";
+    invoices.value = [];
+  } finally {
+    loadingSidebar.value = false;
+  }
+}
+
+function loadRecommendedCourse() {
+  const courseId = Number(route.params.id);
+  const course = recommendedCourses.find((c) => c.id === courseId);
+
+  if (!course) {
+    courseTitle.value = "No Recommended Course";
+    courseDescription.value = "There is no recommended course available at this time.";
+    courseLongDescription.value =
+      "Browse the course catalog to explore available offerings.";
+    chapters.value = ["No course content available."];
+    return;
+  }
+
+  courseTitle.value = course.title || "Course title unavailable";
+  courseDescription.value =
+    course.description || "Description unavailable.";
+  courseLongDescription.value =
+    course.longDescription || "No course description available.";
+  chapters.value =
+    Array.isArray(course.chapters) && course.chapters.length > 0
+      ? course.chapters
+      : ["No course content available."];
+}
+
+onMounted(async () => {
+  loadRecommendedCourse();
+
+  await Promise.all([
+    loadMessages(),
+    loadSidebarData(),
+  ]);
+});
+</script>
+
 <template>
   <div class="recommended-course-page">
 
@@ -36,7 +147,9 @@
 
           <!-- Left -->
           <div class="summary-left">
-            <div class="course-image-large recommended-image"></div>
+            <div class="course-image-large recommended-image">
+              <span class="fallback-text-large">NO IMAGE</span>
+            </div>
 
             <div class="course-header-info">
               <h2 class="course-title">{{ courseTitle }}</h2>
@@ -126,10 +239,32 @@
           <div class="divider"></div>
 
           <div class="side-body">
-            <div class="side-link">Email message (5/5/2025)</div>
-            <div class="side-link">Email message (5/03/2025)</div>
-            <div class="side-link">Email message (4/21/2025)</div>
+            <div v-if="loadingMessages" class="state-message loading-message">
+              Loading messages…
+            </div>
+
+            <div v-else-if="messagesError" class="state-message error-message">
+              We couldn’t load your messages right now.
+            </div>
+
+            <div v-else-if="messages.length === 0" class="state-message empty-message">
+              No messages available.
+            </div>
+
+            <template v-else>
+              <div
+                v-for="message in messages"
+                :key="message.id"
+                class="side-link"
+              >
+                {{ message.subject || "Message unavailable" }}
+                <span v-if="message.date">({{ message.date }})</span>
+              </div>
+            </template>
           </div>
+          <router-link to="/messages" class="side-footer">
+            (View all messages)
+          </router-link>
 
           <div class="side-footer">(View all messages)</div>
         </div>
@@ -159,16 +294,35 @@
 
           <div class="divider"></div>
 
-          <div class="side-body">
-            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 1</div>
-            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 2</div>
-            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 3</div>
-            <div class="side-link">Industrial Waste Treatment, Vol 1</div>
+        <div class="side-body">
+          <div v-if="loadingSidebar" class="state-message loading-message">
+            Loading purchase history…
           </div>
 
-          <router-link to="/purchase-history" class="side-footer">
-            (View all purchases)
-          </router-link>
+          <div v-else-if="sidebarError" class="state-message error-message">
+            We couldn’t load your purchase history right now.
+          </div>
+
+          <div v-else-if="invoices.length === 0" class="state-message empty-message">
+            No purchase history available.
+          </div>
+
+          <template v-else>
+            <div
+              v-for="invoice in invoices"
+              :key="invoice.invoicenum"
+              class="side-link"
+            >
+              Invoice: {{ invoice.invoicenum || "Unavailable" }} -
+              {{ getInvoiceName(invoice.invoicenum) }}
+            </div>
+          </template>
+        </div>
+
+        <router-link to="/purchase-history" class="side-footer">
+          (View all purchases)
+        </router-link>
+        
         </div>
 
       </div>
@@ -176,38 +330,6 @@
     </div>
   </div>
 </template>
-
-
-<script>
-import { useRoute } from "vue-router";
-import { recommendedCourses } from "../data/coursesData.js";
-
-export default {
-  name: "RecommendedCourse",
-  setup() {
-    const route = useRoute();
-    const courseId = Number(route.params.id);
-
-    const course = recommendedCourses.find(c => c.id === courseId);
-
-    const courseTitle = course ? course.title : "Course Not Found";
-    const courseDescription = course ? course.description : "Description unavailable.";
-    const courseLongDescription = course ? course.longDescription : "";
-
-    const chapters =
-      course && Array.isArray(course.chapters)
-        ? course.chapters
-        : [
-            "Introduction to Wastewater Treatment",
-            "Effluent Discharge and Reuse",
-            "Odor Control"
-          ];
-
-    return { courseTitle, courseDescription, chapters, courseLongDescription };
-  }
-};
-</script>
-
 
 <style scoped>
 .recommended-course-page {
@@ -513,5 +635,38 @@ export default {
 .back-link:hover {
   text-decoration: underline;
 }
+
+.state-message {
+  padding: 8px 0;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.loading-message,
+.empty-message {
+  color: #707070;
+}
+
+.error-message {
+  color: #9F3323;
+  font-weight: 600;
+}
+
+.fallback-image-large {
+  background-color: #6DBE4B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.fallback-text-large {
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
+  letter-spacing: 0.5px;
+}
+
 </style>
 

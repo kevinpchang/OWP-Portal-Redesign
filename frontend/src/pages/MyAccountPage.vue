@@ -1,7 +1,19 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { UserRound, NotebookText, Hash, FileText, History, SquareUserRound } from "lucide-vue-next";
+import { Hash, SquareUserRound } from "lucide-vue-next";
+
+import user from '@/assets/icons/owp-2color/user-icon.svg'
+import contactcard from '@/assets/icons/owp-2color/contact-card-icon.svg'
+import transcript from '@/assets/icons/owp-2color/transcipt-icon.svg'
+import history from '@/assets/icons/owp-2color/history-icon.svg'
+
+import {
+  getAccountDetails,
+  getActiveEnrollment,
+  getCourseGrades,
+  getOperatorList,
+} from "@/services/myAccountAPI";
 
 import * as api from "@/services/owpAPI";
 
@@ -276,7 +288,7 @@ async function saveContactInfo() {
 
       <!-- Profile across both columns -->
       <div class="card profile-card">
-        <UserRound class="avatar-icon" :size="125" color="#00A5B5" />
+        <img :src="user" class="icon" />
         <div class="profile-meta">
           <div class="user-name">{{ account?.fullname ?? "Loading..." }}</div>
           <div class="user-role">Student,<br />Office of Water Programs</div>
@@ -291,7 +303,7 @@ async function saveContactInfo() {
         <div class="card contact-card">
           <header class="card-head">
             <div class="head-left">
-              <NotebookText :size="26" color="#007C8A" class="head-icon-svg" aria-hidden="true" />
+              <img :src="contactcard" class="icon" />
               <h2>Contact Info</h2>
             </div>
             <button class="btn xsmall" @click="openContactDialogWithData">Edit</button>
@@ -388,7 +400,7 @@ async function saveContactInfo() {
         <!-- Transcripts -->
         <div class="side card">
         <header class="side-head">
-          <FileText :size="26" color="#007C8A" class="side-icon-svg" aria-hidden="true" />
+          <img :src="transcript" class="side-icon-svg" />
           <h3>Transcripts</h3>
         </header>
 
@@ -419,7 +431,7 @@ async function saveContactInfo() {
         <!-- Purchase history -->
         <div class="side card">
           <header class="side-head">
-            <History :size="26" color="#007C8A" class="side-icon-svg" />
+            <img :src="history" class="side-icon-svg" />
             <h3>Purchase History</h3>
           </header>
 
@@ -761,8 +773,12 @@ a:hover { text-decoration: underline; }
   gap: 8px;
   margin: 6px 6px 10px;
 }
-.side-icon-svg {
-  display: inline-block;
+.side-icon-svg { 
+  width: 30px;
+  height: 30px;
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 .side-head h3 {
   margin: 0;
@@ -1046,5 +1062,12 @@ a:hover { text-decoration: underline; }
   background-color: #00A5B5;
   cursor: pointer;
 }
+
+.contact-card .icon {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
 </style>
 

@@ -4,6 +4,9 @@
   //API Integrations
   import * as api from "@/services/owpAPI"
 
+  import mail from '@/assets/icons/owp-2color/mail-icon.svg'
+  import certificate from '@/assets/icons/owp-2color/certificate-icon.svg'
+
   const pid = 458860;
   const error = ref("");
   const opNum = ref("");
@@ -102,16 +105,23 @@
     editPopup.value = false
   }
 
-  async function deleteNumber(ip, id){
-    console.log("deleteNumber called with ip:", ip, "and id:", id);
+  async function deleteNumber(){
 
+    const original = nums.value.find(
+      item => item.liccatid === selectedRow.value
+    )
+
+    if (!original) return
+    
     try{
-
-      api.deleteOperator(ip, id, pid);
-      console.log("Operator Number deleted successfully");
+    
+      api.deleteOperator("localhost", original.oprlicid, pid);
+      console.log("deleteNumber called with ip:", "localhost", "and id:", original.oprlicid);
     } catch (e) {
       error.value = e?.message ?? String(e);
     }
+
+    deletePopup.value = false
   }
 
 
@@ -147,7 +157,15 @@
   }
 
   const deletePopup = ref(false)
-  function openDelete() {
+  function openDelete(liccatid) {
+    selectedRow.value = liccatid
+
+    const entry = nums.value.find(
+      item => item.liccatid === liccatid
+    )
+
+    if (!entry) return
+
     deletePopup.value = true
   }
 
@@ -189,7 +207,7 @@
               <td>{{ entry.state }}</td>
               <td>
                 <button class="edit-button" @click.left="openEdit(entry.liccatid)">Edit</button>
-                <button class="remove-button" @click.left="openDelete">Remove</button>
+                <button class="remove-button" @click.left="openDelete(entry.liccatid)">Remove</button>
               </td>
             </tr>
           <!--
@@ -228,7 +246,7 @@
     <div class="quick-links">
       <div class="messages">
         <div class="header">
-          <Mail class="icon" color="#007C8A"/>
+          <img :src="mail" class="icon" />
           <div class="text">Messages</div>
         </div>
         <div class="divider"></div>
@@ -244,7 +262,7 @@
 
       <div class="purchase-history">
         <div class="header">
-          <Award class="icon" color="#007C8A"/>
+          <img :src="certificate" class="icon" />
           <div class="text">Certificates</div>
         </div>
         <div class="divider"></div>
@@ -321,7 +339,7 @@
             </h1>
             <p class="popup-text">Are you sure you want to remove the Operator Number?</p>
             <!-- Method=GET for buttons api/v1/account/deleteOperator/{ip}/{id}/{pid}-->
-            <button class = popup-button-left @click="closeDelete">Yes</button>
+            <button class = popup-button-left @click="deleteNumber">Yes</button>
             <button class = popup-button-right @click="closeDelete">No</button>
 
           </div>

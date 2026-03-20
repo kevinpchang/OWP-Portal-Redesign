@@ -1,9 +1,39 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { BookMarked, GalleryVerticalEnd, Mail, History } from 'lucide-vue-next'
+
+import clarifier from '@/assets/artwork/clarifier.jpg'
+
+//import icons
+import book from '@/assets/icons/owp-2color/book-icon.svg'
+import slide from '@/assets/icons/owp-2color/slides-icon.svg'
+import mail from '@/assets/icons/owp-2color/mail-icon.svg'
+import history from '@/assets/icons/owp-2color/history-icon.svg'
 
 import * as api from '@/services/owpAPI'
+
+import MBR2nd from "@/assets/manual-imgs/MBR-2nd-cvr.png";
+import owtp1st8th from "@/assets/manual-imgs/owtp-1-8th-cvr.jpg";
+import owtp2nd8th from "@/assets/manual-imgs/owtp-2-8th-cvr.jpg";
+import owtp3rd8th from "@/assets/manual-imgs/owtp-3-8th-cvr.jpg";
+import um3rd from "@/assets/manual-imgs/um-3rd-cvr.jpg";
+import wtpo1st7th from "@/assets/manual-imgs/wtpo-1-7th-cvr.jpg";
+import wtpo2nd7th from "@/assets/manual-imgs/wtpo-2-7th-cvr.jpg";
+
+const courseImageMap = {
+  UM: um3rd,
+  WTPO1: wtpo1st7th,
+  WTPO2: wtpo2nd7th,
+  OWTP1: owtp1st8th,
+  OWTP2: owtp2nd8th,
+  OWTP3: owtp3rd8th,
+  MBR: MBR2nd,
+};
+
+function getCourseImage(owpabbr) {
+  return courseImageMap[owpabbr] || null;
+}
+
 
 const route = useRoute()
 const currentDate = ref(formatDate())
@@ -48,7 +78,7 @@ async function loadDash() {
       const c = await api.getInvoiceData(v.invoicenum)
       invoicedata.value[v.invoicenum] = c.response ?? []
     }
-    console.log('Invoice Data', invdata)
+    console.log('Invoice Data', invoicedata)
   } catch (e) {
     error.value = e?.message ?? String(e)
   } finally {
@@ -127,14 +157,22 @@ function scheduleNextUpdate() {
       <div class="dashboard-left">
         <div class="active-enrollments">
           <div class="header">
-            <BookMarked class="icon" color="#007C8A" />
+            <img :src="book" class="icon" />
             <div class="text">Active Enrollments</div>
           </div>
           <div class="divider"></div>
           <div class="body">
             <router-link class="object" v-for="v in activeEnrollments.slice(0, 3)" :key="v.enrollid" :to="`/courses/${v.enrollid}`">
               <div class="left">
-                <div class="icon"></div>
+                <img
+                  v-if="getCourseImage(v.owpabbr)"
+                  :src="getCourseImage(v.owpabbr)"
+                  alt="Course image"
+                  class="course-cover"
+                />
+                <div v-else class="course-cover fallback-image">
+                  <span class="fallback-text">NO IMAGE AVAILABLE</span>
+                </div>
               </div>
               <div class="right">
                 <div class="title">
@@ -150,6 +188,7 @@ function scheduleNextUpdate() {
                   </div>
                 </div>
               </div>
+              
             </router-link>
           </div>
           <div class="view-all">
@@ -165,7 +204,7 @@ function scheduleNextUpdate() {
 
         <div class="instructor-slides">
           <div class="header">
-            <GalleryVerticalEnd class="icon" color="#007C8A" />
+            <img :src="slide" class="icon" />
             <div class="text">Instructor Slides</div>
           </div>
           <div class="divider"></div>
@@ -196,7 +235,7 @@ function scheduleNextUpdate() {
       <div class="dashboard-right">
         <div class="messages">
           <div class="header">
-            <Mail class="icon" color="#007C8A" />
+            <img :src="mail" class="icon" />
             <div class="text">Messages</div>
           </div>
           <div class="divider"></div>
@@ -214,16 +253,16 @@ function scheduleNextUpdate() {
 
         <div class="purchase-history">
           <div class="header">
-            <History class="icon" color="#007C8A" />
+            <img :src="history" class="icon" />
             <div class="text">Purchase History</div>
           </div>
           <div class="divider"></div>
           <div class="body">
-            <div class="object" v-for="v in invoices.slice(0, 5)" :key="v.invoicenum">
+            <router-link class="object" v-for="v in invoices.slice(0, 3)" :key="v.invoicenum" :to="`/purchase-history/${v.invoicenum}`">
               <div class="text">
                 Invoice: {{ v.invoicenum }} - {{ getInvoiceName(v.invoicenum) }}
               </div>
-            </div>
+            </router-link>
           </div>
           <div class="view-all">
             <router-link
@@ -385,14 +424,34 @@ function scheduleNextUpdate() {
   align-items: center;
 }
 
-.active-enrollments .body .object .left .icon {
+.active-enrollments .body .object .left .course-cover {
   width: 59px;
   height: 71px;
   margin-left: 24px;
-  border-radius: 4rem;
-  display: flex;
-  background-color: #5d9632;
+  border-radius: 4px;
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
 }
+
+.active-enrollments .body .object .left .fallback-image {
+  background-color: #6DBE4B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.active-enrollments .body .object .left .fallback-text {
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.3px;
+  font-family: 'Roboto', sans-serif;
+  padding: 4px;
+}
+
 
 .active-enrollments .body .object .right {
   width: 617px;
