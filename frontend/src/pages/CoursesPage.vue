@@ -6,7 +6,6 @@ import {
   getInvoices,
   getInvoiceData,
 } from "@/services/owpAPI.js";
-import { recommendedCourses } from "../data/coursesData.js";
 
 import book from "@/assets/icons/owp-2color/book-icon.svg";
 import pass from "@/assets/icons/1color/check-mark-filled.svg";
@@ -38,12 +37,16 @@ const pid = 458860;
 
 const activeCourses = ref([]);
 const completedCourses = ref([]);
+const recommendedCourses = ref([]);
 
 const loadingActive = ref(true);
 const activeError = ref("");
 
 const loadingCompleted = ref(true);
 const completedError = ref("");
+
+const loadingRecommended = ref(true);
+const recommendedError = ref("");
 
 const loadingSidebar = ref(true);
 const sidebarError = ref("");
@@ -99,11 +102,29 @@ async function loadSidebarData() {
   }
 }
 
+async function loadRecommendedCourses() {
+  loadingRecommended.value = true;
+  recommendedError.value = "";
+
+  try {
+    // in place for future integration
+      recommendedCourses.value = [];
+  } catch (e) {
+    console.error("Failed to load recommended courses:", e);
+    recommendedError.value = "load-failed";
+    recommendedCourses.value = [];
+  } finally {
+    loadingRecommended.value = false;
+  }
+}
+
 onMounted(async () => {
   loadingActive.value = true;
   loadingCompleted.value = true;
+  loadingRecommended.value = true;
   activeError.value = "";
   completedError.value = "";
+  recommendedError.value = "";
 
   try {
     const data = await getActiveEnrollment(pid);
@@ -167,7 +188,8 @@ onMounted(async () => {
     loadingCompleted.value = false;
   }
 
-  await Promise.all([loadMessages(), loadSidebarData()]);
+  await Promise.all([loadMessages(), loadSidebarData(), loadRecommendedCourses(),
+ ]);
 });
 </script>
 
@@ -224,7 +246,9 @@ onMounted(async () => {
                       alt="Course image"
                       class="course-image"
                     />
-                    <div v-else class="course-image fallback-image"></div>
+                    <div v-else class="course-image fallback-image">
+                      <span class="fallback-text">NO IMAGE AVAILABLE</span>
+                    </div>
                   <div class="course-info">
                       <div class="course-title">{{ course.title }}</div>
 
@@ -286,7 +310,9 @@ onMounted(async () => {
                       alt="Course image"
                       class="course-image completed-image"
                     />
-                    <div v-else class="course-image completed-image fallback-image"></div>
+                    <div v-else class="course-image completed-image fallback-image">
+                      <span class="fallback-text">NO IMAGE AVAILABLE</span>
+                    </div>
                   <div class="course-info">
                     <div class="course-title">{{ course.title }}</div>
 
@@ -326,38 +352,69 @@ onMounted(async () => {
 
 
           <!--Recommended-->
-          <div class="course-card">
-            <div class="card-header">
-              <div class="header-icon recommended-icon">
-               <img :src="book" alt="Recommended enrollments icon" /> 
+            <div class="course-card">
+              <div class="card-header">
+                <div class="header-icon recommended-icon">
+                  <img :src="book" alt="Recommended enrollments icon" />
+                </div>
+                <h2 class="card-title">Recommended Courses</h2>
               </div>
-              <h2 class="card-title">Recommended Courses</h2>
-            </div>
-            <div class="card-divider"></div>
+              <div class="card-divider"></div>
 
-            <div class="card-body">
-              <router-link
-                v-for="course in recommendedCourses"
-                :key="course.id"
-                :to="`/recommended/${course.id}`"
-                class="course-row-link"
-              >
-                <div class="course-row">
-                  <div class="course-image recommended-image"></div>
+              <div class="card-body">
+                <div v-if="loadingRecommended" class="state-message loading-message">
+                  Loading recommended courses…
+                </div>
 
-                  <div class="course-info recommended-info">
-                    <div class="course-title">{{ course.title }}</div>
-                    <div class="rec-meta">{{ course.description }}</div>
-                    <div class="rec-meta">{{ course.chapterCount }} Chapters</div>
+                <div v-else-if="recommendedError" class="state-message error-message">
+                  We couldn’t load recommended courses right now.
+                </div>
+
+                <div v-else-if="recommendedCourses.length === 0" class="recommended-empty">
+                  <div class="empty-title">No Recommended Courses</div>
+                  <div class="empty-subtext">
+                    You have no recommended courses available at this time.
                   </div>
 
-                  <div class="card-action"></div>
+                  <a
+                    href="https://www.owp.csus.edu/operator-training/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="catalog-link"
+                  >
+                    Browse Course Catalog
+                  </a>
                 </div>
-              </router-link>
+
+                <router-link
+                  v-else
+                  v-for="course in recommendedCourses"
+                  :key="course.id"
+                  :to="`/recommended/${course.id}`"
+                  class="course-row-link"
+                >
+                  <div class="course-row">
+                    <img
+                      v-if="course.image"
+                      :src="course.image"
+                      alt="Course image"
+                      class="course-image"
+                    />
+                    <div v-else class="course-image fallback-image">
+                      <span class="fallback-text">NO IMAGE AVAILABLE</span>
+                    </div>
+
+                    <div class="course-info recommended-info">
+                      <div class="course-title">{{ course.title }}</div>
+                      <div class="rec-meta">{{ course.description }}</div>
+                      <div class="rec-meta">{{ course.chapterCount }} Chapters</div>
+                    </div>
+
+                    <div class="card-action"></div>
+                  </div>
+                </router-link>
+              </div>
             </div>
-          </div>
-
-
         </div>
       </div>
 
@@ -385,15 +442,17 @@ onMounted(async () => {
                 No messages available.
               </div>
 
-              <div
-                v-else
-                v-for="message in messages"
-                :key="message.id"
-                class="side-link"
-              >
-                {{ message.subject || "Message unavailable" }}
-                <span v-if="message.date">({{ message.date }})</span>
-              </div>
+              <template v-else>
+                <div
+                  v-for="message in messages"
+                  :key="message.id"
+                  class="side-link"
+                >
+                  {{ message.subject || "Message unavailable" }}
+                  <span v-if="message.date">({{ message.date }})</span>
+                </div>
+              </template>
+
             </div>
 
           <router-link to="/messages" class="side-footer">
@@ -424,15 +483,17 @@ onMounted(async () => {
               No purchase history available.
             </div>
 
-            <div
-              v-else
-              v-for="invoice in invoices"
-              :key="invoice.invoicenum"
-              class="side-link"
-            >
-              Invoice: {{ invoice.invoicenum || "Unavailable" }} -
-               {{ getInvoiceName(invoice.invoicenum) }}
-            </div>
+            <template v-else>
+              <div
+                v-for="invoice in invoices"
+                :key="invoice.invoicenum"
+                class="side-link"
+              >
+                Invoice: {{ invoice.invoicenum || "Unavailable" }} -
+                {{ getInvoiceName(invoice.invoicenum) }}
+              </div>
+            </template>
+
           </div>
 
           <router-link to="/purchase-history" class="side-footer">
@@ -875,6 +936,60 @@ onMounted(async () => {
 
 .fallback-image {
   background-color: #6DBE4B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.fallback-text {
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.recommended-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #034750;
+  font-family: 'Roboto', sans-serif;
+}
+
+.empty-subtext {
+  font-size: 14px;
+  color: #707070;
+  line-height: 1.5;
+  font-family: 'Roboto', sans-serif;
+}
+
+.catalog-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #00A5B5;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: 'Roboto', sans-serif;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.catalog-link:hover {
+  background-color: #008c9a;
 }
 
 </style>

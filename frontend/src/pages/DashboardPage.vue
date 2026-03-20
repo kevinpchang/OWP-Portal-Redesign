@@ -170,7 +170,9 @@ function scheduleNextUpdate() {
                   alt="Course image"
                   class="course-cover"
                 />
-                <div v-else class="course-cover fallback-image"></div>
+                <div v-else class="course-cover fallback-image">
+                  <span class="fallback-text">NO IMAGE AVAILABLE</span>
+                </div>
               </div>
               <div class="right">
                 <div class="title">
@@ -433,8 +435,23 @@ function scheduleNextUpdate() {
 }
 
 .active-enrollments .body .object .left .fallback-image {
-  background-color: #5d9632;
+  background-color: #6DBE4B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
+
+.active-enrollments .body .object .left .fallback-text {
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.3px;
+  font-family: 'Roboto', sans-serif;
+  padding: 4px;
+}
+
 
 .active-enrollments .body .object .right {
   width: 617px;

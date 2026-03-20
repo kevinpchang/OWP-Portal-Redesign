@@ -311,7 +311,9 @@ onMounted(async () => {
           alt="Course image"
           class="course-image-large completed-image"
         />
-        <div v-else class="course-image-large completed-image fallback-image"></div>
+        <div v-else class="course-image-large completed-image fallback-image">
+          <span class="fallback-text-large">NO IMAGE AVAILABLE</span>
+        </div>
 
         <div class="course-header-info">
           <h2 class="course-title">{{ courseTitle }}</h2>
@@ -355,8 +357,8 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    </div>
   </div>
-</div>
 </div>
 
 
@@ -606,10 +608,6 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 
-.fallback-image {
-  background-color: #6DBE4B;
-}
-
 .course-header-info {
   display: flex;
   flex-direction: column;
@@ -737,10 +735,12 @@ onMounted(async () => {
 }
 
 .side-card { width: 100%; }
-.courses-right { display: flex; flex-direction: column; gap: 16px; margin-left: auto; max-width: 260px; }
-
-
-
+.courses-right { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 16px; margin-left: 
+  auto; max-width: 260px; 
+}
 
 .metric {
   display: flex;
@@ -894,6 +894,21 @@ onMounted(async () => {
 .error-message {
   color: #9F3323;
   font-weight: 600;
+}
+
+.fallback-image {
+  background-color: #6DBE4B;
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  text-align: center;
+}
+
+.fallback-text-large {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
 }
 
 </style>
