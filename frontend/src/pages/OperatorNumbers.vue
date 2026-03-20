@@ -77,7 +77,7 @@
   async function updateNumber(){
 
     const original = nums.value.find(
-      item => item.liccatid === selectedRow.value
+      item => item.oprlicid === selectedRow.value
     )
 
     if (!original) return
@@ -108,7 +108,7 @@
   async function deleteNumber(){
 
     const original = nums.value.find(
-      item => item.liccatid === selectedRow.value
+      item => item.oprlicid === selectedRow.value
     )
 
     if (!original) return
@@ -137,11 +137,11 @@
 
   const editPopup = ref(false)
   const selectedRow = ref(null)
-  function openEdit(liccatid) {
-    selectedRow.value = liccatid
+  function openEdit(oprlicid) {
+    selectedRow.value = oprlicid
 
     const entry = nums.value.find(
-      item => item.liccatid === liccatid
+      item => item.oprlicid === oprlicid
     )
 
     if (!entry) return
@@ -157,11 +157,11 @@
   }
 
   const deletePopup = ref(false)
-  function openDelete(liccatid) {
-    selectedRow.value = liccatid
+  function openDelete(oprlicid) {
+    selectedRow.value = oprlicid
 
     const entry = nums.value.find(
-      item => item.liccatid === liccatid
+      item => item.oprlicid === oprlicid
     )
 
     if (!entry) return
@@ -206,8 +206,8 @@
               <td>{{ entry.operatornumber }}</td>
               <td>{{ entry.state }}</td>
               <td>
-                <button class="edit-button" @click.left="openEdit(entry.liccatid)">Edit</button>
-                <button class="remove-button" @click.left="openDelete(entry.liccatid)">Remove</button>
+                <button class="edit-button" @click.left="openEdit(entry.oprlicid)">Edit</button>
+                <button class="remove-button" @click.left="openDelete(entry.oprlicid)">Remove</button>
               </td>
             </tr>
           <!--
