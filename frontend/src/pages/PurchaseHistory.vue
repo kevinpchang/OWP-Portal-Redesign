@@ -164,7 +164,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import * as api from "@/services/owpAPI";
 
 const invoices = ref([]);
@@ -290,7 +291,7 @@ function buildProductName(r) {
   return detail || fee || "Item";
 }
 
-async function open(inv: Invoice) {
+async function open(inv) {
 
   router.push(`/purchase-history/${inv.id}`);
   loading.value = true;
