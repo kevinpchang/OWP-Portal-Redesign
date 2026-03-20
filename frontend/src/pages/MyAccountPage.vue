@@ -164,7 +164,7 @@ const contactForm = reactive({
   phone_extension: "",
   fax_area_code: "",
   fax_local: "",
-  ipAddr: "127.0.0.1",
+  ip: "ip",
 });
 
 function digitsOnly(v) {
@@ -211,7 +211,8 @@ function openContactDialogWithData() {
   contactForm.phone_area_code = a?.hmphncity ?? p.area ?? "";
   contactForm.phone_local     = a?.hmphnlocal ?? p.local ?? "";
   contactForm.phone_extension = a?.hmphnext ?? "";
-
+  
+  contactForm.ip;
 
   contactDialog.value = true;
 }
@@ -256,7 +257,7 @@ async function saveContactInfo() {
       fax_area_code: contactForm.fax_area_code ?? "",
       fax_local: contactForm.fax_local ?? "",
 
-      ipAddr: "localhost",
+      ip: "ip",
     };
 
     console.log("updateContactInfo payload:", payload);
