@@ -57,7 +57,7 @@
       status: original.oprlicstatus,
       operatornumber: addOpNum.value,
       state: addState.value,
-      ipAddr: "localhost" 
+      ip: "localhost" 
     };
 
     
@@ -89,7 +89,7 @@
       status: original.oprlicstatus,
       operatornumber: editOpNum.value,
       state: editState.value,
-      ipAddr: "localhost"
+      ip: "localhost"
     }
 
     
