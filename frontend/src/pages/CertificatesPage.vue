@@ -85,7 +85,7 @@ async function loadCertificates() {
             ceus = Number.isFinite(rawCeu) ? rawCeu.toFixed(1) : "—";
             contactHours = record.contacthour ?? record.contacthours ?? "—";
           }
-        } catch (_) {
+        } catch {
           // silently fallback — CEUs/hours not critical
         }
         return {

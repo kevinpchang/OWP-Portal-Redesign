@@ -286,10 +286,6 @@ function buildProductName(r) {
   const comment = toStr(r.mstfeecomment).trim();
   const course = toStr(r.coursetitle).trim();
 
-  // Examples:
-  // Sales Tax + City of Sacramento => "Sales Tax: City of Sacramento"
-  // Shipping + UPS Ground => "Shipping: UPS Ground"
-  // Enrollment + course title => "Enrollment: WTPO1 - ..."
   const detail = course || comment;
   if (fee && detail) return `${fee}: ${detail}`;
   return detail || fee || "Item";
@@ -322,7 +318,7 @@ async function open(inv) {
     const payParsed = parseFmtdAddr(h.pmtfmtdaddr);
     const payment = {
       ...emptyPayment(),
-      amountPaid: toNum(h.payamt), // KEEP SIGNED
+      amountPaid: toNum(h.payamt),
       payDate: normalizeDate(h.paydate),
       method: toStr(h.paymethodname),
       description: toStr(h.description) || "—",
@@ -338,8 +334,8 @@ async function open(inv) {
     const items = rows.map((r) => {
       return {
         product: buildProductName(r),
-        qty: toInt(r.itmqty),      // KEEP SIGNED (refunds are negative)
-        total: toNum(r.itmamt),    // KEEP SIGNED
+        qty: toInt(r.itmqty),
+        total: toNum(r.itmamt),
       };
     });
 
@@ -350,7 +346,7 @@ async function open(inv) {
       shipped: toStr(h.shippedflag) === "1",
       balanceDue: toNum(h.balancedue),
       placedBy: toStr(h.entityname),
-      orderMethod: toStr(h.cssagent) || "OWP Website", // ✅ use backend field
+      orderMethod: toStr(h.cssagent) || "OWP Website",
       status: "Paid",
       billing,
       items,
@@ -386,7 +382,7 @@ async function loadInvoiceFromRoute() {
 function fmtMoneySigned(n) {
   const abs = Math.abs(n);
   const s = `$${abs.toFixed(2)}`;
-  return n < 0 ? `(${s})` : s; // ✅ PDF style for refunds
+  return n < 0 ? `(${s})` : s;
 }
 
 function fmtQtySigned(n) {
@@ -399,7 +395,6 @@ function fmtDate(iso) {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "2-digit", day: "2-digit" });
 }
 
-/** Receipt -> calls backend API and opens PDF in a new tab */
 async function downloadAndOpenReceipt() {
   if (!selected.value) return;
   receiptLoading.value = true;
@@ -418,7 +413,6 @@ async function downloadAndOpenReceipt() {
 
     window.open(url, "_blank", "noopener,noreferrer");
 
-    // ✅ Safari-friendly: download link
     const a = document.createElement("a");
     a.href = url;
     a.download = `receipt-${selected.value.id}.pdf`;
@@ -426,7 +420,6 @@ async function downloadAndOpenReceipt() {
     a.click();
     a.remove();
 
-    // optional: cleanup later
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
   } catch (e) {
     error.value = e?.message ?? String(e);
