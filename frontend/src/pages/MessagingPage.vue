@@ -211,7 +211,20 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
+
+// Loading from Dashboard
+const route = useRoute()
+
+onMounted(async () => {
+  await loadThreads()
+
+  const threadId = Number(route.query.threadId)
+  if (threadId) {
+    await selectThread(threadId)
+  }
+})
 
 const API_BASE = 'https://owp-portal-redesign-db.onrender.com'
 
