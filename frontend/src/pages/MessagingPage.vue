@@ -213,7 +213,7 @@
 import { ref, computed, nextTick, onMounted, watch } from 'vue'
 
 
-const API_BASE = 'http://localhost:3001'
+const API_BASE = 'https://owp-portal-redesign-db.onrender.com'
 
 // IMPORTANT: set this to a real Users.UserId in your DB
 const CURRENT_USER_ID = 1
