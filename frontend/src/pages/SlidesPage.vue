@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 
 // --- Sample data for slides ---
@@ -38,7 +38,7 @@ const completedSlides = {
 
 // Track which category is expanded
 const activeCategory = ref('')
-const toggleCategory = (id: string) => {
+const toggleCategory = (id) => {
   activeCategory.value = activeCategory.value === id ? '' : id
 }
 </script>
