@@ -306,8 +306,8 @@ async function saveContactInfo() {
       <div class="card profile-card">
         <img :src="user" class="icon" />
         <div class="profile-meta">
-          <div class="user-name">{{ account?.fullname ?? "Loading..." }}</div>
-          <div class="user-role">Student,<br />Office of Water Programs</div>
+          <div class="user-name">{{ account?.firstname ?? "Loading..." }}</div>
+          <div class="user-role">TESTING,<br />Office of Water Programs</div>
 
           <button class="btn xsmall" @click="openContactDialogWithData">Edit</button>
         </div>
