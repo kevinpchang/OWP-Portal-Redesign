@@ -115,15 +115,92 @@ export async function addOperator(payload) {
 }
 
 // updateContactInfo
-export async function updateContactInfo(payload) {
+
+// ==========================
+// shared helpers
+// ==========================
+function toApiValue(value) {
+  if (value === undefined || value === null) return "null";
+
+  const str = String(value).trim();
+  return str === "" ? "null" : str;
+}
+
+function digitsOnly(value) {
+  return String(value ?? "").replace(/\D/g, "");
+}
+
+/**
+ * Expected backend field names:
+ * pid
+ * street_1, street_2, street_3
+ * city, state, postal_code, country
+ * phone_area_code, phone_local, phone_extension
+ * fax_area_code, fax_local
+ * ipAddr
+ */
+export function buildUpdateContactInfoPayload(pid, form) {
+  // Because the confirmed request shows:
+  // country=1
+  // phone_area_code=1
+  // phone_local=415
+  // phone_extension=8669023
+  //
+  // we should preserve that exact field contract rather than inventing
+  // phone_country_code / fax_country_code keys.
+
+  const phoneCountryCode = digitsOnly(form.phone_country_code ?? form.phone_area_code ?? "").slice(0, 3);
+  const phoneAreaCode = digitsOnly(form.phone_local ?? "").slice(0, 3);
+  const phoneNumber = digitsOnly(form.phone_extension ?? "").slice(0, 7);
+
+  const faxCountryCode = digitsOnly(form.fax_country_code ?? form.fax_area_code ?? "").slice(0, 3);
+  const faxNumber = digitsOnly(form.fax_local ?? "").slice(0, 10);
+
+  return {
+    pid: toApiValue(pid),
+
+    street_1: toApiValue(form.street_1),
+    street_2: toApiValue(form.street_2),
+    street_3: toApiValue(form.street_3),
+    city: toApiValue(form.city),
+    state: toApiValue(form.state),
+    postal_code: toApiValue(form.postal_code),
+    country: toApiValue(form.country ?? "1"),
+
+    // IMPORTANT:
+    // These names match the working Postman request exactly.
+    phone_area_code: toApiValue(phoneCountryCode),
+    phone_local: toApiValue(phoneAreaCode),
+    phone_extension: toApiValue(phoneNumber),
+
+    fax_area_code: toApiValue(faxCountryCode),
+    fax_local: toApiValue(faxNumber),
+
+    ipAddr: toApiValue(form.ipAddr),
+  };
+}
+
+export async function updateContactInfo(pid, form) {
+  const payload = buildUpdateContactInfoPayload(pid, form);
+
   const request = await fetch(`${BASE}/updateContactInfo`, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Accept": "application/json",
+    },
     body: new URLSearchParams(payload).toString(),
   });
 
   const text = await request.text();
-  if (!request.ok) throw new Error(text);
 
-  try { return JSON.parse(text); } catch { return text; }
+  if (!request.ok) {
+    throw new Error(text || "updateContactInfo request failed");
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
 }
