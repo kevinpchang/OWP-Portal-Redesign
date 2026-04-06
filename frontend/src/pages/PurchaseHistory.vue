@@ -59,39 +59,39 @@
         <div class="detail-table">
           <div class="row">
             <div class="cell h">Invoice Num</div>
-            <div class="cell">#{{ selected!.id }}</div>
+            <div class="cell">#{{ selected.id }}</div>
             <div class="cell h">Invoice Date</div>
-            <div class="cell">{{ fmtDate(selected!.invoiceDate) }}</div>
+            <div class="cell">{{ fmtDate(selected.invoiceDate) }}</div>
             <div class="cell h">Invoice Due Date</div>
-            <div class="cell">{{ fmtDate(selected!.dueDate) }}</div>
+            <div class="cell">{{ fmtDate(selected.dueDate) }}</div>
           </div>
 
           <div class="row">
             <div class="cell h">Shipped</div>
-            <div class="cell">{{ selected!.shipped ? "Yes" : "No" }}</div>
+            <div class="cell">{{ selected.shipped ? "Yes" : "No" }}</div>
             <div class="cell h">Balance Due</div>
-            <div class="cell">{{ fmtMoneySigned(selected!.balanceDue) }}</div>
+            <div class="cell">{{ fmtMoneySigned(selected.balanceDue) }}</div>
             <div class="cell h">Order Method</div>
-            <div class="cell">{{ selected!.orderMethod }}</div>
+            <div class="cell">{{ selected.orderMethod }}</div>
           </div>
 
           <div class="row multi">
             <div class="cell h">Order Placed By</div>
-            <div class="cell">{{ selected!.placedBy }}</div>
+            <div class="cell">{{ selected.placedBy }}</div>
 
             <div class="cell h">Billing Address & Phone</div>
             <div class="cell">
-              <div class="addr">{{ selected!.billing.name }}</div>
-              <div class="addr">{{ selected!.billing.address1 }}</div>
-              <div class="addr" v-if="selected!.billing.address2">
-                {{ selected!.billing.address2 }}
+              <div class="addr">{{ selected.billing.name }}</div>
+              <div class="addr">{{ selected.billing.address1 }}</div>
+              <div class="addr" v-if="selected.billing.address2">
+                {{ selected.billing.address2 }}
               </div>
               <div class="addr">
-                {{ selected!.billing.city }},
-                {{ selected!.billing.state }}
-                {{ selected!.billing.zip }}
+                {{ selected.billing.city }},
+                {{ selected.billing.state }}
+                {{ selected.billing.zip }}
               </div>
-              <div class="addr">{{ selected!.billing.phone }}</div>
+              <div class="addr">{{ selected.billing.phone }}</div>
             </div>
           </div>
         </div>
@@ -105,13 +105,13 @@
             <div class="c total">Total Cost</div>
           </div>
 
-          <div v-for="(it, i) in selected!.items" :key="i" class="items-row">
+          <div v-for="(it, i) in selected.items" :key="i" class="items-row">
             <div class="c product">{{ it.product }}</div>
             <div class="c qty">{{ fmtQtySigned(it.qty) }}</div>
             <div class="c total">{{ fmtMoneySigned(it.total) }}</div>
           </div>
 
-          <div v-if="selected!.items.length === 0" class="items-row">
+          <div v-if="selected.items.length === 0" class="items-row">
             <div class="c product" style="color:#64748b">No items returned.</div>
             <div class="c qty"></div>
             <div class="c total"></div>
@@ -122,38 +122,38 @@
 
         <div class="payment">
           <div class="p-row">
-            <div class="p-h">{{ selected!.payment.amountPaid < 0 ? "Amount Refunded" : "Amount Paid" }}</div>
-            <div class="p-v">{{ fmtMoneySigned(selected!.payment.amountPaid) }}</div>
+            <div class="p-h">{{ selected.payment.amountPaid < 0 ? "Amount Refunded" : "Amount Paid" }}</div>
+            <div class="p-v">{{ fmtMoneySigned(selected.payment.amountPaid) }}</div>
 
             <div class="p-h">Pay Date</div>
-            <div class="p-v">{{ fmtDate(selected!.payment.payDate) }}</div>
+            <div class="p-v">{{ fmtDate(selected.payment.payDate) }}</div>
 
             <div class="p-h">Pay Method</div>
-            <div class="p-v">{{ selected!.payment.method }}</div>
+            <div class="p-v">{{ selected.payment.method }}</div>
           </div>
 
           <div class="p-row">
             <div class="p-h">Description</div>
-            <div class="p-v">{{ selected!.payment.description }}</div>
+            <div class="p-v">{{ selected.payment.description }}</div>
 
             <div class="p-h">Payment Made By</div>
-            <div class="p-v">{{ selected!.payment.madeBy }}</div>
+            <div class="p-v">{{ selected.payment.madeBy }}</div>
 
             <div class="p-h">Payment Phone</div>
-            <div class="p-v">{{ selected!.payment.phone }}</div>
+            <div class="p-v">{{ selected.payment.phone }}</div>
           </div>
 
           <div class="p-row">
             <div class="p-h">Payment Address</div>
             <div class="p-v">
-              <div>{{ selected!.payment.address1 }}</div>
-              <div v-if="selected!.payment.address2">
-                {{ selected!.payment.address2 }}
+              <div>{{ selected.payment.address1 }}</div>
+              <div v-if="selected.payment.address2">
+                {{ selected.payment.address2 }}
               </div>
               <div>
-                {{ selected!.payment.city }},
-                {{ selected!.payment.state }}
-                {{ selected!.payment.zip }}
+                {{ selected.payment.city }},
+                {{ selected.payment.state }}
+                {{ selected.payment.zip }}
               </div>
             </div>
           </div>
@@ -163,52 +163,15 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { onMounted, ref, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import * as api from "@/services/owpAPI";
 
-type InvoiceItem = { product: string; qty: number; total: number };
-type Address = {
-  name?: string;
-  address1: string;
-  address2?: string;
-  city: string;
-  state: string;
-  zip: string;
-  phone?: string;
-};
-type Payment = {
-  amountPaid: number; // keep SIGNED
-  payDate: string;
-  method: string;
-  description: string;
-  madeBy: string;
-  phone: string;
-  address1: string;
-  address2?: string;
-  city: string;
-  state: string;
-  zip: string;
-};
-type Invoice = {
-  id: number;
-  invoiceDate: string;
-  dueDate: string;
-  shipped: boolean;
-  balanceDue: number; // keep SIGNED (usually 0)
-  placedBy: string;
-  billing: Address;
-  orderMethod: string;
-  status: "Paid" | "Unpaid";
-  items: InvoiceItem[];
-  payment: Payment;
-};
-
-const invoices = ref<Invoice[]>([]);
-const selected = ref<Invoice | null>(null);
+const invoices = ref([]);
+const selected = ref(null);
 const loading = ref(false);
-const error = ref<string | null>(null);
+const error = ref(null);
 const receiptLoading = ref(false);
 
 // TODO later: come from login/store/session
@@ -216,22 +179,22 @@ const pid = 458860;
 const router = useRouter();
 const route = useRoute();
 
-function toStr(x: any) {
+function toStr(x) {
   return x == null ? "" : String(x);
 }
-function toNum(x: any) {
+function toNum(x) {
   const n = Number(x);
   return Number.isFinite(n) ? n : 0;
 }
-function toInt(x: any) {
+function toInt(x) {
   const n = Number(x);
   return Number.isFinite(n) ? Math.trunc(n) : 0;
 }
 
-function emptyBilling(): Address {
+function emptyBilling() {
   return { name: "", address1: "", city: "", state: "", zip: "", phone: "" };
 }
-function emptyPayment(): Payment {
+function emptyPayment() {
   return {
     amountPaid: 0,
     payDate: "",
@@ -246,7 +209,7 @@ function emptyPayment(): Payment {
   };
 }
 
-function parseFmtdAddr(html: any): Partial<Address> {
+function parseFmtdAddr(html) {
   const s = toStr(html);
   if (!s) return {};
 
@@ -268,7 +231,7 @@ function parseFmtdAddr(html: any): Partial<Address> {
   return { name, address1, city, state, zip };
 }
 
-function normalizeDate(s: any): string {
+function normalizeDate(s) {
   const t = toStr(s).trim();
   if (!t) return "";
   if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
@@ -289,11 +252,11 @@ async function loadInvoices() {
   error.value = null;
 
   try {
-    const raw: any = await api.getInvoices(pid);
-    const list: any[] = Array.isArray(raw?.response) ? raw.response : [];
+    const raw = await api.getInvoices(pid);
+    const list = Array.isArray(raw?.response) ? raw.response : [];
 
     invoices.value = list
-      .map((x: any) => {
+      .map((x) => {
         const id = Number(x.invoicenum);
         return {
           id,
@@ -307,10 +270,10 @@ async function loadInvoices() {
           status: "Paid",
           items: [],
           payment: emptyPayment(),
-        } as Invoice;
+        }
       })
       .filter((inv) => Number.isFinite(inv.id));
-  } catch (e: any) {
+  } catch (e) {
     invoices.value = [];
     error.value = e?.message ?? String(e);
   } finally {
@@ -318,7 +281,7 @@ async function loadInvoices() {
   }
 }
 
-function buildProductName(r: any): string {
+function buildProductName(r) {
   const fee = toStr(r.feetypename).trim();
   const comment = toStr(r.mstfeecomment).trim();
   const course = toStr(r.coursetitle).trim();
@@ -332,15 +295,15 @@ function buildProductName(r: any): string {
   return detail || fee || "Item";
 }
 
-async function open(inv: Invoice) {
+async function open(inv) {
 
   router.push(`/purchase-history/${inv.id}`);
   loading.value = true;
   error.value = null;
 
   try {
-    const raw: any = await api.getInvoiceData(inv.id);
-    const rows: any[] = Array.isArray(raw?.response) ? raw.response : [];
+    const raw = await api.getInvoiceData(inv.id);
+    const rows = Array.isArray(raw?.response) ? raw.response : [];
 
     if (rows.length === 0) {
       selected.value = inv;
@@ -350,14 +313,14 @@ async function open(inv: Invoice) {
     const h = rows[0];
 
     const billParsed = parseFmtdAddr(h.billfmtdaddr);
-    const billing: Address = {
+    const billing = {
       ...emptyBilling(),
       ...billParsed,
       phone: toStr(h.billfmtdphn) || "",
     };
 
     const payParsed = parseFmtdAddr(h.pmtfmtdaddr);
-    const payment: Payment = {
+    const payment = {
       ...emptyPayment(),
       amountPaid: toNum(h.payamt), // KEEP SIGNED
       payDate: normalizeDate(h.paydate),
@@ -372,7 +335,7 @@ async function open(inv: Invoice) {
       zip: payParsed.zip ?? "",
     };
 
-    const items: InvoiceItem[] = rows.map((r: any) => {
+    const items = rows.map((r) => {
       return {
         product: buildProductName(r),
         qty: toInt(r.itmqty),      // KEEP SIGNED (refunds are negative)
@@ -393,7 +356,7 @@ async function open(inv: Invoice) {
       items,
       payment,
     };
-  } catch (e: any) {
+  } catch (e) {
     selected.value = null;
     error.value = e?.message ?? String(e);
   } finally {
@@ -420,17 +383,17 @@ async function loadInvoiceFromRoute() {
 
 
 
-function fmtMoneySigned(n: number) {
+function fmtMoneySigned(n) {
   const abs = Math.abs(n);
   const s = `$${abs.toFixed(2)}`;
   return n < 0 ? `(${s})` : s; // ✅ PDF style for refunds
 }
 
-function fmtQtySigned(n: number) {
+function fmtQtySigned(n) {
   return String(n); // show -1 exactly as backend returns
 }
 
-function fmtDate(iso: string) {
+function fmtDate(iso) {
   if (!iso) return "";
   const d = new Date(iso + "T00:00:00");
   return d.toLocaleDateString(undefined, { year: "numeric", month: "2-digit", day: "2-digit" });
@@ -444,7 +407,7 @@ async function downloadAndOpenReceipt() {
 
   try {
     // owp.js has: fetch(`${BASE}/receipt/download/${invoiceNum}`)
-    const raw: any = await api.downloadReceipt(selected.value.id);
+    const raw = await api.downloadReceipt(selected.value.id);
 
     const b64 = raw?.response;
     if (!b64 || typeof b64 !== "string") throw new Error("Receipt API returned no PDF data.");
@@ -465,7 +428,7 @@ async function downloadAndOpenReceipt() {
 
     // optional: cleanup later
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
-  } catch (e: any) {
+  } catch (e) {
     error.value = e?.message ?? String(e);
   } finally {
     receiptLoading.value = false;
