@@ -54,9 +54,6 @@ async function loadAccount() {
 }
 
 // --- Load certificates from activeEnrollment ---
-// No dedicated /certificates endpoint exists in the OWP API.
-// We derive certificates from completed enrollments with grade "CR" (Credit = Pass).
-// CEUs and contact hours are fetched per-enrollment from enrollmentRecord.
 async function loadCertificates() {
   loadingCerts.value = true;
   certsError.value = "";
@@ -70,7 +67,6 @@ async function loadCertificates() {
         String(r.grade ?? "").trim() === "CR"
     );
 
-    // Fetch enrollmentRecord for CEUs + contact hours
     const enriched = await Promise.all(
       completed.map(async (r) => {
         let ceus = "—";
@@ -86,7 +82,7 @@ async function loadCertificates() {
             contactHours = record.contacthour ?? record.contacthours ?? "—";
           }
         } catch {
-          // silently fallback — CEUs/hours not critical
+          // silently fallback
         }
         return {
           id: r.enrollid,
@@ -110,13 +106,11 @@ async function loadCertificates() {
 }
 
 // --- Generate and download a certificate PDF using jsPDF ---
-// jsPDF is loaded dynamically from CDN — no npm install needed.
 async function downloadCertificate(cert) {
   if (downloadingId.value === cert.id) return;
   downloadingId.value = cert.id;
 
   try {
-    // Dynamically load jsPDF from CDN if not already present
     if (!window.jspdf) {
       await new Promise((resolve, reject) => {
         const script = document.createElement("script");
@@ -135,23 +129,18 @@ async function downloadCertificate(cert) {
     const W = 297;
     const H = 210;
 
-    // ── Background ──────────────────────────────────────────────
-    doc.setFillColor(3, 71, 80);           // #034750 deep teal
+    doc.setFillColor(3, 71, 80);
     doc.rect(0, 0, W, H, "F");
 
-    // Light inner panel
-    doc.setFillColor(242, 241, 242);       // #F2F1F2
+    doc.setFillColor(242, 241, 242);
     doc.roundedRect(14, 14, W - 28, H - 28, 6, 6, "F");
 
-    // Green accent bar on left
-    doc.setFillColor(109, 190, 75);        // #6DBE4B
+    doc.setFillColor(109, 190, 75);
     doc.rect(14, 14, 8, H - 28, "F");
 
-    // Teal accent bar on top
-    doc.setFillColor(0, 165, 181);         // #00A5B5
+    doc.setFillColor(0, 165, 181);
     doc.rect(22, 14, W - 36, 6, "F");
 
-    // ── OWP header ───────────────────────────────────────────────
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.setTextColor(3, 71, 80);
@@ -162,50 +151,42 @@ async function downloadCertificate(cert) {
     doc.setTextColor(112, 112, 112);
     doc.text("California State University, Sacramento", 38, 40);
 
-    // Horizontal rule
     doc.setDrawColor(0, 165, 181);
     doc.setLineWidth(0.5);
     doc.line(38, 44, W - 22, 44);
 
-    // ── "Certificate of Completion" ──────────────────────────────
     doc.setFont("helvetica", "bold");
     doc.setFontSize(28);
     doc.setTextColor(3, 71, 80);
     doc.text("Certificate of Completion", W / 2, 68, { align: "center" });
 
-    // ── "This certifies that" ────────────────────────────────────
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
     doc.setTextColor(80, 80, 80);
     doc.text("This certifies that", W / 2, 82, { align: "center" });
 
-    // ── Recipient name ───────────────────────────────────────────
     const displayName = accountName.value || "Student";
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
     doc.setTextColor(0, 165, 181);
     doc.text(displayName, W / 2, 96, { align: "center" });
 
-    // Underline name
     const nameWidth = doc.getTextWidth(displayName);
     doc.setDrawColor(0, 165, 181);
     doc.setLineWidth(0.4);
     doc.line(W / 2 - nameWidth / 2, 98, W / 2 + nameWidth / 2, 98);
 
-    // ── "has successfully completed" ─────────────────────────────
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
     doc.setTextColor(80, 80, 80);
     doc.text("has successfully completed the course", W / 2, 108, { align: "center" });
 
-    // ── Course title ─────────────────────────────────────────────
     doc.setFont("helvetica", "bold");
     doc.setFontSize(15);
     doc.setTextColor(3, 71, 80);
     const titleLines = doc.splitTextToSize(cert.title, 200);
     doc.text(titleLines, W / 2, 120, { align: "center" });
 
-    // ── Metadata row ─────────────────────────────────────────────
     const metaY = 148;
     doc.setDrawColor(200, 200, 200);
     doc.setLineWidth(0.3);
@@ -228,7 +209,6 @@ async function downloadCertificate(cert) {
       doc.text(col.value, col.x, metaY + 7, { align: "center" });
     }
 
-    // ── Signature line ───────────────────────────────────────────
     doc.setDrawColor(3, 71, 80);
     doc.setLineWidth(0.5);
     doc.line(W / 2 - 40, 170, W / 2 + 40, 170);
@@ -237,7 +217,6 @@ async function downloadCertificate(cert) {
     doc.setTextColor(112, 112, 112);
     doc.text("Director, Office of Water Programs", W / 2, 175, { align: "center" });
 
-    // ── Footer ───────────────────────────────────────────────────
     doc.setFontSize(8);
     doc.setTextColor(160, 160, 160);
     doc.text(
@@ -245,7 +224,6 @@ async function downloadCertificate(cert) {
       W / 2, H - 18, { align: "center" }
     );
 
-    // ── Decorative seal ──────────────────────────────────────────
     doc.setDrawColor(109, 190, 75);
     doc.setLineWidth(1.5);
     doc.circle(W - 45, 160, 18, "S");
@@ -257,7 +235,6 @@ async function downloadCertificate(cert) {
     doc.text("CERTIFIED", W - 45, 158, { align: "center" });
     doc.text("OWP", W - 45, 164, { align: "center" });
 
-    // ── Save ─────────────────────────────────────────────────────
     const safeName = cert.title
       .replace(/[^a-z0-9]/gi, "_")
       .replace(/_+/g, "_")
