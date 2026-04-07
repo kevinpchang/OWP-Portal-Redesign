@@ -11,4 +11,7 @@ test('Operator Numbers page loads main sections correctly', async ({ page }) => 
 
   await expect(page.locator('.title')).toContainText('Operator Numbers')
   
+  await expect(page.locator('.quick-links .messages .header')).toContainText('Messages')
+  await expect(page.locator('.quick-links .purchase-history .header')).toContainText('Certificates')
+  
 })
