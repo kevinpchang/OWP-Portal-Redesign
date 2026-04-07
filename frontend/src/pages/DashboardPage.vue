@@ -38,7 +38,52 @@ function getCourseImage(owpabbr) {
 const route = useRoute()
 const currentDate = ref(formatDate())
 
-// --- API STATE ---
+// --- Silicon Scribes DB ---
+const MESSAGING_API_BASE = 'https://owp-portal-redesign-db.onrender.com'
+const messagingUserId = 1
+
+const messages = ref([])
+const loadingMessages = ref(false)
+const messagesError = ref('')
+
+function formatInboxDate(dt) {
+  if (!dt) return ''
+  return new Date(dt).toLocaleDateString(undefined, {
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+async function loadMessages() {
+  loadingMessages.value = true
+  messagesError.value = ''
+
+  try {
+    const url = new URL(`${MESSAGING_API_BASE}/api/messaging/threads`)
+    url.searchParams.set('userId', String(messagingUserId))
+
+    const res = await fetch(url.toString())
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+    const data = await res.json()
+
+    messages.value = (data.threads || []).slice(0, 3).map((row) => ({
+      id: Number(row.ThreadId),
+      sender: row.LastSenderName || row.LastSenderEmail || 'Unknown',
+      date: formatInboxDate(row.LastSentAt || row.LastMessageAt || row.CreatedAt),
+    }))
+  } catch (e) {
+    console.error('Failed to load messages:', e)
+    messagesError.value = e?.message ?? 'load-failed'
+    messages.value = []
+  } finally {
+    loadingMessages.value = false
+  }
+}
+
+
+// --- OWP API ---
 const pid = 458860 // later: come from auth/session
 
 const loading = ref(false)
@@ -84,6 +129,8 @@ async function loadDash() {
   } finally {
     loading.value = false
   }
+
+  await loadMessages()
 }
 
 const activeEnrollments = computed(() =>
@@ -240,11 +287,9 @@ function scheduleNextUpdate() {
           </div>
           <div class="divider"></div>
           <div class="body">
-            <div class="object"><div class="text">Email message (4/11/2025)</div></div>
-            <div class="object"><div class="text">Email message (4/07/2025)</div></div>
-            <div class="object"><div class="text">Email message (4/03/2025)</div></div>
+            <router-link :to="`/messages?threadId=${message.id}`" class="object" v-for="message in messages.slice(0, 3)" :key="message.id"><div class="text">Email Message from: {{ message.sender }} {{ message.date }}</div></router-link>
           </div>
-          <div class="view-all">
+          <div class="view-all"> 
             <router-link to="/messages">
               <div class="text">(View all messages)</div>
             </router-link>
@@ -283,7 +328,7 @@ function scheduleNextUpdate() {
 .dashboard-page {
   display: grid;
   grid-template-rows: auto 1fr;
-  row-gap: 32px;
+  row-gap: 32rem;
   justify-content: center;
   align-items: top;
 }
@@ -291,8 +336,8 @@ function scheduleNextUpdate() {
 .dashboard-top {
   grid-row: 1;
   display: grid;
-  grid-template-columns: 508px 508px;
-  margin-top: 32px;
+  grid-template-columns: 508rem 508rem;
+  margin-top: 32rem;
 }
 
 .text {
@@ -301,7 +346,7 @@ function scheduleNextUpdate() {
   flex-direction: column;
   justify-content: center;
   align-items: left;
-  height: 240px;
+  height: 240rem;
   color: #034750;
 }
 
@@ -318,56 +363,56 @@ function scheduleNextUpdate() {
 }
 
 .date {
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 600;
   color: #707070;
-  margin-top: 24px;
-  margin-bottom: 32px;
-  margin-left: 24px;
+  margin-top: 24rem;
+  margin-bottom: 32rem;
+  margin-left: 24rem;
 }
 
 .welcome-message {
-  font-size: 56px;
+  font-size: 56rem;
   font-weight: 700;
   color: #00a5b5;
-  margin-bottom: 16px;
-  margin-left: 24px;
+  margin-bottom: 16rem;
+  margin-left: 24rem;
 }
 
 .dashboard-description {
-  width: 395px;
-  height: 71px;
-  font-size: 19px;
+  width: 395rem;
+  height: 71rem;
+  font-size: 19rem;
   font-weight: 400;
   color: #747474;
-  margin-bottom: 33px;
-  margin-left: 24px;
+  margin-bottom: 33rem;
+  margin-left: 24rem;
 }
 
 .dashboard-bottom {
   grid-row: 2;
   display: grid;
-  grid-template-columns: 700px 300px;
-  column-gap: 16px;
-  margin-bottom: 48px;
+  grid-template-columns: 700rem 300rem;
+  column-gap: 16rem;
+  margin-bottom: 48rem;
 }
 
 .dashboard-left {
   grid-column: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16rem;
 }
 
 .divider {
   width: 100%;
-  height: 0px;
-  border-top: 1px solid #ffffff;
+  height: 0rem;
+  border-top: 1rem solid #ffffff;
 }
 
 .active-enrollments {
-  height: 450px;
-  border-radius: 14px;
+  height: 450rem;
+  border-radius: 14rem;
   display: flex;
   flex-direction: column;
   justify-content: top;
@@ -376,7 +421,7 @@ function scheduleNextUpdate() {
 }
 
 .active-enrollments .header {
-  height: 68px;
+  height: 68rem;
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -384,17 +429,17 @@ function scheduleNextUpdate() {
 }
 
 .active-enrollments .header .icon {
-  width: 26.53px;
-  height: 33.67px;
+  width: 26.53rem;
+  height: 33.67rem;
   transform: rotate(-25deg);
-  margin-left: 23.55px;
+  margin-left: 23.55rem;
 }
 
 .active-enrollments .header .text {
   height: 20rem;
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 700;
-  margin-left: 8px;
+  margin-left: 8rem;
   color: #034750;
 }
 
@@ -406,10 +451,10 @@ function scheduleNextUpdate() {
 }
 
 .active-enrollments .body .object {
-  height: 118px;
+  height: 118rem;
   display: flex;
   flex-direction: row;
-  margin-bottom: 4px;
+  margin-bottom: 4rem;
   text-decoration: none;
 }
 
@@ -419,16 +464,16 @@ function scheduleNextUpdate() {
 }
 
 .active-enrollments .body .object .left {
-  width: 83px;
+  width: 83rem;
   display: flex;
   align-items: center;
 }
 
 .active-enrollments .body .object .left .course-cover {
-  width: 59px;
-  height: 71px;
-  margin-left: 24px;
-  border-radius: 4px;
+  width: 59rem;
+  height: 71rem;
+  margin-left: 24rem;
+  border-radius: 4rem;
   object-fit: cover;
   display: block;
   flex-shrink: 0;
@@ -444,61 +489,61 @@ function scheduleNextUpdate() {
 
 .active-enrollments .body .object .left .fallback-text {
   color: #ffffff;
-  font-size: 10px;
+  font-size: 10rem;
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.3rem;
   font-family: 'Roboto', sans-serif;
-  padding: 4px;
+  padding: 4rem;
 }
 
 
 .active-enrollments .body .object .right {
-  width: 617px;
+  width: 617rem;
   display: flex;
   cursor: pointer;
   flex-direction: column;
 }
 
 .active-enrollments .body .object .right .title {
-  height: 17px;
-  margin-top: 23px;
+  height: 17rem;
+  margin-top: 23rem;
   color: #034750;
 }
 
 .active-enrollments .body .object .right .title .text {
-  height: 17px;
-  font-size: 16px;
+  height: 17rem;
+  font-size: 16rem;
   font-weight: 600;
   text-decoration: underline;
-  margin-left: 13.5px;
+  margin-left: 13.5rem;
   color: #707070;
 }
 
 .active-enrollments .body .object .right .data {
-  height: 14px;
+  height: 14rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin-top: 16px;
-  margin-left: 13px;
-  margin-right: 24px;
+  margin-top: 16rem;
+  margin-left: 13rem;
+  margin-right: 24rem;
 }
 
 .active-enrollments .body .object .right .data .text {
-  height: 14px;
-  font-size: 14px;
+  height: 14rem;
+  font-size: 14rem;
   font-weight: 400;
   color: #707070;
 }
 
 .active-enrollments .body .object .right .progress {
-  height: 16px;
+  height: 16rem;
   border-radius: 4rem;
   display: flex;
-  margin-top: 8px;
-  margin-left: 13px;
-  margin-right: 24px;
+  margin-top: 8rem;
+  margin-left: 13rem;
+  margin-right: 24rem;
   background-color: #7a7a7a;
 }
 
@@ -511,11 +556,11 @@ function scheduleNextUpdate() {
 }
 
 .active-enrollments .body .object .right .progress .percent .text {
-  height: 13px;
-  font-size: 14px;
+  height: 13rem;
+  font-size: 14rem;
   font-weight: 400;
-  line-height: 1px;
-  margin-top: 2px;
+  line-height: 1rem;
+  margin-top: 2rem;
   color: #ffffff;
 }
 
@@ -526,10 +571,10 @@ function scheduleNextUpdate() {
 }
 
 .view-all .text {
-  height: 20px;
-  font-size: 20px;
+  height: 20rem;
+  font-size: 20rem;
   font-weight: 400;
-  margin-bottom: 12px;
+  margin-bottom: 12rem;
   cursor: pointer;
   color: #034750;
   transition: color 0.2s ease;
@@ -552,7 +597,7 @@ function scheduleNextUpdate() {
 }
 
 .instructor-slides {
-  height: 250px;
+  height: 250rem;
   border-radius: 14rem;
   display: flex;
   flex-direction: column;
@@ -560,7 +605,7 @@ function scheduleNextUpdate() {
 }
 
 .instructor-slides .header {
-  height: 68px;
+  height: 68rem;
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -568,27 +613,27 @@ function scheduleNextUpdate() {
 }
 
 .instructor-slides .header .icon {
-  width: 26.53px;
-  height: 33.67px;
-  margin-left: 23.55px;
+  width: 26.53rem;
+  height: 33.67rem;
+  margin-left: 23.55rem;
 }
 
 .instructor-slides .header .text {
-  height: 20px;
-  font-size: 20px;
+  height: 20rem;
+  font-size: 20rem;
   font-weight: 700;
-  margin-left: 8px;
+  margin-left: 8rem;
   color: #034750;
 }
 
 .instructor-slides .body {
-  height: 140px;
+  height: 140rem;
   display: flex;
   flex-direction: column;
 }
 
 .instructor-slides .body .object {
-  height: 40px;
+  height: 40rem;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -600,9 +645,9 @@ function scheduleNextUpdate() {
 }
 
 .instructor-slides .body .object .text {
-  height: 14px;
-  margin-left: 24px;
-  font-size: 16px;
+  height: 14rem;
+  margin-left: 24rem;
+  font-size: 16rem;
   font-weight: 400;
   text-decoration: underline;
   color: #007c8a;
@@ -612,11 +657,11 @@ function scheduleNextUpdate() {
   grid-column: 2;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16rem;
 }
 
 .messages {
-  height: 240px;
+  height: 240rem;
   border-radius: 14rem;
   display: flex;
   flex-direction: column;
@@ -624,7 +669,7 @@ function scheduleNextUpdate() {
 }
 
 .messages .header {
-  height: 68px;
+  height: 68rem;
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -632,27 +677,27 @@ function scheduleNextUpdate() {
 }
 
 .messages .header .icon {
-  width: 26.53px;
-  height: 33.67px;
-  margin-left: 23.55px;
+  width: 26.53rem;
+  height: 33.67rem;
+  margin-left: 23.55rem;
 }
 
 .messages .header .text {
-  height: 20px;
-  font-size: 20px;
+  height: 20rem;
+  font-size: 20rem;
   font-weight: 700;
-  margin-left: 8px;
+  margin-left: 8rem;
   color: #034750;
 }
 
 .messages .body {
-  height: 172px;
+  height: 172rem;
   display: flex;
   flex-direction: column;
 }
 
 .messages .body .object {
-  height: 40px;
+  height: 40rem;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -664,16 +709,16 @@ function scheduleNextUpdate() {
 }
 
 .messages .body .object .text {
-  height: 14px;
-  margin-left: 24px;
-  font-size: 16px;
+  height: 14rem;
+  margin-left: 24rem;
+  font-size: 16rem;
   font-weight: 400;
   text-decoration: underline;
   color: #007c8a;
 }
 
 .purchase-history {
-  height: 460px;
+  height: 460rem;
   border-radius: 14rem;
   display: flex;
   flex-direction: column;
@@ -681,7 +726,7 @@ function scheduleNextUpdate() {
 }
 
 .purchase-history .header {
-  height: 68px;
+  height: 68rem;
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -689,28 +734,28 @@ function scheduleNextUpdate() {
 }
 
 .purchase-history .header .icon {
-  width: 26.53px;
-  height: 33.67px;
-  margin-left: 23.55px;
+  width: 26.53rem;
+  height: 33.67rem;
+  margin-left: 23.55rem;
 }
 
 .purchase-history .header .text {
-  height: 20px;
-  font-size: 20px;
+  height: 20rem;
+  font-size: 20rem;
   font-weight: 700;
-  margin-left: 8px;
+  margin-left: 8rem;
   color: #034750;
 }
 
 .purchase-history .body {
-  height: 460px;
+  height: 460rem;
   display: flex;
   flex-direction: column;
   overflow-y: hidden;
 }
 
 .purchase-history .body .object {
-  height: 50px;
+  height: 50rem;
   padding-top: 2%;
   padding-bottom: 2%;
   display: flex;
@@ -724,10 +769,10 @@ function scheduleNextUpdate() {
 }
 
 .purchase-history .body .object .text {
-  height: 14px;
-  padding-left: 24px;
-  padding-right: 24px;
-  font-size: 16px;
+  height: 14rem;
+  padding-left: 24rem;
+  padding-right: 24rem;
+  font-size: 16rem;
   font-weight: 400;
   text-decoration: underline;
   color: #007c8a;

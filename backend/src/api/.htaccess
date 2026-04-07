@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Let Apache serve real files directly.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Forward all API routes to the PHP proxy entrypoint.
+RewriteRule ^ index.php [QSA,L]
