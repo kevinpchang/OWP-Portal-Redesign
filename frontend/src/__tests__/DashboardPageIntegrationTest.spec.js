@@ -1,7 +1,7 @@
 // Runs unit tests for the Dashboard Page
 // To use:
 // Open a Terminal and cd to the frontend directory
-// To run individually: npm run test:front -- src/__tests__/DashboardPage.spec.js
+// To run individually: npm run test:front -- src/__tests__/DashboardPageIntegrationTest.spec.js
 // To run all frontend tests: npm run test:front
 
 import { describe, it, expect, vi } from 'vitest'

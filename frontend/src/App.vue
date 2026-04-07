@@ -35,8 +35,8 @@
 <style>
   :root {
     font-size: min(calc(100vw / 1628), calc(100vh / 1080));
-    --header-h: 100px;
-    --sidebar-w: 295px;
+    --header-h: 100rem;
+    --sidebar-w: 295rem;
   }
 
   body, html {
