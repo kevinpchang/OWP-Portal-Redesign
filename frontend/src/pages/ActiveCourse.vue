@@ -295,7 +295,7 @@ onMounted(async () => {
           <h2 class="card-title">Active Enrollments</h2>
         </div>
 
-        <div class="divider"></div>
+        <div class="divider"></div> 
 
         <div class="summary-body">
           <div class="summary-left">
@@ -305,9 +305,7 @@ onMounted(async () => {
                 alt="Course image"
                 class="course-image-large"
               />
-              <div v-else class="course-image-large fallback-image">
-                <span class="fallback-text-large">NO IMAGE AVAILABLE</span>
-              </div>
+              <div v-else class="course-image-large fallback-image"></div>
 
             <div class="course-header-info">
               <h2 class="course-title">{{ courseTitle }}</h2>
@@ -612,6 +610,10 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 
+.fallback-image {
+  background-color: #6DBE4B;
+}
+
 .course-header-info {
   display: flex;
   flex-direction: column;
@@ -912,21 +914,6 @@ onMounted(async () => {
 .error-message {
   color: #9F3323;
   font-weight: 600;
-}
-
-.fallback-image {
-  background-color: #6DBE4B;
-  display: flex;
-  align-items: center;
-  justify-content: center; 
-  text-align: center;
-}
-
-.fallback-text-large {
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
-  font-family: 'Roboto', sans-serif;
 }
 
 </style>
