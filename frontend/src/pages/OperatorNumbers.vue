@@ -64,9 +64,9 @@
     const original = nums.value[0]
 
     const payload = {
-      liccatid: original.liccatid,
-      countryid: original.countryid,
-      status: original.oprlicstatus,
+      liccatid: "1",
+      countryid: "1",
+      status: "1",
       operatornumber: addOpNum.value,
       state: addState.value,
       ipAddr: "localhost"
@@ -258,6 +258,9 @@
             </tr>
           </thead>
           <tbody class="table-body">
+            <tr v-if="nums.length === 0">
+              <td colspan="3" style="text-align: center; padding: 20px;">No operator numbers available.</td>
+            </tr>
             <tr v-for="entry in nums" :key="entry.oprlicid">
               <td>{{ entry.state }}</td>
               <td>{{ entry.operatornumber }}</td>
