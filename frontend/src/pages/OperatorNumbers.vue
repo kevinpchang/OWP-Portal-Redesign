@@ -77,7 +77,7 @@
   async function updateNumber(){
 
     const original = nums.value.find(
-      item => item.liccatid === selectedRow.value
+      item => item.oprlicid === selectedRow.value
     )
 
     if (!original) return
@@ -108,7 +108,7 @@
   async function deleteNumber(){
 
     const original = nums.value.find(
-      item => item.liccatid === selectedRow.value
+      item => item.oprlicid === selectedRow.value
     )
 
     if (!original) return
