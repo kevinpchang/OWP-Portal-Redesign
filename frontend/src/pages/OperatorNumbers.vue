@@ -203,8 +203,8 @@
           </thead>
           <tbody class="table-body">
             <tr v-for="entry in nums" :key="entry.oprlicid">
-              <td>{{ entry.operatornumber }}</td>
               <td>{{ entry.state }}</td>
+              <td>{{ entry.operatornumber }}</td>
               <td>
                 <button class="edit-button" @click.left="openEdit(entry.oprlicid)">Edit</button>
                 <button class="remove-button" @click.left="openDelete(entry.oprlicid)">Remove</button>
