@@ -11,9 +11,16 @@
   const error = ref("");
   const opNum = ref("");
   const state = ref("");
+  const certificatesError = ref("");
+  const messagesError = ref("");
   const loading = ref(false);
+  const loadingMessages = ref(false);
+  const loadingCertificates = ref(false);
 
   const nums = ref([]);
+  const messages = ref([]);
+  const certificates = ref([]);
+  const enrollments = ref([]);
 
   const editState = ref("")
   const editOpNum = ref("")
@@ -38,6 +45,11 @@
       state.value = nums.value?.state ?? ""
 
       console.log("Numbers loaded");
+
+      await Promise.all([
+        loadMessages(),
+        loadCertificates(),
+      ]);
 
     } catch (e) {
       error.value = e?.message ?? String(e);
@@ -124,6 +136,49 @@
     deletePopup.value = false
   }
 
+  async function loadMessages() {
+    loadingMessages.value = true;
+    messagesError.value = "";
+
+    try {
+      messages.value = [];
+    } catch (e) {
+      console.error("Failed to load messages:", e);
+      messagesError.value = "load-failed";
+      messages.value = [];
+    } finally {
+      loadingMessages.value = false;
+    }
+  }
+
+  async function loadCertificates() {
+    loadingCertificates.value = true;
+    certificatesError.value = "";
+
+    const enr = await api.getActiveEnrollment(pid);
+    enrollments.value = enr.response ?? [];
+
+    try {
+      const rows = enrollments.value ?? [];
+      certificates.value = rows;
+
+      const transcriptRows = rows.filter(
+        (r) => r.statustxt === "Complete" || r.statustxt === "Dropped"
+      );
+
+      certificates.value = transcriptRows.slice(0, 2).map((r) => ({
+        key: r.enrollid,
+        title: r.title || "Course title unavailable",
+        routeTo: "/Certificates",
+      }));
+    } catch (e) {
+      certificatesError.value = e?.message ?? "load-failed";
+      console.log(e);
+      certificates.value = [];
+    } finally {
+      loadingCertificates.value = false;
+    }
+  }
 
   //hide/show popups
   const addPopup = ref(false)
@@ -179,6 +234,7 @@
   const route = useRoute()
 
   onMounted(loadTable);
+  
 
 </script>
 
@@ -250,14 +306,33 @@
           <div class="text">Messages</div>
         </div>
         <div class="divider"></div>
-        <div class="body">
-          <div class="object"><div class="text">Email message (4/11/2025)</div></div>
-          <div class="object"><div class="text">Email message (4/07/2025)</div></div>
-          <div class="object"><div class="text">Email message (4/03/2025)</div></div>
+        <div class=" side-links body">
+          <div v-if="loadingMessages" class="notext">
+            Loading messages…
+          </div>
+
+          <div v-else-if="messagesError" class="notext">
+            We couldn’t load your messages right now.
+          </div>
+
+          <div v-else-if="messages.length === 0" class="notext">
+            No messages available.
+          </div>
+
+          <template v-else>
+            <div
+              v-for="message in messages"
+              :key="message.id"
+              class="object text"
+            >
+              {{ message.subject || "Message unavailable" }}
+              <span v-if="message.date">({{ message.date }})</span>
+            </div>
+          </template>
         </div>
-        <div class="view-all">
-          <a class="text" href="">(View all messages)</a>
-        </div>
+        <router-link to="/messages" class="view-all">
+          <a class="text">(View all messages)</a>
+        </router-link>
       </div>
 
       <div class="purchase-history">
@@ -266,15 +341,26 @@
           <div class="text">Certificates</div>
         </div>
         <div class="divider"></div>
-        <div class="body">
+        <ul class="body side-links">
+          <!--
           <div class="object"><div class="text">Waste Water 1 Certificate</div></div>
           <div class="object"><div class="text">Waste Water 2 Certificate</div></div>
           <div class="object"><div class="text">Utility 1 Certificate </div></div>
           <div class="object"><div class="text">Utility 2 Certificate </div></div>
-        </div>
-        <div class="view-all">
-          <a class="text" href="/Certificates">(View all Certificates)</a>
-        </div>
+          -->
+          <li v-if="loadingCertificates"><span class="notext">Loading certificates…</span></li>
+          <li v-else-if="certificatesError"><span class="notext">Couldn’t load certificates.</span></li>
+          <li v-else-if="certificates.length === 0"><span class="notext">No certificates available.</span></li>
+
+          <li v-else v-for="t in certificates" :key="t.key">
+            <router-link :to="t.routeTo" class="side-link">
+              {{ t.title }}
+            </router-link>
+          </li>
+        </ul>
+        <router-link to="/Certificates" class="view-all">
+          <a class="text">(View all certificates)</a>
+        </router-link>
       </div>
     </div>
 
@@ -645,7 +731,7 @@
     width: 26.53px;
     height: 33.67px;
     border-radius: 4rem;
-    margin-top: 18.53px;
+    margin-top: 9.53px;
     margin-left: 23.55px;
   }
 
@@ -653,7 +739,7 @@
     height: 20px;
     font-size: 20px;
     font-weight: 700;
-    margin-top: 29px;
+    margin-top: 15px;
     margin-left: 8px;
     color: #034750;
   }
@@ -670,8 +756,18 @@
     margin-left: 24px;
     font-size: 16px;
     font-weight: 400;
-    text-decoration: underline;
+    /* text-decoration: underline; */
     color: #007C8A;
+  }
+
+  .messages .body .notext {
+    height: 14px;
+    margin-top: 10px;
+    margin-left: 24px;
+    font-size: 16px;
+    font-weight: 400;
+    /* text-decoration: underline; */
+    color: #000000;
   }
 
   .messages .view-all {
@@ -679,6 +775,41 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .side-links {
+    list-style:none;
+    margin: 0 0 24px 0;  /** Make's padding/grey space between view all & side-links */
+    padding: 0;
+    display: grid;
+    gap: 0;
+  }
+
+  .side-links li {
+    margin: 0 0;           /* full-bleed to card's edge (matches divider bleed) */
+    padding: 8px 20px;         /* fits the hover grey box in side-links */
+    border-radius: 0;
+  }
+  .side-links li:hover{ background:#D9D9D9; } /* rectangular hover like Dashboard */
+
+  .side-links a{
+    display:block;
+    text-decoration:underline;
+    color:#007C8A;
+    font-size: 16px;           /* Makes Transcipt and Purchase History size match mockup */
+  }
+  .side-links a:hover{ color:#034750; }
+
+  .side-link {
+    display: block;
+    margin-left: 15px;
+    text-decoration: underline;
+    color: #007C8A;
+    font-size: 16px;
+  }
+
+  .side-link:hover {
+    color: #034750;
   }
 
   .messages .view-all .text {
@@ -708,7 +839,7 @@
     width: 26.53px;
     height: 33.67px;
     border-radius: 4rem;
-    margin-top: 18.53px;
+    margin-top: 9.53px;
     margin-left: 23.55px;
   }
 
@@ -716,7 +847,7 @@
     height: 20px;
     font-size: 20px;
     font-weight: 700;
-    margin-top: 29px;
+    margin-top: 15px;
     margin-left: 8px;
     color: #034750;
   }
@@ -736,6 +867,16 @@
     font-weight: 400;
     text-decoration: underline;
     color: #007C8A;
+  }
+
+    .purchase-history .body .notext {
+    height: 14px;
+    margin-top: 10px;
+    margin-left: 24px;
+    font-size: 16px;
+    font-weight: 400;
+    /* text-decoration: underline; */
+    color: #000000;
   }
 
   .purchase-history .view-all {
