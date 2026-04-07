@@ -3,10 +3,10 @@ import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { Hash, SquareUserRound } from "lucide-vue-next";
 
-import user from '@/assets/icons/owp-2color/user-icon.svg'
-import contactcard from '@/assets/icons/owp-2color/contact-card-icon.svg'
-import transcript from '@/assets/icons/owp-2color/transcipt-icon.svg'
-import history from '@/assets/icons/owp-2color/history-icon.svg'
+import user from "@/assets/icons/owp-2color/user-icon.svg";
+import contactcard from "@/assets/icons/owp-2color/contact-card-icon.svg";
+import transcript from "@/assets/icons/owp-2color/transcipt-icon.svg";
+import history from "@/assets/icons/owp-2color/history-icon.svg";
 
 import {
   getAccountDetails,
@@ -25,22 +25,22 @@ const pid = 458860; // later: come from auth/session
 const loading = ref(false);
 const error = ref("");
 
-const account = ref(null);          // will hold accountDetails response.response
-const enrollments = ref([]);        // will hold activeEnrollment response.response
+const account = ref(null);
+const enrollments = ref([]);
 const selectedEnrollId = ref(null);
-const grades = ref([]);             // will hold getCourseGrades response.response
-const operatorList = ref([]);       // will hold getOperatorList response.response
+const grades = ref([]);
+const operatorList = ref([]);
 
 // --- Transcripts preview (from enrollments) ---
 const loadingTranscripts = ref(false);
 const transcriptsError = ref("");
-const transcriptItems = ref([]); // [{ key, title, routeTo }]
+const transcriptItems = ref([]);
 
 // --- Purchase history preview (invoices) ---
 const loadingPurchases = ref(false);
 const purchasesError = ref("");
 const invoices = ref([]);
-const invoiceDataByNum = ref({}); // { [invoicenum]: items[] }
+const invoiceDataByNum = ref({});
 
 function getInvoiceName(invoicenum) {
   const items = invoiceDataByNum.value?.[invoicenum] ?? [];
@@ -51,6 +51,7 @@ function getInvoiceName(invoicenum) {
 async function loadAccount() {
   loading.value = true;
   error.value = "";
+
   try {
     const acc = await getAccountDetails(pid);
     account.value = acc.response;
@@ -61,9 +62,9 @@ async function loadAccount() {
     const op = await getOperatorList(pid);
     operatorList.value = op.response ?? [];
 
-    // pick an "Enrolled" one if possible, else first
     const preferred =
-      enrollments.value.find(e => e.statustxt === "Enrolled") ?? enrollments.value[0];
+      enrollments.value.find((e) => e.statustxt === "Enrolled") ??
+      enrollments.value[0];
 
     if (preferred?.enrollid) {
       selectedEnrollId.value = preferred.enrollid;
@@ -72,11 +73,11 @@ async function loadAccount() {
     } else {
       grades.value = [];
     }
+
     await Promise.all([
       loadTranscriptsPreview(),
       loadPurchaseHistoryPreview(),
     ]);
-
   } catch (e) {
     error.value = e?.message ?? String(e);
   } finally {
@@ -136,38 +137,44 @@ async function loadTranscriptsPreview() {
 
 onMounted(loadAccount);
 
+const contactForm = reactive({
+  street_1: null,
+  street_2: null,
+  street_3: null,
+  city: null,
+  state: null,
+  postal_code: null,
+  country: null,
+
+  phone_display: "",
+
+  phone_country_code: "1",
+  phone_area_code: null,
+  phone_local: null,
+  phone_extension: null,
+
+  fax_country_code: "1",
+  fax_area_code: null,
+  fax_local: null,
+
+  ipAddr: null,
+});
+
+function safeTrim(value) {
+  return String(value ?? "").trim();
+}
+
+function digitsOnly(value) {
+  return String(value ?? "").replace(/\D/g, "");
+}
+
 function addressLine2(a) {
-  const city = (a?.hmcity ?? "").trim();
-  const state = (a?.hmstate ?? "").trim();
-  const zip = (a?.hmzip ?? "").trim();
+  const city = safeTrim(a?.hmcity);
+  const state = safeTrim(a?.hmstate);
+  const zip = safeTrim(a?.hmzip);
 
   const cityState = [city, state].filter(Boolean).join(", ");
   return [cityState, zip].filter(Boolean).join(" ").trim();
-}
-
-const contactForm = reactive({
-  street_1: "",
-  street_2: "",
-  street_3: "",
-  city: "",
-  state: "",
-  postal_code: "",
-  country: "US",
-
-  // UI-only
-  phone_display: "",
-
-  // API fields
-  phone_area_code: "",
-  phone_local: "",
-  phone_extension: "",
-  fax_area_code: "",
-  fax_local: "",
-  ipAddr: "127.0.0.1",
-});
-
-function digitsOnly(v) {
-  return String(v ?? "").replace(/\D/g, "");
 }
 
 function formatPhoneDisplay(input) {
@@ -176,7 +183,7 @@ function formatPhoneDisplay(input) {
   const b = d.slice(3, 6);
   const c = d.slice(6, 10);
 
-  if (d.length === 0) return "";
+  if (!d) return "";
   if (d.length < 4) return `(${a}`;
   if (d.length < 7) return `(${a})-${b}`;
   return `(${a})-${b}-${c}`;
@@ -184,8 +191,11 @@ function formatPhoneDisplay(input) {
 
 function splitPhoneFromDisplay(display) {
   const d = digitsOnly(display);
-  if (d.length < 10) return { area: "", local: "" };
-  return { area: d.slice(0, 3), local: d.slice(3, 10) }; // local = 7 digits
+
+  return {
+    area: d.length >= 3 ? d.slice(0, 3) : null,
+    local: d.length >= 10 ? d.slice(3, 10) : null,
+  };
 }
 
 function onPhoneInput() {
@@ -193,40 +203,46 @@ function onPhoneInput() {
 }
 
 function openContactDialogWithData() {
-  const a = account.value;
+  const a = account.value ?? {};
 
-  contactForm.street_1 = a?.hmstreet1 ?? "";
-  contactForm.street_2 = a?.hmstreet2 ?? "";
-  contactForm.street_3 = a?.hmstreet3 ?? "";
-  contactForm.city     = a?.hmcity ?? "";
-  contactForm.state    = a?.hmstate ?? "";
-  contactForm.postal_code = a?.hmzip ?? "";
-  contactForm.country  = "US";
+  contactForm.street_1 = a.hmstreet1 ?? null;
+  contactForm.street_2 = a.hmstreet2 ?? null;
+  contactForm.street_3 = a.hmstreet3 ?? null;
+  contactForm.city = a.hmcity ?? null;
+  contactForm.state = a.hmstate ?? null;
+  contactForm.postal_code = a.hmzip ?? null;
+  contactForm.country = a.hmcountry ?? null;
 
-  // fill the UI display + api pieces
-  contactForm.phone_display = a?.hmfmtdphn ? formatPhoneDisplay(a.hmfmtdphn) : "";
+  contactForm.phone_display = a.hmfmtdphn
+    ? formatPhoneDisplay(a.hmfmtdphn)
+    : "";
+
   const p = splitPhoneFromDisplay(contactForm.phone_display);
 
-  contactForm.phone_area_code = a?.hmphncity ?? p.area ?? "";
-  contactForm.phone_local     = a?.hmphnlocal ?? p.local ?? "";
-  contactForm.phone_extension = a?.hmphnext ?? "";
-  
-  contactForm.ipAddr;
+  contactForm.phone_country_code = "1";
+  contactForm.phone_area_code = a.hmphncity ?? p.area ?? null;
+  contactForm.phone_local = a.hmphnlocal ?? p.local ?? null;
+  contactForm.phone_extension = a.hmphnext ?? null;
+
+  contactForm.fax_country_code = "1";
+  contactForm.fax_area_code = a.hmfaxcity ?? null;
+  contactForm.fax_local = a.hmfaxlocal ?? null;
+
+  contactForm.ipAddr = null;
 
   contactDialog.value = true;
 }
 
-
-const contactDialog = ref(false)
+const contactDialog = ref(false);
 
 function closeContactDialog() {
-  contactDialog.value = false
+  contactDialog.value = false;
 }
 
-const profileDialog = ref(false)
+const profileDialog = ref(false);
 
 function closeProfileDialog() {
-  profileDialog.value = false
+  profileDialog.value = false;
 }
 
 const savingContact = ref(false);
@@ -237,31 +253,30 @@ async function saveContactInfo() {
   contactError.value = "";
 
   try {
-    const p = splitPhoneFromDisplay(contactForm.phone_display);
+    const parsedPhone = splitPhoneFromDisplay(contactForm.phone_display);
 
-    // IMPORTANT: include ALL keys every time (even if blank)
-    const payload = {
-      street_1: contactForm.street_1 ?? "",
-      street_2: contactForm.street_2 ?? "",
-      street_3: contactForm.street_3 ?? "",
-      city: contactForm.city ?? "",
-      state: contactForm.state ?? "",
-      postal_code: contactForm.postal_code ?? "",
-      country: contactForm.country ?? "US",
+    const formForApi = {
+      street_1: contactForm.street_1,
+      street_2: contactForm.street_2,
+      street_3: contactForm.street_3,
+      city: contactForm.city,
+      state: contactForm.state,
+      postal_code: contactForm.postal_code,
+      country: contactForm.country,
 
-      phone_area_code: p.area ?? "",
-      phone_local: p.local ?? "",
-      phone_extension: contactForm.phone_extension ?? "",
+      phone_country_code: contactForm.phone_country_code ?? "1",
+      phone_area_code: parsedPhone.area ?? contactForm.phone_area_code,
+      phone_local: parsedPhone.local ?? contactForm.phone_local,
+      phone_extension: contactForm.phone_extension,
 
-      fax_area_code: contactForm.fax_area_code ?? "",
-      fax_local: contactForm.fax_local ?? "",
+      fax_country_code: contactForm.fax_country_code ?? "1",
+      fax_area_code: contactForm.fax_area_code,
+      fax_local: contactForm.fax_local,
 
-      ipAddr: "localhost",
+      ipAddr: contactForm.ipAddr,
     };
 
-    console.log("updateContactInfo payload:", payload);
-
-    const resp = await api.updateContactInfo(payload);
+    const resp = await api.updateContactInfo(pid, formForApi);
     console.log("updateContactInfo response:", resp);
 
     await loadAccount();
@@ -273,8 +288,8 @@ async function saveContactInfo() {
     savingContact.value = false;
   }
 }
-  
 </script>
+
 
 <template>
   <div class="account-page">
