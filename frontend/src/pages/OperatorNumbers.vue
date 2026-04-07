@@ -137,16 +137,16 @@
 
   const editPopup = ref(false)
   const selectedRow = ref(null)
-  function openEdit(liccatid) {
-    selectedRow.value = liccatid
+  function openEdit(oprlicid) {
+    selectedRow.value = oprlicid
 
     const entry = nums.value.find(
-      item => item.liccatid === liccatid
+      item => item.oprlicid === oprlicid
     )
 
     if (!entry) return
 
-    editState.value = entry.state
+    editState.value = entry.stateid
     editOpNum.value = entry.operatornumber
 
     editPopup.value = true
@@ -157,11 +157,11 @@
   }
 
   const deletePopup = ref(false)
-  function openDelete(liccatid) {
-    selectedRow.value = liccatid
+  function openDelete(oprlicid) {
+    selectedRow.value = oprlicid
 
     const entry = nums.value.find(
-      item => item.liccatid === liccatid
+      item => item.oprlicid === oprlicid
     )
 
     if (!entry) return
@@ -203,11 +203,11 @@
           </thead>
           <tbody class="table-body">
             <tr v-for="entry in nums" :key="entry.oprlicid">
-              <td>{{ entry.operatornumber }}</td>
               <td>{{ entry.state }}</td>
+              <td>{{ entry.operatornumber }}</td>
               <td>
-                <button class="edit-button" @click.left="openEdit(entry.liccatid)">Edit</button>
-                <button class="remove-button" @click.left="openDelete(entry.liccatid)">Remove</button>
+                <button class="edit-button" @click.left="openEdit(entry.oprlicid)">Edit</button>
+                <button class="remove-button" @click.left="openDelete(entry.oprlicid)">Remove</button>
               </td>
             </tr>
           <!--
