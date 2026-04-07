@@ -260,6 +260,11 @@ onMounted(async () => {
       <div class="text-block">
         <h1 class="courses-header">Certificates</h1>
         <p class="page-description">View and download your earned certificates</p>
+        <div style="margin-top: 10px; font-size: 14px; color: #707070;">
+          <span v-if="loadingAccount">Loading account…</span>
+          <span v-else-if="accountError" style="color: #9F3323;">{{ accountError }}</span>
+          <span v-else>Logged in as: <strong>{{ accountName }}</strong></span>
+        </div>
       </div>
 
       <div class="search-container">
@@ -401,30 +406,30 @@ onMounted(async () => {
 }
 
 .courses-top {
-  max-width: 62.5rem;
+  max-width: 1000px;
   width: 100%;
-  margin: 2rem auto 0;
+  margin: 32px auto 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1.25rem;
+  padding: 0 20px;
   position: sticky;
   top: 0;
   background-color: #fff;
   z-index: 5;
-  padding-bottom: 0.5rem;
+  padding-bottom: 8px;
 }
 
-.courses-header { font-size: 2rem; font-weight: 700; color: #034750; margin: 0; }
-.page-description { font-size: 1rem; color: #555; margin: 0.5rem 0 0; }
+.courses-header { font-size: 32px; font-weight: 700; color: #034750; margin: 0; }
+.page-description { font-size: 16px; color: #555; margin: 8px 0 0; }
 .search-container { position: relative; }
 
 .search-input {
-  padding: 0.625rem 1rem;
+  padding: 10px 16px;
   border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  width: 16.25rem;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 260px;
   outline: none;
 }
 
@@ -436,98 +441,98 @@ onMounted(async () => {
 .search-input::placeholder { color: #999; }
 
 .courses-bottom {
-  max-width: 62.5rem;
+  max-width: 1000px;
   width: 100%;
-  margin: 0 auto 3rem;
+  margin: 0 auto 48px;
   display: grid;
-  grid-template-columns: 43.75rem 18.75rem;
-  column-gap: 1rem;
-  padding: 0 1.25rem;
+  grid-template-columns: 700px 300px;
+  column-gap: 16px;
+  padding: 0 20px;
 }
 
 .courses-left { display: flex; flex-direction: column; }
 
 .tiles-container {
-  margin-top: 2.875rem;
+  margin-top: 46px;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 40px;
 }
 
 .course-card {
   background-color: #f2f1f2;
-  border-radius: 0.875rem;
-  padding: 1rem 1.25rem 1.25rem 1.25rem;
+  border-radius: 14px;
+  padding: 16px 20px 20px 20px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 12px;
 }
 
 .card-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding-top: 0.25rem;
-  margin-left: 1.25rem;
+  gap: 8px;
+  padding-top: 4px;
+  margin-left: 20px;
 }
 
-.header-icon, .side-icon { width: 1.625rem; height: 2.125rem; }
-.card-title, .side-title { font-size: 1.25rem; font-weight: 700; color: #034750; margin: 0; }
+.header-icon, .side-icon { width: 26px; height: 34px; }
+.card-title, .side-title { font-size: 20px; font-weight: 700; color: #034750; margin: 0; }
 
-.divider { width: 100%; border-top: 1px solid #ffffff; margin: 0.75rem 0 0.5rem 0; }
+.divider { width: 100%; border-top: 1px solid #ffffff; margin: 12px 0 8px 0; }
 
-.state-message { padding: 0.75rem 1.25rem; font-size: 1rem; }
+.state-message { padding: 12px 20px; font-size: 16px; }
 .loading-message, .empty-message { color: #707070; }
 .error-message { color: #9f3323; font-weight: 600; }
 
 .card-body {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  max-height: 32.5rem;
+  gap: 4px;
+  max-height: 520px;
   overflow-y: auto;
-  padding-right: 0.25rem;
+  padding-right: 4px;
 }
 
-.card-body::-webkit-scrollbar { width: 0.375rem; }
+.card-body::-webkit-scrollbar { width: 6px; }
 .card-body::-webkit-scrollbar-track { background: transparent; }
-.card-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 0.1875rem; }
+.card-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
 
 .certificate-item {
   display: grid;
-  grid-template-columns: 4.375rem 1fr;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  margin: 0 -1.25rem;
-  width: calc(100% + 2.5rem);
+  grid-template-columns: 70px 1fr;
+  gap: 16px;
+  padding: 16px 20px;
+  margin: 0 -20px;
+  width: calc(100% + 40px);
   transition: background-color 0.2s ease;
 }
 
 .certificate-item:hover { background-color: #d9d9d9; }
 
 .cert-thumbnail {
-  width: 4.375rem;
-  height: 5.625rem;
+  width: 70px;
+  height: 90px;
   background: linear-gradient(135deg, #5aa843 0%, #6dbe4b 100%);
-  border-radius: 0.375rem;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
 }
 
-.owp-text { color: white; font-weight: bold; font-size: 1.125rem; }
+.owp-text { color: white; font-weight: bold; font-size: 18px; }
 
 .cert-info {
   display: flex;
   flex-direction: column;
-  gap: 0.4375rem;
+  gap: 7px;
   justify-content: center;
 }
 
 .cert-title {
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 600;
   color: #707070;
   text-decoration: underline;
@@ -537,30 +542,30 @@ onMounted(async () => {
 .cert-meta-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-top: 0.125rem;
+  gap: 6px;
+  margin-top: 2px;
 }
 
 .meta-chip {
-  font-size: 0.8125rem;
+  font-size: 13px;
   color: #555;
   background-color: #e8e8e8;
-  border-radius: 1.25rem;
-  padding: 0.1875rem 0.625rem;
+  border-radius: 20px;
+  padding: 3px 10px;
   white-space: nowrap;
 }
 
 .meta-chip strong { color: #034750; }
 
-.download-section { margin-top: 0.25rem; }
+.download-section { margin-top: 4px; }
 
 .download-btn {
   background-color: #00a5b5;
   color: white;
   border: none;
-  border-radius: 0.375rem;
-  padding: 0.4375rem 1rem;
-  font-size: 0.875rem;
+  border-radius: 6px;
+  padding: 7px 16px;
+  font-size: 14px;
   font-family: "Roboto", sans-serif;
   font-weight: 600;
   cursor: pointer;
@@ -569,43 +574,43 @@ onMounted(async () => {
 
 .download-btn:hover:not(:disabled) {
   background-color: #008c9a;
-  transform: translateY(-0.0625rem);
+  transform: translateY(-1px);
 }
 
 .download-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-.courses-right { display: flex; flex-direction: column; gap: 1rem; margin-top: 2.875rem; }
+.courses-right { display: flex; flex-direction: column; gap: 16px; margin-top: 46px; }
 
 .side-card {
   background-color: #f2f1f2;
-  border-radius: 0.875rem;
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 12px;
 }
 
-.side-header { display: flex; align-items: center; gap: 0.625rem; margin: 1rem 1.25rem 0 1.25rem; }
-.side-body { display: flex; flex-direction: column; gap: 0.875rem; margin: 0 1.25rem; }
+.side-header { display: flex; align-items: center; gap: 10px; margin: 16px 20px 0 20px; }
+.side-body { display: flex; flex-direction: column; gap: 14px; margin: 0 20px; }
 
 .side-link {
-  font-size: 1rem;
+  font-size: 16px;
   color: #007c8a;
   cursor: pointer;
   text-decoration: underline;
-  padding: 0.3125rem 0;
+  padding: 5px 0;
   transition: background-color 0.2s ease;
 }
 
 .side-link:hover { background-color: #d9d9d9; }
 
 .side-footer {
-  height: 2rem;
+  height: 32px;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  font-size: 1.125rem;
+  font-size: 18px;
   font-weight: 400;
-  margin: 0 1.25rem 1.25rem 1.25rem;
+  margin: 0 20px 20px 20px;
   cursor: pointer;
   color: #034750;
   text-decoration: none;
@@ -613,9 +618,9 @@ onMounted(async () => {
 
 .side-footer:hover { text-decoration: underline; color: #007c8a; }
 
-@media (max-width: 48rem) {
+@media (max-width: 768px) {
   .courses-bottom { grid-template-columns: 1fr; }
-  .courses-right { margin-top: 1.25rem; }
-  .search-input { width: 12.5rem; }
+  .courses-right { margin-top: 20px; }
+  .search-input { width: 200px; }
 }
 </style>
