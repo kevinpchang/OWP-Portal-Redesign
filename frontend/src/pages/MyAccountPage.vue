@@ -53,13 +53,13 @@ async function loadAccount() {
   error.value = "";
 
   try {
-    const acc = await getAccountDetails(pid);
+    const acc = await api.getAccountDetails(pid);
     account.value = acc.response;
 
-    const enr = await getActiveEnrollment(pid);
+    const enr = await api.getActiveEnrollment(pid);
     enrollments.value = enr.response ?? [];
 
-    const op = await getOperatorList(pid);
+    const op = await api.getOperatorList(pid);
     operatorList.value = op.response ?? [];
 
     const preferred =
@@ -68,7 +68,7 @@ async function loadAccount() {
 
     if (preferred?.enrollid) {
       selectedEnrollId.value = preferred.enrollid;
-      const g = await getCourseGrades(preferred.enrollid);
+      const g = await api.getCourseGrades(preferred.enrollid);
       grades.value = g.response ?? [];
     } else {
       grades.value = [];
@@ -80,6 +80,7 @@ async function loadAccount() {
     ]);
   } catch (e) {
     error.value = e?.message ?? String(e);
+    console.log("error loading account page data:", e);
   } finally {
     loading.value = false;
   }
@@ -300,13 +301,13 @@ async function saveContactInfo() {
     <div v-if="error" style="padding:0 16px; color:red;">{{ error }}</div>
     <!-- GRID -->
     <div class="grid">
-      
+
       <!-- Profile across both columns -->
       <div class="card profile-card">
         <img :src="user" class="icon" />
         <div class="profile-meta">
-          <div class="user-name">{{ account?.fullname ?? "Loading..." }}</div>
-          <div class="user-role">Student,<br />Office of Water Programs</div>
+          <div class="user-name">{{ account?.firstname ?? "Loading..." }}</div>
+          <div class="user-role">,<br />Office of Water Programs</div>
 
           <button class="btn xsmall" @click="openContactDialogWithData">Edit</button>
         </div>
@@ -587,7 +588,7 @@ async function saveContactInfo() {
       </div>
     </div>
   </transition>
-  
+
 </template>
 
 <style scoped>
@@ -598,13 +599,13 @@ async function saveContactInfo() {
   row-gap:32px;
   justify-content:center;
   align-items:start;
-  padding:16px 0 42px; 
+  padding:16px 0 42px;
   color:#034750;
 }
 .page-title {
-  justify-self: start;      
-  width: 1016px;             
-  padding: 0 16px;           
+  justify-self: start;
+  width: 1016px;
+  padding: 0 16px;
   margin: 0 0 0 0;       /* tighten below THE TITLE's spacing */
   font-size: 28px;
   font-weight: 800;
@@ -615,11 +616,11 @@ async function saveContactInfo() {
 /* ===== Grid ===== */
 .grid {
   display: grid;
-  grid-template-columns: 700px 300px;                  
+  grid-template-columns: 700px 300px;
   grid-template-areas:
     "profile profile"
     "left    right";
-  column-gap: 16px;                                    
+  column-gap: 16px;
   row-gap: 16px;
   margin: 0 auto;
   padding: 0 16px;
@@ -633,18 +634,18 @@ async function saveContactInfo() {
   column-gap: 16px;
   align-items: center;
 }
-.left-col { 
-  grid-area: left; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 16px; 
+.left-col {
+  grid-area: left;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-.right-col { 
-  grid-area: right; 
-  display: flex; 
-  flex-direction: 
-  column; 
-  gap: 16px; 
+.right-col {
+  grid-area: right;
+  display: flex;
+  flex-direction:
+  column;
+  gap: 16px;
 }
 
 /* ===== Cards ===== */
@@ -652,13 +653,13 @@ async function saveContactInfo() {
   background: #F2F1F2;
   border-radius: 14px;
   padding: 16px;
-  transition: none;                     
+  transition: none;
 }
 
 
 /* Profile content */
-.avatar-icon { 
-  align-self: center; 
+.avatar-icon {
+  align-self: center;
 }
 .profile-meta { /** Fixed the edit button glitch by shoving everything to the left of the profile card */
   display: flex;
@@ -667,33 +668,33 @@ async function saveContactInfo() {
   gap: 6px;
 }
 /*
-.profile-meta { 
-  display: grid; 
-  align-content: start; 
-  gap: 6px; 
+.profile-meta {
+  display: grid;
+  align-content: start;
+  gap: 6px;
   position: relative;
 } */
-.user-name { 
-  font-weight: bold; 
-  font-size: 28px; 
-  color: #00A5B5; 
+.user-name {
+  font-weight: bold;
+  font-size: 28px;
+  color: #00A5B5;
 }
-.user-role { 
-  font-size: 16px; 
-  color: #707070; 
-  line-height: 1.5; 
+.user-role {
+  font-size: 16px;
+  color: #707070;
+  line-height: 1.5;
 }
 
 /* Button(s) */
 .btn {
-  background:#00A5B5; 
-  color:#fff; 
-  border:0; 
-  border-radius:12px; 
-  cursor:pointer; 
+  background:#00A5B5;
+  color:#fff;
+  border:0;
+  border-radius:12px;
+  cursor:pointer;
   align-self:start;
 }
-.btn.xsmall { 
+.btn.xsmall {
   padding: 8px 20px;
   border-radius: 10px;
   font-size: 16px;
@@ -713,10 +714,10 @@ async function saveContactInfo() {
 .card-head h2 { margin: 0; font-size: 20px; font-weight: 800; color: #034750; }
 
 /* Divider(s) */
-.divider { 
-  border-top: 1px solid #FFFFFF; 
-  margin: 12px 0; 
-  height: 0; 
+.divider {
+  border-top: 1px solid #FFFFFF;
+  margin: 12px 0;
+  height: 0;
 }
 .card .divider {
   margin-left: -14px;
@@ -724,69 +725,69 @@ async function saveContactInfo() {
 }
 
 /* Contact body */
-.contact-body { 
-  background: transparent; 
-  border-radius: 18px; 
-  padding: 16px 18px; 
+.contact-body {
+  background: transparent;
+  border-radius: 18px;
+  padding: 16px 18px;
 }
-.row { 
-  margin-bottom: 12px; 
+.row {
+  margin-bottom: 12px;
 }
-.row.two { 
-  display: grid; 
-  grid-template-columns: 1fr 1fr; 
-  gap: 18px; 
+.row.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
 }
-.field .label { 
-  font-size: 18px; 
-  color:#034750; 
-  margin-bottom: 2px; 
-  font-weight: 600; 
+.field .label {
+  font-size: 18px;
+  color:#034750;
+  margin-bottom: 2px;
+  font-weight: 600;
 }
-.field .value { 
-  font-size: 16px; 
-  color:#707070; 
+.field .value {
+  font-size: 16px;
+  color:#707070;
 }
 
 /* Operator numbers */
-.operator-card { 
-  padding: 10px 14px 14px; 
+.operator-card {
+  padding: 10px 14px 14px;
 }
-.op-line { 
-  position: relative; 
-  z-index: 1; 
-  margin: 8px 8px 4px; 
-  color: #3a4e51; 
+.op-line {
+  position: relative;
+  z-index: 1;
+  margin: 8px 8px 4px;
+  color: #3a4e51;
   font-size: 16px;
   padding: 16px 18px; /** Matches with contact-body */
 }
-.op-line .label { 
+.op-line .label {
   color: #034750;
   font-weight: bold;
-  margin-right: 6px; 
+  margin-right: 6px;
 }
-.op-line a { 
+.op-line a {
   color: #034750;
-  text-decoration: none; 
+  text-decoration: none;
 }
 a:hover { text-decoration: underline; }
-.operator-card .divider { 
-  position: relative; 
-  z-index: 0; 
+.operator-card .divider {
+  position: relative;
+  z-index: 0;
 }
 
 /* ===== Right column panels ===== */
-.side.card { 
+.side.card {
   overflow: hidden;
 }
-.side { 
-  padding: 16px 18px; 
+.side {
+  padding: 16px 18px;
 }
-.side-head { 
-  display: flex; 
-  align-items: center; 
-  gap: 8px; 
-  margin: 6px 6px 10px; 
+.side-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 6px 10px;
 }
 .side-icon-svg { 
   width: 30px;
@@ -795,23 +796,23 @@ a:hover { text-decoration: underline; }
   object-fit: contain;
   flex-shrink: 0;
 }
-.side-head h3 { 
-  margin: 0; 
-  font-size: 20px; 
-  font-weight: 800; 
-  color: #034750; 
+.side-head h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #034750;
 }
 
 .side-links {
   list-style:none;
-  margin: 0 0 24px 0;  /** Make's padding/grey space between view all & side-links */              
+  margin: 0 0 24px 0;  /** Make's padding/grey space between view all & side-links */
   padding: 0;
   display: grid;
   gap: 0;
 }
 /* More space in Purchase History only */
-.right-col .side:last-child .side-links { 
-  margin-bottom: 102px; 
+.right-col .side:last-child .side-links {
+  margin-bottom: 102px;
 }
 .side-links li {
   margin: 0 -18px;           /* full-bleed to card's edge (matches divider bleed) */
@@ -856,7 +857,7 @@ a:hover { text-decoration: underline; }
 
 .card :where(h2, h3) { letter-spacing: .2px; }
 
-/* ===== Responsive =====  ||| REMOVE IF NOT REQUIRED ADAPTS THE PAGE WHEN MANIPULATED ( e.g. MINIMIZED) */ 
+/* ===== Responsive =====  ||| REMOVE IF NOT REQUIRED ADAPTS THE PAGE WHEN MANIPULATED ( e.g. MINIMIZED) */
 @media (max-width: 1200px) {
   .grid {
     grid-template-columns: 1fr;

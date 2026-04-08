@@ -164,17 +164,17 @@
   .account-button-dialog {
     position: fixed;
     z-index: 15;
-    width: 200px;
-    border-radius: 4px;
-    margin-top: 220px;
+    width: 200rem;
+    border-radius: 4rem;
+    margin-top: 220rem;
     display: flex;
     flex-direction: column;
     background-color: #FEFEFE;
-    box-shadow: 0px 3px 9px #00000029;
+    box-shadow: 0rem 3rem 9rem #00000029;
   }
 
   .account-button-dialog .top {
-    height: 50px;
+    height: 50rem;
     display: flex;
   }
 
@@ -192,14 +192,14 @@
   }
 
   .account-button-dialog .top .info .left .icon {
-    width: 28px;
-    height: 28px;
-    margin-left: 16px;
+    width: 28rem;
+    height: 28rem;
+    margin-left: 16rem;
   }
 
   .account-button-dialog .top .info .right {
     width: 100%;
-    margin-left: 10px;
+    margin-left: 10rem;
     display: flex;
     flex-direction: column;
     justify-content: top;
@@ -215,7 +215,7 @@
 
   .account-button-dialog .top .info .right .name .text {
     
-    font-size: 15px;
+    font-size: 15rem;
     font-weight: 600;
     color: #034750;
   }
@@ -229,13 +229,13 @@
 
   .account-button-dialog .top .info .right .email .text {
     
-    font-size: 10px;
+    font-size: 10rem;
     font-weight: 400;
     color: #034750;
   }
 
   .divider2 {
-    border-top: 1px solid #C2C2C2;
+    border-top: 1rem solid #C2C2C2;
   }
 
   .account-button-dialog .bottom {
@@ -243,7 +243,7 @@
   }
 
   .account-button-dialog .bottom .object {
-    height: 40px;
+    height: 40rem;
     display: flex;
     align-items: center;
   }
@@ -258,9 +258,9 @@
   }
 
   .account-button-dialog .bottom .object .text {
-    margin-left: 16px;
+    margin-left: 16rem;
     
-    font-size: 16px;
+    font-size: 16rem;
     font-weight: 400;
     color: #707070;
   }
@@ -275,133 +275,133 @@
     justify-content: center;
     align-items: center;
     background-color: #0000009a;
-    backdrop-filter: blur(9px);
-    -webkit-backdrop-filter: blur(9px);
+    backdrop-filter: blur(9rem);
+    -webkit-backdrop-filter: blur(9rem);
   }
 
   .contact-info-dialog .dialog {
-    width: 700px;
-    height: 500px;
+    width: 700rem;
+    height: 500rem;
     display: flex;
     flex-direction: column;
-    border-radius: 14px;
-    border: #707070 solid 1px;
+    border-radius: 14rem;
+    border: #707070 solid 1rem;
     background-color: #FEFEFE;
   }
 
   .contact-info-dialog .dialog .header {
     width: 100%;
-    height: 85px;
+    height: 85rem;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    border-radius: 14px;
+    border-radius: 14rem;
     background-color: #FEFEFE;
   }
 
   .contact-info-dialog .dialog .header .icon {
-    width: 40px;
-    height: 40px;
-    margin-left: 16px;
+    width: 40rem;
+    height: 40rem;
+    margin-left: 16rem;
   }
 
   .contact-info-dialog .dialog .header .text {
-    height: 16px;
-    margin-left: 8px;
-    font-size: 20px;
+    height: 16rem;
+    margin-left: 8rem;
+    font-size: 20rem;
     font-weight: 600;
     color: #034750;
   }
 
   .contact-info-dialog .dialog .body {
-    height: 386px;
-    margin-top: 32px;
-    margin-left: 32px;
-    margin-right: 32px;
+    height: 386rem;
+    margin-top: 32rem;
+    margin-left: 32rem;
+    margin-right: 32rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
   }
 
   .contact-info-dialog .dialog .body .text{
-    height: 16px;
+    height: 16rem;
     
-    font-size: 18px;
+    font-size: 18rem;
     font-weight: 600;
-    line-height: 8px;
+    line-height: 8rem;
     color: #034750;
   }
 
   .contact-info-dialog .dialog .input-large {
-    width: 306px;
-    height: 31px;
+    width: 306rem;
+    height: 31rem;
     
-    font-size: 15px;
+    font-size: 15rem;
     font-weight: 400;
-    border: 0.75px solid #747474;
-    border-radius: 4px;
+    border: 0.75rem solid #747474;
+    border-radius: 4rem;
     box-sizing: border-box;
   }
 
   .contact-info-dialog .dialog .body .input-medium{
-    width: 176px;
-    height: 31px;
+    width: 176rem;
+    height: 31rem;
     
-    font-size: 15px;
+    font-size: 15rem;
     font-weight: 400;
-    border: 0.75px solid #747474;
-    border-radius: 4px;
+    border: 0.75rem solid #747474;
+    border-radius: 4rem;
     box-sizing: border-box;
   }
 
   .contact-info-dialog .dialog .body .input-small{
-    width: 100px;
+    width: 100rem;
     
-    font-size: 15px;
+    font-size: 15rem;
     font-weight: 400;
-    border: 0.75px solid #747474;
-    border-radius: 4px;
+    border: 0.75rem solid #747474;
+    border-radius: 4rem;
     box-sizing: border-box;
   }
 
   .contact-info-dialog .dialog .body .input-tiny{
-    width: 31px;
+    width: 31rem;
     
-    font-size: 15px;
+    font-size: 15rem;
     font-weight: 400;
-    border: 0.75px solid #747474;
-    border-radius: 4px;
+    border: 0.75rem solid #747474;
+    border-radius: 4rem;
     box-sizing: border-box;
   }
 
   .contact-info-dialog .dialog .whitespace{
     width: 100%;
-    height: 16px;
+    height: 16rem;
   }
 
   .contact-info-dialog .dialog .body .object {
     width: 100%;
-    height: 78px;
+    height: 78rem;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 24px;
+    gap: 24rem;
     box-sizing: border-box;
   }
 
   .contact-info-dialog .dialog .body .object-large {
     width: 100%;
-    height: 109px;
+    height: 109rem;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 24px;
+    gap: 24rem;
     box-sizing: border-box;
   }
 
   .contact-info-dialog .dialog .body .left{
     width: 50%;
-    height: 78px;
+    height: 78rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -411,7 +411,7 @@
 
   .contact-info-dialog .dialog .body .right{
     width: 50%;
-    height: 78px;
+    height: 78rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -420,8 +420,8 @@
   }
 
   .contact-info-dialog .dialog .body .object-large .right .right-subdiv{
-    width: 176px;
-    height: 31px;
+    width: 176rem;
+    height: 31rem;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -433,17 +433,17 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin: 32px;
+    margin: 32rem;
   }
 
   .contact-info-dialog .dialog .bottom .cancel{
-    width: 306px;
-    height: 29px;
-    border-radius: 8px;
+    width: 306rem;
+    height: 29rem;
+    border-radius: 8rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 16px;
+    font-size: 16rem;
     
     font-weight: 400;
     color: #FFFFFF;
@@ -452,13 +452,13 @@
   }
 
   .contact-info-dialog .dialog .bottom .save{
-    width: 306px;
-    height: 29px;
-    border-radius: 8px;
+    width: 306rem;
+    height: 29rem;
+    border-radius: 8rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 16px;
+    font-size: 16rem;
     
     font-weight: 400;
     color: #FFFFFF;
@@ -476,8 +476,8 @@
   }
 
   .header .left > img {
-    width: 316.96px;
-    height: 41.08px;
+    width: 316.96rem;
+    height: 41.08rem;
     object-fit: scale-down;
     object-position: center;
     display: block;
@@ -486,54 +486,54 @@
   .header .right {
     display: flex;
     flex-direction: row;
-    margin-right: 16.5px;
+    margin-right: 16.5rem;
     justify-content: center;
     align-items: center;
   }
 
   .header .right .divider {
-    width: 0px;
-    height: 32px;
-    margin-left: 16.5px;
-    border: 1px, solid, #FFFFFF;
+    width: 0rem;
+    height: 32rem;
+    margin-left: 16.5rem;
+    border: 1rem, solid, #FFFFFF;
   }
 
   .header .right .help_button {
-    width: 24.05px;
-    height: 24.05px;
-    margin-left: 16.5px;
+    width: 24.05rem;
+    height: 24.05rem;
+    margin-left: 16.5rem;
     cursor: pointer;
   }
 
   .header .right .messages_button {
-    width: 24.05px;
-    height: 24.05px;
-    margin-left: 16.5px;
+    width: 24.05rem;
+    height: 24.05rem;
+    margin-left: 16.5rem;
     cursor: pointer;
   }
 
   .header .right .account_button {
-    height: 30px;
-    border-radius: 4px;
+    height: 30rem;
+    border-radius: 4rem;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    margin-left: 16.5px;
+    margin-left: 16.5rem;
     cursor: pointer;
   }
 
   .header .right .account_button .icon {
-    width: 24.05px;
-    height: 24.05px;
+    width: 24.05rem;
+    height: 24.05rem;
   }
 
   .header .right .account_button .text {
-    font-size: 15px;
+    font-size: 15rem;
     
     font-weight: 600;
-    margin-top: 4px;
-    margin-left: 8px;
+    margin-top: 4rem;
+    margin-left: 8rem;
     color: #FFFFFF;
   }
 </style>

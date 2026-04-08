@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { useRoute } from 'vue-router'
 import {
   History,
@@ -135,7 +135,7 @@ const route = useRoute()
 /*  Vertical divider */
 .right-line {
   position: fixed;
-  left: 295px;
+  left: 295rem;
   top: 0;
   height: 100vh; /* full viewport height */
   border-left: 1px solid #D9D9D9;
@@ -166,14 +166,14 @@ const route = useRoute()
 /* Sidebar layout */
 .sidebar {
   position: fixed;
-  top: 120px;
+  top: 120rem;
   left: 0;
-  width: 295px;
-  height: calc(100vh - 220px);
+  width: 295rem;
+  height: calc(100vh - 220rem);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 5rem;
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
@@ -184,9 +184,9 @@ const route = useRoute()
 
 /* Button text style */
 .button-text {
-  font-size: 20px;
+  font-size: 22rem;
   font-weight: 600;
-  margin-left: 20px;
+  margin-left: 20rem;
   color: #034750;
 }
 
@@ -200,12 +200,12 @@ const route = useRoute()
 .operator-numbers-button,
 .certificates-button,
 .purchase-history-button {
-  width: 250px;
-  height: 47px;
-  border-radius: 8px;
+  width: 250rem;
+  height: 47rem;
+  border-radius: 8rem;
   display: flex;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 10rem;
   text-decoration: none;
 }
 
@@ -222,21 +222,6 @@ const route = useRoute()
   padding-left: 5px;
   text-decoration: none;
   color: inherit;
-}
-
-/* Operator Numbers */
-.operator-numbers-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: #034750;
-  width: 250px;
-  height: 47px;
-  border-radius: 8px;
-  margin-top: 10px;
-  padding-left: 0;
-  position: static;
 }
 
 /* Logout button (fixed on top of white footer) */
@@ -282,11 +267,11 @@ const route = useRoute()
 .media-button .button-text,
 .certificates-button .button-text,
 .courses-button .button-text {
-  margin-left: 5px;
+  margin-left: 5rem;
 }
 
 .operator-numbers-button .button-text {
-  margin-left: -3px;
+  margin-left: -3rem;
 }
 
 .dashboard-button .button-text {

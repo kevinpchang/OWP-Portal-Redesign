@@ -295,7 +295,7 @@ onMounted(async () => {
           <h2 class="card-title">Active Enrollments</h2>
         </div>
 
-        <div class="divider"></div>
+        <div class="divider"></div> 
 
         <div class="summary-body">
           <div class="summary-left">
