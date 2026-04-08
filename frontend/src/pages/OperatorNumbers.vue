@@ -334,7 +334,7 @@
           </template>
         </div>
         <router-link to="/messages" class="view-all">
-          <a class="text">(View all messages)</a>
+          <a class="text messages-link">(View all messages)</a>
         </router-link>
       </div>
 
@@ -362,7 +362,7 @@
           </li>
         </ul>
         <router-link to="/Certificates" class="view-all">
-          <a class="text">(View all certificates)</a>
+          <a class="text certificates-link">(View all certificates)</a>
         </router-link>
       </div>
     </div>
