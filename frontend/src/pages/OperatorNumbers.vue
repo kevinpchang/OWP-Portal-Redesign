@@ -64,9 +64,9 @@
     const original = nums.value[0]
 
     const payload = {
-      liccatid: "1",
-      countryid: "1",
-      status: "1",
+      liccatid: 1,
+      countryid: 1,
+      status: "A",
       operatornumber: addOpNum.value,
       state: addState.value,
       ipAddr: "localhost"
@@ -262,8 +262,8 @@
               <td colspan="3" style="text-align: center; padding: 20px;">No operator numbers available.</td>
             </tr>
             <tr v-for="entry in nums" :key="entry.oprlicid">
-              <td>{{ entry.state }}</td>
-              <td>{{ entry.operatornumber }}</td>
+              <td class="state">{{ entry.state }}</td>
+              <td class="number">{{ entry.operatornumber }}</td>
               <td>
                 <button class="edit-button" @click.left="openEdit(entry.oprlicid)">Edit</button>
                 <button class="remove-button" @click.left="openDelete(entry.oprlicid)">Remove</button>
