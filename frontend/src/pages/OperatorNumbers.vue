@@ -27,6 +27,17 @@
   const addState = ref("")
   const addOpNum = ref("")
 
+  //const addState = ref("")
+  const states = {"AL": "Alabama", "AK": "Alaska", "AS":"American Samoa", "AZ": "Arizona", "AR": "Arkansas", "CA": "California", "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", 
+                  "DC":"District of Columbia", "FL": "Florida", "GA": "Georgia","GU":"Guam", "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa", "KS": "Kansas", "KY": "Kentucky", 
+                  "LA": "Louisiana", "ME": "Maine", "MH":"Marshall Islands", "MD": "Maryland","MA": "Massachusetts", "MI": "Michigan", "FM":"Micronesia", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri", 
+                  "MT": "Montana", "MP":"N. Mariana Islands", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey","NM": "New Mexico", "NY": "New York", "NC": "North Carolina", 
+                  "ND": "North Dakota", "OH": "Ohio", "OK": "Oklahoma", "OR": "Oregon", "PW":"Palau", "PA": "Pennsylvania", "PR":"Puerto Rico", "RI": "Rhode Island", "SC": "South Carolina",
+                  "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont", "VI":"Virgin Islands", "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", 
+                  "WI": "Wisconsin","WY":"Wyoming"}
+  const territories = {"AB": "Alberta", "BC": "British Columbia", "MB": "Manitoba", "NB": "New Brunswick", "NL": "Newfound & Labrador", "NT": "Northwest Territories", 
+                      "NS": "Nova Scotia", "NU": "Nunavut", "ON": "Ontario", "PE": "Prince Edward Island", "QC": "Quebec", "SK": "Saskatchewan", "YT": "Yukon"}
+
   async function loadTable() {
     console.log("loadTable called");
     loading.value = true;
@@ -381,7 +392,21 @@
             <h1 class="popup-title">
               Add Operator Number
             </h1>
-            <input type="text" id="state" class="input-box" placeholder="State/Province Abbreviation" v-model="addState"><br><br>
+            <select id="state" class="input-box" v-model="addState">
+              <option disabled value="">Select State/Province</option>
+              <optgroup label="United States">
+                <option v-for="(name, abbr) in states":key="abbr":value="abbr">
+                  {{ name }}
+                </option>
+              </optgroup>
+              <optgroup label="Canada">
+                <option v-for="(name, abbr) in territories":key="abbr":value="abbr">
+                  {{ name }}
+                </option>
+              </optgroup>
+              
+              <!-- Add more as needed -->
+            </select><br><br>
             <input type="text" id="opnum" class="input-box" placeholder="Operator Number" v-model="addOpNum"><br><br>
             <!-- Method=POST for button /api/v1/account/addOperator-->
             <button class = popup-button-left @click="addNumber">Add</button>
