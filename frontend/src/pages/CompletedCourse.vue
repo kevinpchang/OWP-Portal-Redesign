@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import {
   getEnrollmentRecord,
@@ -20,6 +20,8 @@ import owtp3rd8th from "@/assets/manual-imgs/owtp-3-8th-cvr.jpg";
 import um3rd from "@/assets/manual-imgs/um-3rd-cvr.jpg";
 import wtpo1st7th from "@/assets/manual-imgs/wtpo-1-7th-cvr.jpg";
 import wtpo2nd7th from "@/assets/manual-imgs/wtpo-2-7th-cvr.jpg";
+import sws from "@/assets/manual-imgs/sws.png";
+import pfi from "@/assets/manual-imgs/pfi.png";
 
 // course image map
 const courseImageMap = {
@@ -30,6 +32,10 @@ const courseImageMap = {
   OWTP2: owtp2nd8th,
   OWTP3: owtp3rd8th,
   MBR: MBR2nd,
+
+  //SiliconScribes addition
+  CE29: sws,
+  PFI: pfi,
 };
 
 const courseImage = ref(null);
@@ -51,6 +57,50 @@ const loadError = ref("");
 const courseTitle = ref("Course title unavailable");
 const courseCompletedDate = ref("—");
 const courseGrade = ref("—");
+const courseStatus = ref("");
+
+// button logic
+const normalizedCourseStatus = computed(() => {
+  return String(courseStatus.value || "").trim().toUpperCase();
+});
+
+const isCompletedCourse = computed(() => {
+  const status = normalizedCourseStatus.value;
+  return status === "CR" || status === "PASS" || status === "COMPLETED";
+});
+
+const isDroppedOrFailed = computed(() => {
+  const status = normalizedCourseStatus.value;
+  return (
+    status === "F" ||
+    status === "FAIL" ||
+    status === "FAILED" ||
+    status === "D" ||
+    status === "DR" ||
+    status === "DROP" ||
+    status === "DROPPED"
+  );
+});
+
+const courseActionLabel = computed(() => {
+  return isDroppedOrFailed.value ? "Re-Enroll" : "Completed";
+});
+
+
+//donut logic (red/green for pass/fail) grey when empty PROBABLY SHOULD DEFINE
+const donutColor = computed(() => {
+  const status = normalizedCourseStatus.value;
+
+  if (
+    status === "F" ||
+    status === "FAIL" ||
+    status === "FAILED"
+  ) {
+    return "#9F3323"; // red for failed
+  }
+
+  return "#6DBE4B"; // green default
+});
 
 // metrics
 const totalChapters = ref("—");
@@ -182,6 +232,15 @@ async function loadCourse() {
 
     courseTitle.value = record.title || "Course title unavailable";
     courseCompletedDate.value = record.completedate || "—";
+
+    courseStatus.value = String(
+      record.grade ??
+      record.enrollmentstatus ??
+      record.status ??
+      record.enrollmentstatusdesc ??
+      ""
+    ).trim();
+
     courseGrade.value = record.grade || "—";
 
     const rawCeu = Number(record.ceus ?? record.ceu);
@@ -190,7 +249,8 @@ async function loadCourse() {
       : "—";
 
     contactHours.value = record.contacthour ?? record.contacthours ?? "—";
-    courseImage.value = courseImageMap[record?.owpabbr] || null;
+    const abbr = String(record?.owpabbr || "").trim().toUpperCase();
+    courseImage.value = courseImageMap[abbr] || null;
 
     const editionId = String(
       record.editionid ?? record.editionId ?? record.edition ?? ""
@@ -261,6 +321,7 @@ async function loadCourse() {
     animatedAngle.value = 0;
     animatedProgress.value = 0;
     courseImage.value = null;
+    courseStatus.value = "";
   } finally {
     loadingCourse.value = false;
   }
@@ -288,82 +349,87 @@ onMounted(async () => {
       Loading course data…
     </div>
 
-     <div v-else-if="loadError" class="state-message error-message">
+    <div v-else-if="loadError" class="state-message error-message">
       {{ loadError }}
     </div>
 
-  <div class="page-container">
-  <div class="summary-tile">
-    <div class="card-header">
-      <div class="header-icon">
-        <img :src="book" alt="Completed enrollments icon" />
+    <div class="page-container">
+      <div class="summary-tile">
+        <div class="card-header">
+          <div class="header-icon">
+            <img :src="book" alt="Completed enrollments icon" />
+          </div>
+          <h2 class="card-title">Completed Enrollments</h2>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="summary-body">
+          <div class="summary-left">
+            <img
+              v-if="courseImage"
+              :src="courseImage"
+              alt="Course image"
+              class="course-image-large completed-image"
+            />
+            <div v-else class="course-image-large completed-image fallback-image">
+              <span class="fallback-text-large">NO IMAGE AVAILABLE</span>
+            </div>
+
+            <div class="course-header-info">
+              <h2 class="course-title">{{ courseTitle }}</h2>
+              <p class="course-expiration">Status Date: {{ courseCompletedDate }}</p>
+              <p class="course-grade">Final Grade: {{ courseGrade }}</p>
+
+              <button
+                class="course-action-button"
+                :class="{ disabled: isCompletedCourse }"
+                :disabled="isCompletedCourse"
+              >
+                {{ courseActionLabel }}
+              </button>
+            </div>
+
+            <div class="course-metrics">
+              <div class="metric">
+                <div class="metric-value">{{ totalChapters }}</div>
+                <div class="metric-label">Total Chapters</div>
+              </div>
+
+              <div class="metric">
+                <div class="metric-value">{{ courseGrade }}</div>
+                <div class="metric-label">Grade</div>
+              </div>
+
+              <div class="metric">
+                <div class="metric-value">{{ ceus }}</div>
+                <div class="metric-label">CEUs</div>
+              </div>
+
+              <div class="metric">
+                <div class="metric-value">{{ contactHours }}</div>
+                <div class="metric-label">Contact Hours</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="course-progress">
+            <div class="donut">
+              <div
+                class="donut-fill"
+                :style="{
+                    background:
+                      'conic-gradient(' + donutColor + ' ' + animatedAngle + 'deg, #7A7A7A 0deg)'
+                  }"
+              ></div>
+              <div class="donut-inner">{{ animatedProgress }}%</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <h2 class="card-title">Completed Enrollments</h2>
     </div>
-
-    <div class="divider"></div>
-
-    <div class="summary-body">
-      <div class="summary-left">
-        <img
-          v-if="courseImage"
-          :src="courseImage"
-          alt="Course image"
-          class="course-image-large completed-image"
-        />
-        <div v-else class="course-image-large completed-image fallback-image">
-          <span class="fallback-text-large">NO IMAGE AVAILABLE</span>
-        </div>
-
-        <div class="course-header-info">
-          <h2 class="course-title">{{ courseTitle }}</h2>
-          <p class="course-expiration">Completed: {{ courseCompletedDate }}</p>
-          <p class="course-grade">Final Grade: {{ courseGrade }}</p>
-        </div>
-
-        <div class="course-metrics">
-          <div class="metric">
-            <div class="metric-value">{{ totalChapters }}</div>
-            <div class="metric-label">Total Chapters</div>
-          </div>
-
-          <div class="metric">
-            <div class="metric-value">{{ courseGrade }}</div>
-            <div class="metric-label">Grade</div>
-          </div>
-
-          <div class="metric">
-            <div class="metric-value">{{ ceus }}</div>
-            <div class="metric-label">CEUs</div>
-          </div>
-
-          <div class="metric">
-            <div class="metric-value">{{ contactHours }}</div>
-            <div class="metric-label">Contact Hours</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="course-progress">
-        <div class="donut">
-          <div
-            class="donut-fill"
-            :style="{
-              background:
-                'conic-gradient(#6DBE4B ' + animatedAngle + 'deg, #7A7A7A 0deg)'
-            }"
-          ></div>
-          <div class="donut-inner">{{ animatedProgress }}%</div>
-        </div>
-      </div>
-    </div>
-    </div>
-  </div>
-</div>
-
 
     <div class="courses-bottom">
-
       <div class="courses-left">
         <div class="chapter-progress-tile">
           <div class="card-header">
@@ -373,19 +439,19 @@ onMounted(async () => {
             <h2 class="card-title">Chapter Progress</h2>
           </div>
 
-            <div class="divider"></div>
+          <div class="divider"></div>
 
-            <div v-if="loadingCourse" class="state-message loading-message">
-              Loading chapter progress…
-            </div>
+          <div v-if="loadingCourse" class="state-message loading-message">
+            Loading chapter progress…
+          </div>
 
-            <div v-else-if="loadError" class="state-message error-message">
-              We couldn’t load this chapter data right now.
-            </div>
+          <div v-else-if="loadError" class="state-message error-message">
+            We couldn’t load this chapter data right now.
+          </div>
 
-            <div v-else-if="chapters.length === 0" class="state-message empty-message">
-              No chapter data available.
-            </div>
+          <div v-else-if="chapters.length === 0" class="state-message empty-message">
+            No chapter data available.
+          </div>
 
           <div class="chapter-table">
             <div class="chapter-table-header">
@@ -407,93 +473,92 @@ onMounted(async () => {
               <div class="date-col">{{ chapter.date }}</div>
               <div class="grade-col">{{ chapter.grade }}</div>
             </div>
-            </div>
+          </div>
         </div>
 
         <router-link to="/courses" class="back-link">← Back to Courses</router-link>
       </div>
 
       <div class="courses-right">
-          <!-- Messages -->
-          <div class="side-card">
-            <div class="side-header">
-              <div class="header-icon side-icon">
-                <img :src="mail" class="icon" />
-              </div>
-              <div class="side-title">Messages</div>
+        <div class="side-card">
+          <div class="side-header">
+            <div class="header-icon side-icon">
+              <img :src="mail" class="icon" />
             </div>
-            <div class="divider"></div>
+            <div class="side-title">Messages</div>
+          </div>
+          <div class="divider"></div>
 
-            <div class="side-body">
-              <div v-if="loadingMessages" class="state-message loading-message">
-                Loading messages…
-              </div>
-
-              <div v-else-if="messagesError" class="state-message error-message">
-                We couldn’t load your messages right now.
-              </div>
-
-              <div v-else-if="messages.length === 0" class="state-message empty-message">
-                No messages available.
-              </div>
-
-              <div
-                v-else
-                v-for="message in messages"
-                :key="message.id"
-                class="side-link"
-              >
-                {{ message.subject || "Message unavailable" }}
-                <span v-if="message.date">({{ message.date }})</span>
-              </div>
+          <div class="side-body">
+            <div v-if="loadingMessages" class="state-message loading-message">
+              Loading messages…
             </div>
 
-            <router-link to="/messages" class="side-footer">
-              (View all messages)
-            </router-link>
+            <div v-else-if="messagesError" class="state-message error-message">
+              We couldn’t load your messages right now.
+            </div>
+
+            <div v-else-if="messages.length === 0" class="state-message empty-message">
+              No messages available.
+            </div>
+
+            <div
+              v-else
+              v-for="message in messages"
+              :key="message.id"
+              class="side-link"
+            >
+              {{ message.subject || "Message unavailable" }}
+              <span v-if="message.date">({{ message.date }})</span>
+            </div>
           </div>
 
-             <!-- Purchase History -->
-              <div class="side-card">
-                <div class="side-header">
-                  <div class="header-icon side-icon">
-                    <img :src="history" class="icon" />
-                  </div>
-                  <div class="side-title">Purchase History</div>
-                </div>
-
-                <div class="divider"></div>
-
-                <div class="side-body">
-                  <div v-if="loadingSidebar" class="state-message loading-message">
-                    Loading purchase history…
-                  </div>
-
-                  <div v-else-if="sidebarError" class="state-message error-message">
-                    We couldn’t load your purchase history right now.
-                  </div>
-
-                  <div v-else-if="invoices.length === 0" class="state-message empty-message">
-                    No purchase history available.
-                  </div>
-
-                  <div
-                    v-else
-                    v-for="invoice in invoices"
-                    :key="invoice.invoicenum"
-                    class="side-link"
-                  >
-                    Invoice: {{ invoice.invoicenum || "Unavailable" }} -
-                    {{ getInvoiceName(invoice.invoicenum) }}
-                  </div>
-                </div>
-
-              <router-link to="/purchase-history" class="side-footer">
-                (View all purchases)
-              </router-link>
-            </div>
+          <router-link to="/messages" class="side-footer">
+            (View all messages)
+          </router-link>
         </div>
+
+        <div class="side-card">
+          <div class="side-header">
+            <div class="header-icon side-icon">
+              <img :src="history" class="icon" />
+            </div>
+            <div class="side-title">Purchase History</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="side-body">
+            <div v-if="loadingSidebar" class="state-message loading-message">
+              Loading purchase history…
+            </div>
+
+            <div v-else-if="sidebarError" class="state-message error-message">
+              We couldn’t load your purchase history right now.
+            </div>
+
+            <div v-else-if="invoices.length === 0" class="state-message empty-message">
+              No purchase history available.
+            </div>
+
+            <div
+              v-else
+              v-for="invoice in invoices"
+              :key="invoice.invoicenum"
+              class="side-link"
+            >
+              Invoice: {{ invoice.invoicenum || "Unavailable" }} -
+              {{ getInvoiceName(invoice.invoicenum) }}
+            </div>
+          </div>
+
+          <router-link to="/purchase-history" class="side-footer">
+            (View all purchases)
+          </router-link>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <style scoped>
@@ -666,13 +731,11 @@ onMounted(async () => {
   margin-bottom: -18px;
 }
 
-
 .metric-value {
   font-size: 36px;
   font-weight: 700;
   color: #00A5B5;
 }
-
 
 .donut {
   position: relative;
@@ -910,5 +973,36 @@ onMounted(async () => {
   font-weight: 700;
   font-family: 'Roboto', sans-serif;
 }
+
+.course-action-button {
+  margin-top: 10px;
+  width: 140px;
+  height: 38px;
+  border: none;
+  border-radius: 8px;
+  background-color: #00A5B5;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.course-action-button:hover {
+  background-color: #007C8A;
+}
+
+.course-action-button.disabled {
+  background-color: #B8B8B8;
+  color: #F5F5F5;
+  cursor: not-allowed;
+}
+
+.course-action-button.disabled:hover {
+  background-color: #B8B8B8;
+}
+
+
 
 </style>

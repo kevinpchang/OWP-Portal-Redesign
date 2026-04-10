@@ -20,6 +20,8 @@ import owtp3rd8th from "@/assets/manual-imgs/owtp-3-8th-cvr.jpg";
 import um3rd from "@/assets/manual-imgs/um-3rd-cvr.jpg";
 import wtpo1st7th from "@/assets/manual-imgs/wtpo-1-7th-cvr.jpg";
 import wtpo2nd7th from "@/assets/manual-imgs/wtpo-2-7th-cvr.jpg";
+import sws from "@/assets/manual-imgs/sws.png";
+import pfi from "@/assets/manual-imgs/pfi.png";
 
 //course image map
 const courseImageMap = {
@@ -30,6 +32,10 @@ const courseImageMap = {
   OWTP2: owtp2nd8th,
   OWTP3: owtp3rd8th,
   MBR: MBR2nd,
+
+  //Silicon addition
+  CE29: sws,
+  PFI: pfi,
 };
 
 const courseImage = ref(null);
