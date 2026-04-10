@@ -49,7 +49,7 @@
       //const data = await opNums.json();
       nums.value = opNums.response;
 
-      //console.log("API Response:", opNums);
+      console.log("API Response:", opNums);
       //console.log("Operator Numbers JSON:", nums.value);
 
       opNum.value = nums.value?.oprlicid ?? ""
@@ -73,10 +73,15 @@
   async function addNumber(){
 
     const original = nums.value[0]
+    let ctid = 1
+
+    if (Object.hasOwn(territories, addState.value)) {
+      ctid = 2
+    }
 
     const payload = {
       liccatid: 1,
-      countryid: 1,
+      countryid: ctid,
       status: "A",
       operatornumber: addOpNum.value,
       state: addState.value,
