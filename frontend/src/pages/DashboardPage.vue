@@ -89,43 +89,88 @@ const pid = 458860 // later: come from auth/session
 const loading = ref(false)
 const error = ref('')
 
-const account = ref(null)
+const account = ref([])
 const enrollments = ref([])
 const grades = ref([])
 const invoices = ref([])
 const invoicedata = ref([])
 
 async function loadDash() {
-  console.log('loadAccount called')
+  console.log('loadDash called')
   loading.value = true
   error.value = ''
 
   try {
     const acc = await api.getAccountDetails(pid)
     account.value = acc.response
-    console.log('Account JSON:', acc)
+  } catch (e) {
+    error.value = e?.message ?? String(e)
+    console.error('getAccountDetails Failed:', e)
+    window.alert('Failed to refresh data. Please refresh after a moment. However, old data may be displayed for your convenience. Contact an admin if the problem persists. ')
+    console.log('Loading cached data from localStorage due to error')
+    account.value = null
+    account.value = api.attemptLoadFromLocal('getAccountDetails', account)
+  } finally {
+    loading.value = false
+  }
 
+  try {
     const enr = await api.getActiveEnrollment(pid)
     enrollments.value = enr.response
-    console.log('Enrollments JSON:', enr)
+  } catch (e) {
+    error.value = e?.message ?? String(e)
+    console.error('getActiveEnrollment Failed:', e)
+    window.alert('Failed to refresh data. Please refresh after a moment. However, old data may be displayed for your convenience. Contact an admin if the problem persists. ')
+    console.log('Loading cached data from localStorage due to error')
+    enrollments.value = null
+    enrollments.value = api.attemptLoadFromLocal('getActiveEnrollment', enrollments)
+  } finally {
+    loading.value = false
+  }
 
-    for (const v of enr.response) {
+  try {
+    for (const v of enrollments.value) {
       const c = await api.getCourseGrades(v.enrollid)
       grades.value[v.enrollid] = c.response ?? []
     }
-    console.log('Grades JSON:', grades)
+    console.log('Grades loaded successfully:', grades.value)
+  } catch (e) {
+    error.value = e?.message ?? String(e)
+    console.error('getCourseGrades Failed:', e)
+    window.alert('Failed to refresh data. Please refresh after a moment. However, old data may be displayed for your convenience. Contact an admin if the problem persists. ')
+    console.log('Loading cached data from localStorage due to error')
+    grades.value = null
+    grades.value = api.attemptLoadFromLocal('getCourseGrades', grades)
+  } finally {
+    loading.value = false
+  }
 
+  try {
     const inv = await api.getInvoices(pid)
     invoices.value = inv.response
-    console.log('Invoices JSON:', inv)
+  } catch (e) {
+    error.value = e?.message ?? String(e)
+    console.error('getInvoices Failed:', e)
+    window.alert('Failed to refresh data. Please refresh after a moment. However, old data may be displayed for your convenience. Contact an admin if the problem persists. ')
+    console.log('Loading cached data from localStorage due to error')
+    invoices.value = null
+    invoices.value = api.attemptLoadFromLocal('getInvoices', invoices)
+  } finally {
+    loading.value = false
+  }
 
-    for (const v of inv.response) {
+  try {
+    for (const v of invoices.value) {
       const c = await api.getInvoiceData(v.invoicenum)
       invoicedata.value[v.invoicenum] = c.response ?? []
     }
-    console.log('Invoice Data', invoicedata)
   } catch (e) {
     error.value = e?.message ?? String(e)
+    console.error('getInvoiceData Failed:', e)
+    window.alert('Failed to refresh data. Please refresh after a moment. However, old data may be displayed for your convenience. Contact an admin if the problem persists. ')
+    console.log('Loading cached data from localStorage due to error')
+    invoicedata.value = null
+    invoicedata.value = api.attemptLoadFromLocal('getInvoiceData', invoicedata)
   } finally {
     loading.value = false
   }
@@ -139,6 +184,7 @@ const activeEnrollments = computed(() =>
 
 function getCourseCompletion(enrollid) {
   const sections = grades.value[enrollid] ?? []
+  if (!sections.length) return 0
   const completed = sections?.filter((section) => section.grade != null).length
   return Math.round((completed / sections.length) * 100)
 }
@@ -235,7 +281,6 @@ function scheduleNextUpdate() {
                   </div>
                 </div>
               </div>
-              
             </router-link>
           </div>
           <div class="view-all">
