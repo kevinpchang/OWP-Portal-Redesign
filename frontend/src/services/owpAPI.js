@@ -1,4 +1,4 @@
-const BASE = "https://owp-portal-redesign-php.onrender.com/api"; //<-- frontend talks to backend using this base
+const BASE = "/api"; //<-- frontend talks to backend using this base
 
 // ==========================
 // GET ENDPOINTS
