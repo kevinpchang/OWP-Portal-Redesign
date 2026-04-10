@@ -116,9 +116,9 @@ describe('OperatorNumbers', () => {
         const transcriptLinks = wrapper.findAll('.quick-links .purchase-history .side-link')
 
         expect(wrapper.text()).toContain('Course B')
-        expect(wrapper.text()).toContain('Course C')
+        expect(wrapper.text()).toContain('Course D')
         expect(wrapper.text()).not.toContain('Course A')
-        expect(wrapper.text()).not.toContain('Course D')
+        expect(wrapper.text()).not.toContain('Course C')
         expect(transcriptLinks.length).toBeGreaterThanOrEqual(2)
     })
 

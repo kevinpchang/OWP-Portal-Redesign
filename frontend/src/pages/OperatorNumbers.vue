@@ -38,8 +38,8 @@
       //const data = await opNums.json();
       nums.value = opNums.response;
 
-      console.log("API Response:", opNums);
-      console.log("Operator Numbers JSON:", nums.value);
+      //console.log("API Response:", opNums);
+      //console.log("Operator Numbers JSON:", nums.value);
 
       opNum.value = nums.value?.oprlicid ?? ""
       state.value = nums.value?.state ?? ""
@@ -77,7 +77,7 @@
     try{
       //payload needs to have: liccatid, countryid, state, status, operatornumber, ipAddr
       api.addOperator(payload);
-      console.log("addNumber called with payload:", payload);
+      //console.log("addNumber called with payload:", payload);
     } catch (e) {
       error.value = e?.message ?? String(e);
       console.log("Error adding operator number:", error.value);
@@ -108,7 +108,7 @@
     try{
       //payload needs to have: oprlicid, liccatid, countryid, state, status, operatornumber, ipAddr
       api.updateOperatorNumber(payload);
-      console.log("updateNumber called with payload:", payload);
+      //console.log("updateNumber called with payload:", payload);
     } catch (e) {
       error.value = e?.message ?? String(e);
       console.log("Error updating operator number:", error.value);
@@ -128,9 +128,10 @@
     try{
     
       api.deleteOperator("localhost", original.oprlicid, pid);
-      console.log("deleteNumber called with ip:", "localhost", "and id:", original.oprlicid);
+      //console.log("deleteNumber called with ip:", "localhost", "and id:", original.oprlicid);
     } catch (e) {
       error.value = e?.message ?? String(e);
+      console.log("Error deleting operator number:", error.value);
     }
 
     deletePopup.value = false
@@ -163,10 +164,10 @@
       certificates.value = rows;
 
       const transcriptRows = rows.filter(
-        (r) => r.statustxt === "Complete" || r.statustxt === "Dropped"
+        (r) => r.statustxt === 'Complete' && (String(r.grade ?? "").trim() === "CR" || String(r.grade ?? "").trim() === "A" || String(r.grade ?? "").trim() === "B" || String(r.grade ?? "").trim() === "C")
       );
 
-      certificates.value = transcriptRows.slice(0, 2).map((r) => ({
+      certificates.value = transcriptRows.map((r) => ({
         key: r.enrollid,
         title: r.title || "Course title unavailable",
         routeTo: "/Certificates",
