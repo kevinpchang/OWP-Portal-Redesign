@@ -20,6 +20,8 @@ import owtp3rd8th from "@/assets/manual-imgs/owtp-3-8th-cvr.jpg";
 import um3rd from "@/assets/manual-imgs/um-3rd-cvr.jpg";
 import wtpo1st7th from "@/assets/manual-imgs/wtpo-1-7th-cvr.jpg";
 import wtpo2nd7th from "@/assets/manual-imgs/wtpo-2-7th-cvr.jpg";
+import sws from "@/assets/manual-imgs/sws.png";
+import pfi from "@/assets/manual-imgs/pfi.png";
 
 //course image map
 const courseImageMap = {
@@ -30,6 +32,10 @@ const courseImageMap = {
   OWTP2: owtp2nd8th,
   OWTP3: owtp3rd8th,
   MBR: MBR2nd,
+
+  //Silicon addition
+  CE29: sws,
+  PFI: pfi,
 };
 
 const courseImage = ref(null);
@@ -295,7 +301,7 @@ onMounted(async () => {
           <h2 class="card-title">Active Enrollments</h2>
         </div>
 
-        <div class="divider"></div>
+        <div class="divider"></div> 
 
         <div class="summary-body">
           <div class="summary-left">
@@ -305,9 +311,7 @@ onMounted(async () => {
                 alt="Course image"
                 class="course-image-large"
               />
-              <div v-else class="course-image-large fallback-image">
-                <span class="fallback-text-large">NO IMAGE AVAILABLE</span>
-              </div>
+              <div v-else class="course-image-large fallback-image"></div>
 
             <div class="course-header-info">
               <h2 class="course-title">{{ courseTitle }}</h2>
@@ -612,6 +616,10 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 
+.fallback-image {
+  background-color: #6DBE4B;
+}
+
 .course-header-info {
   display: flex;
   flex-direction: column;
@@ -912,21 +920,6 @@ onMounted(async () => {
 .error-message {
   color: #9F3323;
   font-weight: 600;
-}
-
-.fallback-image {
-  background-color: #6DBE4B;
-  display: flex;
-  align-items: center;
-  justify-content: center; 
-  text-align: center;
-}
-
-.fallback-text-large {
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
-  font-family: 'Roboto', sans-serif;
 }
 
 </style>

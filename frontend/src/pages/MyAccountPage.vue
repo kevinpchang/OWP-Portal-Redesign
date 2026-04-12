@@ -307,7 +307,7 @@ async function saveContactInfo() {
         <img :src="user" class="icon" />
         <div class="profile-meta">
           <div class="user-name">{{ account?.firstname ?? "Loading..." }}</div>
-          <div class="user-role">TESTING,<br />Office of Water Programs</div>
+          <div class="user-role">,<br />Office of Water Programs</div>
 
           <button class="btn xsmall" @click="openContactDialogWithData">Edit</button>
         </div>
