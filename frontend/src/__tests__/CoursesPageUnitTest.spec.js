@@ -1,12 +1,16 @@
 // Runs unit tests for the Courses Page
-// To use: 
+// To use:
 // Open a Terminal and cd to the frontend directory
 // To run individually: npm run test:front -- src/__tests__/CoursesPageUnitTest.spec.js
 // To run all frontend tests: npm run test:front
 
 import { describe, it, expect } from 'vitest'
 
-// Unit test for invoice name retrieval
+
+// Invoice name helper tests
+// Verifies invoice numbers map to the correct course title
+// and fall back safely when no title is found.
+
 function getInvoiceName(invoicenum) {
   const items = invoicedata.value[invoicenum] ?? []
   const match = items.find((item) => item?.coursetitle != null)
@@ -28,18 +32,23 @@ const invoicedata = {
 }
 
 describe('getInvoiceName', () => {
+  // Verifies the helper returns the first valid course title for a matching invoice number
   it('returns the correct course title for a given invoice number', () => {
     const courseTitle = getInvoiceName('1')
     expect(courseTitle).toBe('Drinking Water Specialist I')
   })
 
+  // Verifies fallback text is returned when no valid course title exists
   it('returns fallback text if no course title is found', () => {
     const courseTitle = getInvoiceName('2')
     expect(courseTitle).toBe('Course title unavailable')
   })
 })
 
-// Unit test for course image loading
+// Course image tests
+// Verifies each course abbreviation loads the correct image,
+// and unknown abbreviations return null.
+
 function getCourseImage(owpabbr) {
   return courseImageMap[owpabbr] || null
 }
@@ -63,6 +72,7 @@ const courseImageMap = {
 }
 
 describe('getCourseImage', () => {
+  // Verifies valid course abbreviations map to the correct image file
   it('returns the correct image for the corresponding abbreviation', () => {
     expect(getCourseImage('UM')).toBe(um3rd)
     expect(getCourseImage('WTPO1')).toBe(wtpo1st7th)
@@ -73,17 +83,22 @@ describe('getCourseImage', () => {
     expect(getCourseImage('MBR')).toBe(MBR2nd)
   })
 
+  // Verifies unknown abbreviations safely return null
   it('returns null if no abbreviation matches', () => {
     expect(getCourseImage('UNKNOWN')).toBeNull()
   })
 })
 
-// Unit test for filtering active enrollments
+// Active enrollment tests
+// Verifies only currently enrolled courses are included in
+// the active enrollments list.
+
 function getActiveEnrollments(enrollments) {
   return enrollments.filter((r) => r.statustxt === 'Enrolled')
 }
 
 describe('getActiveEnrollments', () => {
+  // Verifies only enrollments marked as Enrolled are returned
   it('filters only enrollments with statustxt "Enrolled"', () => {
     const enrollments = [
       { enrollid: 1, statustxt: 'Enrolled' },
@@ -101,6 +116,7 @@ describe('getActiveEnrollments', () => {
     ])
   })
 
+  // Verifies an empty array is returned when there are no active enrollments
   it('returns an empty array if no enrollments are active', () => {
     const enrollments = [
       { enrollid: 1, statustxt: 'Complete' },
@@ -113,7 +129,10 @@ describe('getActiveEnrollments', () => {
   })
 })
 
-// Unit test for filtering completed enrollments
+// Completed enrollment tests
+// Verifies completed and dropped courses are grouped into the
+// completed enrollments section.
+
 function getCompletedEnrollments(enrollments) {
   return enrollments.filter(
     (r) => r.statustxt === 'Complete' || r.statustxt === 'Dropped'
@@ -121,6 +140,7 @@ function getCompletedEnrollments(enrollments) {
 }
 
 describe('getCompletedEnrollments', () => {
+  // Verifies only Complete and Dropped enrollments are returned
   it('filters only enrollments with statustxt "Complete" or "Dropped"', () => {
     const enrollments = [
       { enrollid: 1, statustxt: 'Enrolled' },
@@ -136,9 +156,26 @@ describe('getCompletedEnrollments', () => {
       { enrollid: 3, statustxt: 'Dropped' },
     ])
   })
+
+  // Verifies an empty array is returned when there are no completed or dropped enrollments
+  it('returns an empty array if no enrollments are completed or dropped', () => {
+    const enrollments = [
+      { enrollid: 1, statustxt: 'Enrolled' },
+      { enrollid: 2, statustxt: 'Enrolled' },
+    ]
+
+    const completedEnrollments = getCompletedEnrollments(enrollments)
+
+    expect(completedEnrollments).toEqual([])
+  })
 })
 
-// Unit test for calculating active course progress percentage
+
+// Active course tests
+// Verifies the progress percentage is calculated correctly
+// based on how many sections have grades.
+
+
 function getCourseProgress(sections) {
   const total = sections.length
   const graded = sections.filter(
@@ -149,6 +186,7 @@ function getCourseProgress(sections) {
 }
 
 describe('getCourseProgress', () => {
+  // Verifies progress is calculated correctly when some sections are graded
   it('returns 60% if 3 out of 5 sections are graded', () => {
     const sections = [
       { grade: '100' },
@@ -162,6 +200,7 @@ describe('getCourseProgress', () => {
     expect(progress).toBe('60%')
   })
 
+  // Verifies 0% is returned when no sections are graded
   it('returns 0% if no sections are graded', () => {
     const sections = [
       { grade: '' },
@@ -173,6 +212,7 @@ describe('getCourseProgress', () => {
     expect(progress).toBe('0%')
   })
 
+  // Verifies 0% is returned safely when the section list is empty
   it('returns 0% if there are no sections', () => {
     const sections = []
 
@@ -181,7 +221,10 @@ describe('getCourseProgress', () => {
   })
 })
 
-// Unit test for completed course pass/fail 
+// Completed course tests
+// Verifies completed courses display Pass or Fail correctly 
+// and dropped courses are handled separately.
+
 function getCompletedCourseStatus(course) {
   if (course.statustxt === 'Dropped') {
     return {
@@ -199,6 +242,7 @@ function getCompletedCourseStatus(course) {
 }
 
 describe('getCompletedCourseStatus', () => {
+  // Verifies a completed course with grade CR is marked as Pass
   it('returns Pass when grade is CR', () => {
     const result = getCompletedCourseStatus({
       statustxt: 'Complete',
@@ -211,6 +255,7 @@ describe('getCompletedCourseStatus', () => {
     })
   })
 
+  // Verifies a completed course with a non-CR grade is marked as Fail
   it('returns Fail when grade is not CR', () => {
     const result = getCompletedCourseStatus({
       statustxt: 'Complete',
@@ -223,6 +268,7 @@ describe('getCompletedCourseStatus', () => {
     })
   })
 
+  // Verifies dropped courses return a dropped state instead of Pass/Fail
   it('returns dropped state when statustxt is Dropped', () => {
     const result = getCompletedCourseStatus({
       statustxt: 'Dropped',

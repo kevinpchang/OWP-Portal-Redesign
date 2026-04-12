@@ -4,14 +4,17 @@
 // To run individually: npm run test:front -- src/__tests__/RecommendedCourseIntegrationTest.spec.js
 // To run all frontend tests: npm run test:front
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import RecommendedCourse from '../pages/RecommendedCourse.vue'
 import * as api from '@/services/owpAPI'
 
+// Shared mock route id so individual tests can change it safely
+let mockRouteId = '1'
+
 vi.mock('vue-router', () => ({
   useRoute: () => ({
-    params: { id: '1' },
+    params: { id: mockRouteId },
   }),
 }))
 
@@ -40,6 +43,16 @@ vi.mock('../data/coursesData.js', () => ({
 }))
 
 describe('RecommendedCourse', () => {
+  // Resets mocks and default route id before each test
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockRouteId = '1'
+  })
+
+  // Recommended course summary tests
+  // Verifies the selected recommended course title and
+  // descriptions render correctly.
+
   it('loads and displays recommended course information correctly', async () => {
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
@@ -51,6 +64,10 @@ describe('RecommendedCourse', () => {
     expect(wrapper.text()).toContain('Short description')
     expect(wrapper.text()).toContain('Long description for the recommended course.')
   })
+
+  // Recommended course content tests
+  // Verifies chapter rows render correctly when chapter content
+  // exists for the selected recommended course.
 
   it('loads and displays course contents correctly', async () => {
     api.getInvoices.mockResolvedValue({ response: [] })
@@ -66,6 +83,10 @@ describe('RecommendedCourse', () => {
     expect(rows[1].text()).toContain('Chapter 2')
   })
 
+  // Purchase history tests
+  // Verifies invoice data is loaded and displayed correctly in
+  // the sidebar.
+ 
   it('displays purchase history correctly', async () => {
     api.getInvoices.mockResolvedValue({
       response: [
@@ -81,6 +102,7 @@ describe('RecommendedCourse', () => {
       if (invoicenum === '2') {
         return { response: [{ coursetitle: 'Course B' }] }
       }
+      return { response: [] }
     })
 
     const wrapper = mount(RecommendedCourse)
@@ -92,18 +114,17 @@ describe('RecommendedCourse', () => {
     expect(invoiceLinks.some((item) => item.text().includes('Invoice: 2 - Course B'))).toBe(true)
   })
 
+  // Missing course fallback tests
+  // Verifies fallback content is shown when the recommended
+  // course id does not match any course.
+  
   it('shows fallback state when the recommended course id does not exist', async () => {
-    vi.doMock('vue-router', () => ({
-      useRoute: () => ({
-        params: { id: '999' },
-      }),
-    }))
+    mockRouteId = '999'
 
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const { default: RecommendedCourseMissing } = await import('../pages/RecommendedCourse.vue')
-    const wrapper = mount(RecommendedCourseMissing)
+    const wrapper = mount(RecommendedCourse)
     await flushPromises()
 
     expect(wrapper.text()).toContain('No Recommended Course')
@@ -112,18 +133,17 @@ describe('RecommendedCourse', () => {
     expect(wrapper.text()).toContain('No course content available.')
   })
 
+  // Empty chapter fallback tests
+  // Verifies fallback chapter content is shown when the
+  // selected recommended course has no chapters.
+  
   it('shows fallback chapter content when a recommended course has no chapters', async () => {
-    vi.doMock('vue-router', () => ({
-      useRoute: () => ({
-        params: { id: '2' },
-      }),
-    }))
+    mockRouteId = '2'
 
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const { default: RecommendedCourseNoChapters } = await import('../pages/RecommendedCourse.vue')
-    const wrapper = mount(RecommendedCourseNoChapters)
+    const wrapper = mount(RecommendedCourse)
     await flushPromises()
 
     expect(wrapper.text()).toContain('Recommended Course Two')

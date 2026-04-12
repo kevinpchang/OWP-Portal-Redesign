@@ -12,6 +12,10 @@ import { recommendedCourses } from "../data/coursesData.js";
 const route = useRoute();
 const pid = 458860;
 
+// Dashboard-style messaging DB connection
+const MESSAGING_API_BASE = "https://owp-portal-redesign-db.onrender.com";
+const messagingUserId = 1;
+
 const invoices = ref([]);
 const invoicedata = ref({});
 const loadingSidebar = ref(true);
@@ -30,6 +34,15 @@ const chapters = ref([
   "No course content available."
 ]);
 
+function formatInboxDate(dt) {
+  if (!dt) return "";
+  return new Date(dt).toLocaleDateString(undefined, {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 function getInvoiceName(invoicenum) {
   const items = invoicedata.value[invoicenum] ?? [];
   const match = items.find((item) => item?.coursetitle != null);
@@ -41,11 +54,24 @@ async function loadMessages() {
   messagesError.value = "";
 
   try {
-    // placeholder for future integration
-    messages.value = [];
+    const url = new URL(`${MESSAGING_API_BASE}/api/messaging/threads`);
+    url.searchParams.set("userId", String(messagingUserId));
+
+    const res = await fetch(url.toString());
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+
+    messages.value = (data.threads || []).slice(0, 3).map((row) => ({
+      id: Number(row.ThreadId),
+      sender: row.LastSenderName || row.LastSenderEmail || "Unknown",
+      date: formatInboxDate(
+        row.LastSentAt || row.LastMessageAt || row.CreatedAt
+      ),
+    }));
   } catch (e) {
     console.error("Failed to load messages:", e);
-    messagesError.value = "load-failed";
+    messagesError.value = e?.message ?? "load-failed";
     messages.value = [];
   } finally {
     loadingMessages.value = false;
@@ -125,14 +151,14 @@ onMounted(async () => {
         <div class="card-header">
           <div class="header-icon">
             <svg xmlns="http://www.w3.org/2000/svg"
-              width="32" 
+              width="32"
               height="40"
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="#007C8A" 
-              stroke-width="2" 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#007C8A"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
               class="lucide lucide-book-marked-icon lucide-book-marked">
               <path d="M10 2v8l3-3 3 3V2"/>
               <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
@@ -144,7 +170,6 @@ onMounted(async () => {
         <div class="divider"></div>
 
         <div class="summary-body">
-
           <!-- Left -->
           <div class="summary-left">
             <div class="course-image-large recommended-image">
@@ -163,7 +188,6 @@ onMounted(async () => {
               {{ courseLongDescription }}
             </p>
           </div>
-
         </div>
       </div>
     </div>
@@ -171,21 +195,20 @@ onMounted(async () => {
     <!-- Bottom Grid -->
     <div class="courses-bottom">
 
-      <!-- Left-->
+      <!-- Left -->
       <div class="courses-left">
         <div class="chapter-progress-tile">
-
           <div class="card-header">
             <div class="header-icon">
               <svg xmlns="http://www.w3.org/2000/svg"
-                width="32" 
+                width="32"
                 height="40"
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="#007C8A" 
-                stroke-width="2" 
-                stroke-linecap="round" 
-                stroke-linejoin="round" 
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#007C8A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
                 class="lucide lucide-book-marked-icon lucide-book-marked">
                 <path d="M10 2v8l3-3 3 3V2"/>
                 <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
@@ -204,7 +227,6 @@ onMounted(async () => {
             >
               <span class="chapter-number">{{ index + 1 }}</span>
               <span class="chapter-title">{{ chapter.title || chapter }}</span>
-
             </div>
           </div>
         </div>
@@ -219,15 +241,15 @@ onMounted(async () => {
         <div class="side-card">
           <div class="side-header">
             <div class="header-icon side-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" 
-                width="24" 
-                height="24" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                stroke-width="2" 
-                stroke-linecap="round" 
-                stroke-linejoin="round" 
+              <svg xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
                 class="lucide lucide-mail-icon lucide-mail">
                 <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/>
                 <rect x="2" y="4" width="20" height="16" rx="2"/>
@@ -251,39 +273,37 @@ onMounted(async () => {
               No messages available.
             </div>
 
-            <template v-else>
-              <div
-                v-for="message in messages"
-                :key="message.id"
-                class="side-link"
-              >
-                {{ message.subject || "Message unavailable" }}
-                <span v-if="message.date">({{ message.date }})</span>
-              </div>
-            </template>
+            <router-link
+              v-else
+              v-for="message in messages"
+              :key="message.id"
+              :to="`/messages?threadId=${message.id}`"
+              class="side-link"
+            >
+              Email Message from: {{ message.sender || "Unknown" }}
+              <span v-if="message.date"> {{ message.date }}</span>
+            </router-link>
           </div>
+
           <router-link to="/messages" class="side-footer">
             (View all messages)
           </router-link>
-
-          <div class="side-footer">(View all messages)</div>
         </div>
 
         <!-- Purchase History -->
         <div class="side-card">
           <div class="side-header">
             <div class="header-icon side-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" 
-                width="24" 
-                height="24" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                stroke-width="2" 
-                stroke-linecap="round" 
-                stroke-linejoin="round" 
-                class="lucide 
-                lucide-history-icon lucide-history">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-history-icon lucide-history">
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                 <path d="M3 3v5h5"/>
                 <path d="M12 7v5l4 2"/>
@@ -294,39 +314,37 @@ onMounted(async () => {
 
           <div class="divider"></div>
 
-        <div class="side-body">
-          <div v-if="loadingSidebar" class="state-message loading-message">
-            Loading purchase history…
-          </div>
-
-          <div v-else-if="sidebarError" class="state-message error-message">
-            We couldn’t load your purchase history right now.
-          </div>
-
-          <div v-else-if="invoices.length === 0" class="state-message empty-message">
-            No purchase history available.
-          </div>
-
-          <template v-else>
-            <div
-              v-for="invoice in invoices"
-              :key="invoice.invoicenum"
-              class="side-link"
-            >
-              Invoice: {{ invoice.invoicenum || "Unavailable" }} -
-              {{ getInvoiceName(invoice.invoicenum) }}
+          <div class="side-body">
+            <div v-if="loadingSidebar" class="state-message loading-message">
+              Loading purchase history…
             </div>
-          </template>
-        </div>
 
-        <router-link to="/purchase-history" class="side-footer">
-          (View all purchases)
-        </router-link>
-        
+            <div v-else-if="sidebarError" class="state-message error-message">
+              We couldn’t load your purchase history right now.
+            </div>
+
+            <div v-else-if="invoices.length === 0" class="state-message empty-message">
+              No purchase history available.
+            </div>
+
+            <template v-else>
+              <div
+                v-for="invoice in invoices"
+                :key="invoice.invoicenum"
+                class="side-link"
+              >
+                Invoice: {{ invoice.invoicenum || "Unavailable" }} -
+                {{ getInvoiceName(invoice.invoicenum) }}
+              </div>
+            </template>
+          </div>
+
+          <router-link to="/purchase-history" class="side-footer">
+            (View all purchases)
+          </router-link>
         </div>
 
       </div>
-
     </div>
   </div>
 </template>
@@ -340,191 +358,189 @@ onMounted(async () => {
 }
 
 .courses-top {
-  max-width: 1000px;
+  max-width: 1000rem;
   width: 100%;
-  margin: 32px auto 0;
+  margin: 32rem auto 0;
   display: flex;
   justify-content: flex-start;
 }
 
 .courses-header {
-  font-size: 32px;
+  font-size: 32rem;
   font-weight: 700;
 }
 
 .page-container {
-  max-width: 1000px;
+  max-width: 1000rem;
   margin: 0 auto;
 }
 
 .summary-tile {
   background-color: #F2F1F2;
-  padding: 20px;
-  margin-top: 32px;
-  border-radius: 14px;
+  padding: 20rem;
+  margin-top: 32rem;
+  border-radius: 14rem;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16rem;
 }
 
 .card-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  transform: translateY(-4px);
-  margin-bottom: 4px;
+  gap: 8rem;
+  transform: translateY(-4rem);
+  margin-bottom: 4rem;
 }
 
 .header-icon {
-  width: 32px;
-  height: 40px;
+  width: 32rem;
+  height: 40rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;   
-  border-radius: 0;  
+  background: none;
+  border-radius: 0;
   padding: 0;
 }
 
 .side-icon {
-  width: 36px;
-  height: 44px;
+  width: 36rem;
+  height: 44rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;  
+  background: none;
 }
 
 .side-icon svg {
-  width: 28px;
-  height: 28px;
+  width: 28rem;
+  height: 28rem;
   stroke: #007C8A;
 }
 
-
 .card-title {
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 700;
   color: #034750;
 }
 
 .summary-tile .divider {
-  border-top: 1px solid #FFFFFF;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  margin-top: -15px;
-  margin-bottom: 14px;
+  border-top: 1rem solid #FFFFFF;
+  width: calc(100% + 40rem);
+  margin-left: -20rem;
+  margin-top: -15rem;
+  margin-bottom: 14rem;
 }
 
 .chapter-progress-tile .divider {
-  border-top: 1px solid #FFFFFF;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  margin-top: 18px;
-  margin-bottom: 18px;
+  border-top: 1rem solid #FFFFFF;
+  width: calc(100% + 40rem);
+  margin-left: -20rem;
+  margin-top: 18rem;
+  margin-bottom: 18rem;
 }
 
 .summary-body {
   display: flex;
   justify-content: flex-start;
-  gap: 48px;
+  gap: 48rem;
 }
 
 .summary-left {
   display: flex;
-  gap: 16px;
+  gap: 16rem;
 }
 
 .course-image-large {
-  width: 100px;
-  height: 120px;
+  width: 100rem;
+  height: 120rem;
   background-color: #6DBE4B;
-  border-radius: 4px;
+  border-radius: 4rem;
 }
 
 .course-header-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: -12px;
+  gap: 6rem;
+  margin-top: -12rem;
 }
 
 .course-title {
   font-family: 'Roboto Semibold', sans-serif;
-  font-size: 16px;
+  font-size: 16rem;
   color: #707070;
-  max-width: 260px;
+  max-width: 260rem;
 }
 
 .course-description-text {
-  font-size: 15px;
+  font-size: 15rem;
   color: #555;
-  max-width: 260px;
+  max-width: 260rem;
   line-height: 1.4;
-  margin-top: -12px;
+  margin-top: -12rem;
 }
 
 .summary-right {
-  max-width: 540px;
+  max-width: 540rem;
 }
 
 .course-long-text {
-  font-size: 15px;
+  font-size: 15rem;
   line-height: 1.45;
   color: #034750;
-  margin-top: 1px;
-  margin-left:-30px;
+  margin-top: 1rem;
+  margin-left: -30rem;
 }
 
 .courses-bottom {
-  max-width: 1000px;
+  max-width: 1000rem;
   width: 100%;
-  margin: 32px auto;
+  margin: 32rem auto;
   display: grid;
   grid-template-columns: 1.6fr 0.8fr;
-  gap: 8px;
+  gap: 8rem;
 }
 
 .courses-left {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16rem;
 }
 
 .chapter-progress-tile {
   background-color: #F2F1F2;
-  padding: 20px;
-  border-radius: 14px;
+  padding: 20rem;
+  border-radius: 14rem;
 }
 
 .chapter-progress-tile {
   width: 95%;
-  max-width: none;  
+  max-width: none;
 }
 
 .chapter-progress-tile .card-header {
-  transform: translateY(-8px);
-  margin-bottom: -18px;
+  transform: translateY(-8rem);
+  margin-bottom: -18rem;
 }
 
 .chapter-progress-tile .divider {
-  margin-top: 18px;
-  margin-bottom: 18px;
+  margin-top: 18rem;
+  margin-bottom: 18rem;
 }
 
 .chapter-table {
-  margin-top: 4px;
+  margin-top: 4rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 8rem;
 }
-
 
 .chapter-row {
   display: flex;
-  gap: 8px;
-  padding: 8px 0;
-  border-bottom: 1px solid #e2e2e2;
+  gap: 8rem;
+  padding: 8rem 0;
+  border-bottom: 1rem solid #e2e2e2;
 }
 
 .chapter-number {
@@ -535,17 +551,17 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
-  padding: 8px 0;
-  border-bottom: 1px solid #e2e2e2;
-  font-size: 14px;
-  color: #034750; 
+  gap: 8rem;
+  padding: 8rem 0;
+  border-bottom: 1rem solid #e2e2e2;
+  font-size: 14rem;
+  color: #034750;
 }
 
 .chapter-number {
   font-weight: 700;
   color: #034750;
-  min-width: 20px;
+  min-width: 20rem;
 }
 
 .chapter-title {
@@ -555,56 +571,56 @@ onMounted(async () => {
 }
 
 .courses-right {
-  margin-left: 30px; 
-  max-width: 260px;
+  margin-left: 30rem;
+  max-width: 260rem;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16rem;
 }
 
 .side-card {
   background-color: #F2F1F2;
-  padding: 20px;
-  border-radius: 14px;
+  padding: 20rem;
+  border-radius: 14rem;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 12rem;
   width: 100%;
 }
 
 .side-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 10rem;
 }
 
 .side-title {
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 700;
 }
 
 .divider {
-  border-top: 1px solid #FFFFFF;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  margin-top: 2px;
-  margin-bottom: 8px;
+  border-top: 1rem solid #FFFFFF;
+  width: calc(100% + 40rem);
+  margin-left: -20rem;
+  margin-top: 2rem;
+  margin-bottom: 8rem;
 }
 
 .side-body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 14rem;
 }
 
 .side-link {
-  font-size: 16px;
+  font-size: 16rem;
   color: #007c8a;
   cursor: pointer;
   text-decoration: underline;
-  padding: 5px 16px;
-  margin: 0 -20px;
-  width: calc(100% + 7px);
+  padding: 5rem 16rem;
+  margin: 0 -20rem;
+  width: calc(100% + 7rem);
   transition: background-color 0.2s ease;
 }
 
@@ -613,11 +629,11 @@ onMounted(async () => {
 }
 
 .side-footer {
-  height: 32px;
+  height: 32rem;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  font-size: 18px;
+  font-size: 18rem;
   cursor: pointer;
   color: #034750;
 }
@@ -627,8 +643,8 @@ onMounted(async () => {
 }
 
 .back-link {
-  margin-top: 12px;
-  font-size: 14px;
+  margin-top: 12rem;
+  font-size: 14rem;
   color: #034750;
 }
 
@@ -637,8 +653,8 @@ onMounted(async () => {
 }
 
 .state-message {
-  padding: 8px 0;
-  font-size: 16px;
+  padding: 8rem 0;
+  font-size: 16rem;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -662,11 +678,9 @@ onMounted(async () => {
 
 .fallback-text-large {
   color: white;
-  font-size: 12px;
+  font-size: 12rem;
   font-weight: 700;
   font-family: 'Roboto', sans-serif;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.5rem;
 }
-
 </style>
-

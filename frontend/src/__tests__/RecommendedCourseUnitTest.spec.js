@@ -6,7 +6,10 @@
 
 import { describe, it, expect } from 'vitest'
 
-// Unit test for invoice name retrieval
+// Invoice name helper tests
+// Verifies invoice numbers map to the correct course title and
+// safely fall back when no course title exists.
+
 function getInvoiceName(invoicenum) {
   const items = invoicedata.value[invoicenum] ?? []
   const match = items.find((item) => item?.coursetitle != null)
@@ -27,18 +30,23 @@ const invoicedata = {
 }
 
 describe('getInvoiceName', () => {
+  // Verifies the helper returns the correct course title for a matching invoice number
   it('returns the correct course title for a given invoice number', () => {
     const courseTitle = getInvoiceName('1')
     expect(courseTitle).toBe('Course A')
   })
 
+  // Verifies fallback text is returned when no valid course title is found
   it('returns fallback text if no course title is found', () => {
     const courseTitle = getInvoiceName('2')
     expect(courseTitle).toBe('Course title unavailable')
   })
 })
 
-// Unit test for recommended course loading
+// Recommended course state helper tests
+// Verifies the selected recommended course data is returned
+// correctly, and fallback values are used when data is missing.
+
 function getRecommendedCourseState(courseId, recommendedCourses) {
   const course = recommendedCourses.find((c) => c.id === courseId)
 
@@ -63,6 +71,7 @@ function getRecommendedCourseState(courseId, recommendedCourses) {
 }
 
 describe('getRecommendedCourseState', () => {
+  // Verifies the helper returns the selected recommended course data when a matching id exists
   it('returns the selected recommended course data when a matching id exists', () => {
     const recommendedCourses = [
       {
@@ -84,6 +93,7 @@ describe('getRecommendedCourseState', () => {
     })
   })
 
+  // Verifies the helper returns the empty fallback state when no matching course exists
   it('returns fallback empty state when no matching course exists', () => {
     const recommendedCourses = [
       {
@@ -105,6 +115,7 @@ describe('getRecommendedCourseState', () => {
     })
   })
 
+  // Verifies fallback chapter content is used when a course has no chapters
   it('uses fallback chapter content when a course has no chapters', () => {
     const recommendedCourses = [
       {
@@ -126,6 +137,7 @@ describe('getRecommendedCourseState', () => {
     })
   })
 
+  // Verifies fallback text is used when description fields are missing
   it('uses fallback text for missing description fields', () => {
     const recommendedCourses = [
       {
@@ -144,6 +156,28 @@ describe('getRecommendedCourseState', () => {
       courseDescription: 'Description unavailable.',
       courseLongDescription: 'No course description available.',
       chapters: ['Intro'],
+    })
+  })
+
+  // Verifies fallback text is used when the course title is missing
+  it('uses fallback title text when the course title is missing', () => {
+    const recommendedCourses = [
+      {
+        id: 4,
+        title: '',
+        description: 'Short description',
+        longDescription: 'Long description here',
+        chapters: ['Chapter 1'],
+      },
+    ]
+
+    const result = getRecommendedCourseState(4, recommendedCourses)
+
+    expect(result).toEqual({
+      courseTitle: 'Course title unavailable',
+      courseDescription: 'Short description',
+      courseLongDescription: 'Long description here',
+      chapters: ['Chapter 1'],
     })
   })
 })
