@@ -49,6 +49,10 @@ const enrollId = String(
   ""
 );
 
+// Dashboard-style messaging DB connection
+const MESSAGING_API_BASE = "https://owp-portal-redesign-db.onrender.com";
+const messagingUserId = 1;
+
 // main page state
 const loadingCourse = ref(true);
 const loadError = ref("");
@@ -86,8 +90,7 @@ const courseActionLabel = computed(() => {
   return isDroppedOrFailed.value ? "Re-Enroll" : "Completed";
 });
 
-
-//donut logic (red/green for pass/fail) grey when empty PROBABLY SHOULD DEFINE
+// donut logic
 const donutColor = computed(() => {
   const status = normalizedCourseStatus.value;
 
@@ -96,10 +99,10 @@ const donutColor = computed(() => {
     status === "FAIL" ||
     status === "FAILED"
   ) {
-    return "#9F3323"; // red for failed
+    return "#9F3323";
   }
 
-  return "#6DBE4B"; // green default
+  return "#6DBE4B";
 });
 
 // metrics
@@ -127,6 +130,15 @@ const loadingSidebar = ref(true);
 const sidebarError = ref("");
 
 let animInterval = null;
+
+function formatInboxDate(dt) {
+  if (!dt) return "";
+  return new Date(dt).toLocaleDateString(undefined, {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 function animateToProgress(progressValue) {
   if (animInterval) clearInterval(animInterval);
@@ -183,10 +195,24 @@ async function loadMessages() {
   messagesError.value = "";
 
   try {
-    messages.value = [];
+    const url = new URL(`${MESSAGING_API_BASE}/api/messaging/threads`);
+    url.searchParams.set("userId", String(messagingUserId));
+
+    const res = await fetch(url.toString());
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+
+    messages.value = (data.threads || []).slice(0, 3).map((row) => ({
+      id: Number(row.ThreadId),
+      sender: row.LastSenderName || row.LastSenderEmail || "Unknown",
+      date: formatInboxDate(
+        row.LastSentAt || row.LastMessageAt || row.CreatedAt
+      ),
+    }));
   } catch (err) {
     console.error("Failed to load messages:", err);
-    messagesError.value = "load-failed";
+    messagesError.value = err?.message ?? "load-failed";
     messages.value = [];
   } finally {
     loadingMessages.value = false;
@@ -479,6 +505,8 @@ onMounted(async () => {
         <router-link to="/courses" class="back-link">← Back to Courses</router-link>
       </div>
 
+
+      <!-- Messages -->
       <div class="courses-right">
         <div class="side-card">
           <div class="side-header">
@@ -502,15 +530,16 @@ onMounted(async () => {
               No messages available.
             </div>
 
-            <div
+            <router-link
               v-else
               v-for="message in messages"
               :key="message.id"
+              :to="`/messages?threadId=${message.id}`"
               class="side-link"
             >
-              {{ message.subject || "Message unavailable" }}
-              <span v-if="message.date">({{ message.date }})</span>
-            </div>
+              Email Message from: {{ message.sender || "Unknown" }}
+              <span v-if="message.date"> {{ message.date }}</span>
+            </router-link>
           </div>
 
           <router-link to="/messages" class="side-footer">
@@ -563,89 +592,89 @@ onMounted(async () => {
 
 <style scoped>
 .completed-course-page {
-  padding: 0px;
+  padding: 0rem;
   background-color: #fff;
   font-family: 'Roboto', sans-serif;
   color: #034750;
 }
 
 .courses-top {
-  max-width: 1000px;
+  max-width: 1000rem;
   width: 100%;
   margin: auto;
   display: flex;
   justify-content: flex-start;
-  margin-top: 32px;
+  margin-top: 32rem;
 }
 
 .courses-header {
-  font-size: 32px;
+  font-size: 32rem;
   font-weight: 700;
   color: #034750;
 }
 
 .page-container {
-  max-width: 1000px;
+  max-width: 1000rem;
   margin: 0 auto;
 }
 
 .summary-tile {
   background-color: #F2F1F2;
-  border-radius: 14px;
-  padding: 20px;
-  margin: 32px auto 0 auto;
+  border-radius: 14rem;
+  padding: 20rem;
+  margin: 32rem auto 0 auto;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1000rem;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16rem;
 }
 
 .summary-tile .divider {
-  border-top: 1px solid #FFFFFF;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  margin-top: -15px;
-  margin-bottom: 14px;
+  border-top: 1rem solid #FFFFFF;
+  width: calc(100% + 40rem);
+  margin-left: -20rem;
+  margin-top: -15rem;
+  margin-bottom: 14rem;
 }
 
 .summary-tile .card-header {
-  transform: translateY(-4px);
-  margin-bottom: 4px;
+  transform: translateY(-4rem);
+  margin-bottom: 4rem;
 }
 
 .card-header {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 4rem;
 }
 
 .header-icon {
-  width: 26px;
-  height: 34px;
+  width: 26rem;
+  height: 34rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .side-icon {
-  width: 36px;
-  height: 44px;
+  width: 36rem;
+  height: 44rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none; 
+  background: none;
   padding: 0;
 }
 
 .side-icon svg {
-  width: 28px;
-  height: 28px;
+  width: 28rem;
+  height: 28rem;
   stroke: #007C8A;
 }
 
 .card-title {
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 700;
   color: #034750;
 }
@@ -654,20 +683,19 @@ onMounted(async () => {
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: 48px;
+  gap: 48rem;
 }
 
 .summary-left {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 16rem;
 }
 
-
 .course-image-large {
-  width: 100px;
-  height: 120px;
-  border-radius: 4px;
+  width: 100rem;
+  height: 120rem;
+  border-radius: 4rem;
   object-fit: cover;
   display: block;
   flex-shrink: 0;
@@ -677,7 +705,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 120px;
+  height: 120rem;
 }
 
 .course-header-info h2,
@@ -688,59 +716,59 @@ onMounted(async () => {
 
 .course-title {
   font-family: 'Roboto Semibold', sans-serif;
-  font-size: 16px;
+  font-size: 16rem;
   color: #707070;
   margin: 0;
   line-height: 1.3;
-  max-width: 260px;
+  max-width: 260rem;
   white-space: normal;
   overflow-wrap: break-word;
 }
 
 .course-expiration,
 .course-grade {
-  font-size: 14px;
+  font-size: 14rem;
   color: #555;
 }
 
 .course-metrics {
   display: flex;
   align-items: center;
-  gap: 32px;
-  margin-left: 24px;
-  transform: translateY(10px);
+  gap: 32rem;
+  margin-left: 24rem;
+  transform: translateY(10rem);
 }
 
 .course-progress {
   display: flex;
   align-items: center;
-  margin-top: -10px;
-  margin-left: 8px;
+  margin-top: -10rem;
+  margin-left: 8rem;
 }
 
 .chapter-progress-tile .divider {
-  border-top: 1px solid #FFFFFF;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  margin-top: 18px;
-  margin-bottom: 18px;
+  border-top: 1rem solid #FFFFFF;
+  width: calc(100% + 40rem);
+  margin-left: -20rem;
+  margin-top: 18rem;
+  margin-bottom: 18rem;
 }
 
 .chapter-progress-tile .card-header {
-  transform: translateY(-8px);
-  margin-bottom: -18px;
+  transform: translateY(-8rem);
+  margin-bottom: -18rem;
 }
 
 .metric-value {
-  font-size: 36px;
+  font-size: 36rem;
   font-weight: 700;
   color: #00A5B5;
 }
 
 .donut {
   position: relative;
-  width: 105px;
-  height: 105px;
+  width: 105rem;
+  height: 105rem;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -756,34 +784,34 @@ onMounted(async () => {
 
 .donut-inner {
   position: relative;
-  width: 68px;
-  height: 68px;
+  width: 68rem;
+  height: 68rem;
   border-radius: 50%;
-  background-color: #F2F1F2; 
+  background-color: #F2F1F2;
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: 'Roboto Semibold', sans-serif;
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 600;
   color: #034750;
   text-align: center;
 }
 
 .courses-bottom {
-  max-width: 1000px;
+  max-width: 1000rem;
   width: 100%;
-  margin: 32px auto;
+  margin: 32rem auto;
   display: grid;
-  grid-template-columns: 1.6fr 0.8fr; 
-  gap: 8px; 
+  grid-template-columns: 1.6fr 0.8fr;
+  gap: 8rem;
   align-items: flex-start;
 }
 
 .courses-left {
   display: flex;
   flex-direction: column;
-  gap: 16px; 
+  gap: 16rem;
 }
 
 .chapter-progress-tile {
@@ -793,16 +821,20 @@ onMounted(async () => {
 .chapter-progress-tile,
 .side-card {
   background-color: #F2F1F2;
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 14rem;
+  padding: 20rem;
 }
 
-.side-card { width: 100%; }
-.courses-right { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 16px; margin-left: 
-  auto; max-width: 260px; 
+.side-card {
+  width: 100%;
+}
+
+.courses-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16rem;
+  margin-left: auto;
+  max-width: 260rem;
 }
 
 .metric {
@@ -812,42 +844,42 @@ onMounted(async () => {
 }
 
 .metric-label {
-  font-size: 14px;
+  font-size: 14rem;
   color: #707070;
 }
 
 .chapter-table {
-  margin-top: 4px;
+  margin-top: 4rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 8rem;
 }
 
 .chapter-table-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #dcdcdc;
-  padding-bottom: 6px;
+  border-bottom: 1rem solid #dcdcdc;
+  padding-bottom: 6rem;
   font-family: 'Roboto Semibold', sans-serif;
-  font-size: 15px;
+  font-size: 15rem;
   color: #034750;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.2rem;
 }
 
 .chapter-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #e2e2e2;
-  font-size: 14px;
+  padding: 8rem 0;
+  border-bottom: 1rem solid #e2e2e2;
+  font-size: 14rem;
   color: #034750;
 }
 
 .chapter-col {
   flex: 1.4;
   display: flex;
-  gap: 8px;
+  gap: 8rem;
 }
 
 .date-col,
@@ -860,13 +892,14 @@ onMounted(async () => {
   font-weight: 700;
   color: #034750;
 }
+
 .side-card {
   background-color: #F2F1F2;
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 14rem;
+  padding: 20rem;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 12rem;
   font-family: 'Roboto', sans-serif;
   width: 100%;
 }
@@ -874,38 +907,38 @@ onMounted(async () => {
 .side-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 10rem;
 }
 
 .side-title {
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 700;
   color: #034750;
 }
 
 .divider {
-  border-top: 1px solid #FFFFFF;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  margin-top: 2px;
-  margin-bottom: 8px;
+  border-top: 1rem solid #FFFFFF;
+  width: calc(100% + 40rem);
+  margin-left: -20rem;
+  margin-top: 2rem;
+  margin-bottom: 8rem;
 }
 
 .side-body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding-top: 4px;
+  gap: 14rem;
+  padding-top: 4rem;
 }
 
 .side-link {
-  font-size: 16px;
+  font-size: 16rem;
   color: #007c8a;
   cursor: pointer;
   text-decoration: underline;
-  padding: 5px 16px;
-  margin: 0 -20px;
-  width: calc(100% + 7px);
+  padding: 5rem 16rem;
+  margin: 0 -20rem;
+  width: calc(100% + 7rem);
   transition: background-color 0.2s ease;
 }
 
@@ -915,13 +948,13 @@ onMounted(async () => {
 }
 
 .side-footer {
-  height: 32px;
+  height: 32rem;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 400;
-  margin-bottom: 8px;
+  margin-bottom: 8rem;
   cursor: pointer;
   color: #034750;
   transition: color 0.2s ease;
@@ -933,9 +966,9 @@ onMounted(async () => {
 }
 
 .back-link {
-  margin-top: 12px;
+  margin-top: 12rem;
   display: inline-block;
-  font-size: 14px;
+  font-size: 14rem;
   color: #034750;
 }
 
@@ -944,8 +977,8 @@ onMounted(async () => {
 }
 
 .state-message {
-  padding: 8px 0;
-  font-size: 16px;
+  padding: 8rem 0;
+  font-size: 16rem;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -963,26 +996,26 @@ onMounted(async () => {
   background-color: #6DBE4B;
   display: flex;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   text-align: center;
 }
 
 .fallback-text-large {
   color: white;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 700;
   font-family: 'Roboto', sans-serif;
 }
 
 .course-action-button {
-  margin-top: 10px;
-  width: 140px;
-  height: 38px;
+  margin-top: 10rem;
+  width: 140rem;
+  height: 38rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 8rem;
   background-color: #00A5B5;
   color: #FFFFFF;
-  font-size: 14px;
+  font-size: 14rem;
   font-weight: 700;
   font-family: 'Roboto', sans-serif;
   cursor: pointer;
@@ -1002,7 +1035,4 @@ onMounted(async () => {
 .course-action-button.disabled:hover {
   background-color: #B8B8B8;
 }
-
-
-
 </style>

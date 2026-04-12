@@ -4,17 +4,19 @@
 // To run individually: npm run test:front -- src/__tests__/ActiveCourseIntegrationTest.spec.js
 // To run all frontend tests: npm run test:front
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import ActiveCourse from '../pages/ActiveCourse.vue'
 import * as api from '@/services/owpAPI'
 
+// Mock route param for course ID
 vi.mock('vue-router', () => ({
   useRoute: () => ({
     params: { id: '123' },
   }),
 }))
 
+// Mock API service functions
 vi.mock('@/services/owpAPI', () => ({
   getEnrollmentRecord: vi.fn(),
   getCourseGrades: vi.fn(),
@@ -23,6 +25,15 @@ vi.mock('@/services/owpAPI', () => ({
 }))
 
 describe('ActiveCourse', () => {
+  // Clears mock state between tests
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  // Course summary integration tests
+  // Verifies main course details render correctly including
+  // title, dates, CEUs, and extend eligibility.
+  
   it('loads and displays course summary information correctly', async () => {
     api.getEnrollmentRecord.mockResolvedValue({
       response: {
@@ -58,6 +69,10 @@ describe('ActiveCourse', () => {
     expect(wrapper.find('.extend-button').exists()).toBe(true)
   })
 
+  // Chapter progress integration tests
+  // Verifies chapters are sorted correctly and display proper
+  // grade, date, and action states.
+  
   it('loads and displays chapter progress correctly', async () => {
     api.getEnrollmentRecord.mockResolvedValue({
       response: {
@@ -88,14 +103,21 @@ describe('ActiveCourse', () => {
     const rows = wrapper.findAll('.chapter-row')
 
     expect(rows).toHaveLength(2)
+
+    // First row should be sorted Chapter 1
     expect(rows[0].text()).toContain('Chapter 1')
     expect(rows[0].text()).toContain('2026-01-10')
     expect(rows[0].text()).toContain('100% (10/10)')
 
+    // Second row should show incomplete state
     expect(rows[1].text()).toContain('Chapter 2')
     expect(rows[1].text()).toContain('Start online exam')
     expect(rows[1].text()).toContain('90% (9/10)')
   })
+
+  // Purchase history integration tests
+  // Verifies invoice data is loaded and displayed correctly in
+  // the sidebar.
 
   it('displays purchase history correctly', async () => {
     api.getEnrollmentRecord.mockResolvedValue({
@@ -121,12 +143,9 @@ describe('ActiveCourse', () => {
     })
 
     api.getInvoiceData.mockImplementation(async (invoicenum) => {
-      if (invoicenum === '1') {
-        return { response: [{ coursetitle: 'Course A' }] }
-      }
-      if (invoicenum === '2') {
-        return { response: [{ coursetitle: 'Course B' }] }
-      }
+      if (invoicenum === '1') return { response: [{ coursetitle: 'Course A' }] }
+      if (invoicenum === '2') return { response: [{ coursetitle: 'Course B' }] }
+      return { response: [] }
     })
 
     const wrapper = mount(ActiveCourse)
@@ -138,6 +157,10 @@ describe('ActiveCourse', () => {
     expect(invoiceLinks.some((item) => item.text().includes('Invoice: 2 - Course B'))).toBe(true)
   })
 
+  // Empty state tests
+  // Verifies UI displays correct fallback when no chapter data
+  // is available.
+ 
   it('shows empty chapter state when no chapter data exists', async () => {
     api.getEnrollmentRecord.mockResolvedValue({
       response: {
@@ -162,6 +185,10 @@ describe('ActiveCourse', () => {
     expect(wrapper.text()).toContain('No chapter data available.')
   })
 
+  // Error state tests
+  // Verifies UI displays correct error message when API fails
+  // to load enrollment data.
+  
   it('shows error state when enrollment record fails to load', async () => {
     api.getEnrollmentRecord.mockRejectedValue(new Error('Failed to load active course data'))
     api.getCourseGrades.mockResolvedValue({ response: [] })
