@@ -17,6 +17,9 @@
   const loadingMessages = ref(false);
   const loadingCertificates = ref(false);
 
+  // Failure Checking
+  const hadFailure = ref(false);
+
   const nums = ref([]);
   const messages = ref([]);
   const certificates = ref([]);
@@ -45,11 +48,16 @@
 
 
     try {
-      const opNums = await api.getOperatorList(pid);
-      //const data = await opNums.json();
-      nums.value = opNums.response;
-
-      console.log("API Response:", opNums);
+      try {
+        const opNums = await api.getOperatorList(pid);
+        //const data = await opNums.json();
+        nums.value = opNums.response;
+      }
+      catch {
+        hadFailure.value = true;
+        nums.value = api.loadFromSession("getOperatorList") ?? [];
+      }
+      
       //console.log("Operator Numbers JSON:", nums.value);
 
       opNum.value = nums.value?.oprlicid ?? ""
@@ -92,10 +100,11 @@
 
     try{
       //payload needs to have: liccatid, countryid, state, status, operatornumber, ipAddr
-      api.addOperator(payload);
+      await api.addOperator(payload);
       //console.log("addNumber called with payload:", payload);
     } catch (e) {
       error.value = e?.message ?? String(e);
+      alert("Error adding an Operator Number. Please wait a moment and try again. If problem persists contact a site admin.");
       console.log("Error adding operator number:", error.value);
     }
 
@@ -123,10 +132,11 @@
 
     try{
       //payload needs to have: oprlicid, liccatid, countryid, state, status, operatornumber, ipAddr
-      api.updateOperatorNumber(payload);
+      await api.updateOperatorNumber(payload);
       //console.log("updateNumber called with payload:", payload);
     } catch (e) {
       error.value = e?.message ?? String(e);
+      alert("Error updating an Operator Number. Please wait a moment and try again. If problem persists contact a site admin.");
       console.log("Error updating operator number:", error.value);
     }
 
@@ -143,9 +153,10 @@
     
     try{
     
-      api.deleteOperator("localhost", original.oprlicid, pid);
+      await api.deleteOperator("localhost", original.oprlicid, pid);
       //console.log("deleteNumber called with ip:", "localhost", "and id:", original.oprlicid);
     } catch (e) {
+      alert("Error deleting an Operator Number. Please wait a moment and try again. If problem persists contact a site admin.");
       error.value = e?.message ?? String(e);
       console.log("Error deleting operator number:", error.value);
     }
@@ -171,16 +182,22 @@
   async function loadCertificates() {
     loadingCertificates.value = true;
     certificatesError.value = "";
-
-    const enr = await api.getActiveEnrollment(pid);
-    enrollments.value = enr.response ?? [];
+    
+    try {
+      const enr = await api.getActiveEnrollment(pid);
+      enrollments.value = enr.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      enrollments.value = api.loadFromSession("getActiveEnrollment") ?? [];
+    }
 
     try {
       const rows = enrollments.value ?? [];
       certificates.value = rows;
 
       const transcriptRows = rows.filter(
-        (r) => r.statustxt === 'Complete' && (String(r.grade ?? "").trim() === "CR" || String(r.grade ?? "").trim() === "A" || String(r.grade ?? "").trim() === "B" || String(r.grade ?? "").trim() === "C")
+        (r) => r.grade === "CR "
       );
 
       certificates.value = transcriptRows.map((r) => ({
@@ -250,7 +267,10 @@
   import { isParameter } from 'typescript';
   const route = useRoute()
 
-  onMounted(loadTable);
+  onMounted(async () => {
+    await loadTable();
+    if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
+  });
   
 
 </script>

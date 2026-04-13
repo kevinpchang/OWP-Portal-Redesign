@@ -5,6 +5,7 @@ import {
   getCourseGrades,
   getInvoices,
   getInvoiceData,
+  loadFromSession,
 } from "@/services/owpAPI.js";
 
 import book from "@/assets/icons/owp-2color/book-icon.svg";
@@ -66,14 +67,8 @@ const messagesError = ref("");
 const invoices = ref([]);
 const invoicedata = ref({});
 
-function formatInboxDate(dt) {
-  if (!dt) return "";
-  return new Date(dt).toLocaleDateString(undefined, {
-    month: "numeric",
-    day: "numeric",
-    year: "numeric",
-  });
-}
+// Failure Checking
+const hadFailure = ref(false);
 
 function getInvoiceName(invoicenum) {
   const items = invoicedata.value[invoicenum] ?? [];
@@ -115,20 +110,44 @@ async function loadSidebarData() {
   sidebarError.value = "";
 
   try {
-    const inv = await getInvoices(pid);
-    invoices.value = inv?.response ?? [];
+    try {
+      const inv = await getInvoices(pid.value);
+      invoices.value = inv?.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      console.log("error");
+      invoices.value = loadFromSession("getInvoices") ?? [];
+    }
 
-    await Promise.all(
-      invoices.value.map(async (invoice) => {
-        const details = await getInvoiceData(invoice.invoicenum);
-        invoicedata.value[invoice.invoicenum] = details?.response ?? [];
-      })
+    const invoiceRequests = invoices.value.map((v) => ({
+    invoicenum: v.invoicenum,
+    promise: getInvoiceData(v.invoicenum),
+    }));
+
+    const invoiceResults = await Promise.allSettled(
+      invoiceRequests.map((item) => item.promise)
     );
-  } catch (e) {
-    console.error("Failed to load sidebar purchase history:", e);
+
+    invoiceRequests.forEach((item, index) => {
+      const result = invoiceResults[index];
+      const key = "getInvoiceData-"+item.invoicenum;
+      if (result.status === 'fulfilled') {
+        invoicedata.value[item.invoicenum] = result.value.response ?? [];
+      }
+      else {
+        hadFailure.value = true;
+        invoicedata.value[item.invoicenum] = loadFromSession(key) ?? [];
+        console.log(invoicedata.value);
+      }
+    })
+  }
+  catch (err) {
+    console.error("Failed to load purchase history:", err);
     sidebarError.value = "load-failed";
     invoices.value = [];
-  } finally {
+  }
+  finally {
     loadingSidebar.value = false;
   }
 }
@@ -158,37 +177,59 @@ onMounted(async () => {
   recommendedError.value = "";
 
   try {
-    const data = await getActiveEnrollment(pid);
-    const rows = data?.response ?? [];
+    let rows = []
+    try {
+      const data = await getActiveEnrollment(pid);
+      rows = data?.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      rows = loadFromSession("getActiveEnrollment") ?? [];
+    }
 
     const activeRows = rows.filter((r) => r.statustxt === "Enrolled");
     const completedRows = rows.filter(
       (r) => r.statustxt === "Complete" || r.statustxt === "Dropped"
     );
 
-    activeCourses.value = await Promise.all(
-      activeRows.map(async (r) => {
-        const gradesData = await getCourseGrades(r.enrollid);
-        const sections = gradesData?.response ?? [];
+    const activeGradeRequests = activeRows.map((r) => ({
+      row: r,
+      promise: getCourseGrades(r.enrollid)
+    }));
 
-        const total = sections.length;
-        const graded = sections.filter(
-          (s) => String(s.grade ?? "").trim() !== ""
-        ).length;
+    const activeGradeResults = await Promise.allSettled(
+      activeGradeRequests.map((item) => item.promise)
+    )
 
-        const percent = total === 0 ? 0 : Math.round((graded / total) * 100);
+    activeCourses.value = activeGradeRequests.map((item, index) =>  {
+      const result = activeGradeResults[index];
+      const gradesKey = "getCourseGrades-"+item.row.enrollid;
 
-        return {
-          id: r.enrollid,
-          title: r.title || "Course title unavailable",
-          expires: r.expiredate || "—",
-          progress: `${percent}%`,
-          extendEligible: r.extendeligible === "1",
-          image: courseImageMap[r.owpabbr] || null,
-        };
-      })
-    );
+      let sections = [];
 
+      if (result.status === "fulfilled") {
+        sections = result.value?.response ?? [];
+      } else {
+        hadFailure.value = true;
+        sections = loadFromSession(gradesKey) ?? [];
+      }
+    
+      const total = sections.length;
+      const graded = sections.filter((s) => String(s.grade ?? "").trim() !== null).length;
+
+      const percent = total === 0 ? 0 : Math.round((graded / total) * 100);
+
+      return {
+        id: item.row.enrollid,
+        title: item.row.title || "Course title unavailable",
+        expires: item.row.expiredate || "—",
+        progress: `${percent}%`,
+        extendEligible: item.row.extendeligible === "1",
+        image: courseImageMap[item.row.owpabbr] || null,
+      };
+    });
+
+    
     completedCourses.value = completedRows.map((r) => {
       if (r.statustxt === "Dropped") {
         return {
@@ -224,6 +265,7 @@ onMounted(async () => {
     loadSidebarData(),
     loadRecommendedCourses(),
   ]);
+ if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
 });
 </script>
 
