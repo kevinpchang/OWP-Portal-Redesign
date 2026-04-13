@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { getActiveEnrollment, getCourseGrades } from "@/services/owpAPI.js";
+import { getActiveEnrollment, getCourseGrades, loadFromSession } from "@/services/owpAPI.js";
 
 /**
  * For now: Silicon Scribes PID (or use localStorage if you set it elsewhere)
@@ -10,6 +10,9 @@ const pid = Number(localStorage.getItem("pid")) || 458860;
 const loading = ref(false);
 const error = ref("");
 const chapters = ref([]);
+
+// Error Checking
+const hadFailure = ref(false)
 
 /* ------------------------------
    PROGRESS RING VARIABLES
@@ -52,11 +55,19 @@ function isActuallyCompleted(item) {
 async function loadTasks() {
   loading.value = true;
   error.value = "";
-
   try {
     // 1) Active enrollments
-    const enr = await getActiveEnrollment(pid);
-    const enrollments = enr?.response ?? [];
+    let enrollments = [];
+    try {
+      const enr = await getActiveEnrollment(pid);
+      enrollments = enr?.response ?? [];
+      console.log(enrollments.value)
+    }
+    catch {
+      hadFailure.value = true;
+      enrollments = loadFromSession("getActiveEnrollment") ?? [];
+      console.log(enrollments.value)
+    }
 
     if (!enrollments.length) {
       chapters.value = [];
@@ -74,8 +85,16 @@ async function loadTasks() {
     }
 
     // 2) Grades list (these become your tasks/chapters)
-    const gradesRes = await getCourseGrades(enrollId);
-    const gradeItems = gradesRes?.response ?? [];
+    let gradeItems = [];
+    const gradesKey = "getCourseGrades-"+enrollId;
+    try {
+      const gradesRes = await getCourseGrades(enrollId);
+      gradeItems = gradesRes?.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      gradeItems = loadFromSession(gradesKey) ?? [];
+    }
 
     // Sort by ordinal so Ch-1..Ch-7..Final is stable
     const sorted = gradeItems
@@ -133,7 +152,10 @@ async function loadTasks() {
   }
 }
 
-onMounted(loadTasks);
+onMounted(async () => {
+  await loadTasks();
+  if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
+});
 </script>
 
 <template>

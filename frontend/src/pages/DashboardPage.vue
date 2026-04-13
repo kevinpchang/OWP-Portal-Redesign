@@ -34,7 +34,6 @@ function getCourseImage(owpabbr) {
   return courseImageMap[owpabbr] || null;
 }
 
-
 const route = useRoute()
 const currentDate = ref(formatDate())
 
@@ -82,12 +81,8 @@ async function loadMessages() {
   }
 }
 
-
 // --- OWP API ---
 const pid = 458860 // later: come from auth/session
-
-const loading = ref(false)
-const error = ref('')
 
 const account = ref([])
 const enrollments = ref([])
@@ -97,82 +92,78 @@ const invoicedata = ref([])
 
 async function loadDash() {
   console.log('loadDash called')
-  loading.value = true
-  error.value = ''
 
-  try {
-    const acc = await api.getAccountDetails(pid)
-    account.value = acc.response
-  } catch (e) {
-    error.value = e?.message ?? String(e)
-    console.error('getAccountDetails Failed:', e)
-    window.alert('Failed to refresh data. Please refresh after a moment. However, old data may be displayed for your convenience. Contact an admin if the problem persists. ')
-    console.log('Loading cached data from localStorage due to error')
-    account.value = null
-    account.value = api.attemptLoadFromLocal('getAccountDetails', account)
-  } finally {
-    loading.value = false
+  const results = await Promise.allSettled([
+    api.getAccountDetails(pid),
+    api.getActiveEnrollment(pid),
+    api.getInvoices(pid),
+  ])
+  const [accountResult, enrollmentsResult, invoicesResult] = results
+  if (accountResult.status === 'fulfilled') {
+    account.value = accountResult.value.response
+  } else {
+    account.value = api.loadFromSession('getAccountDetails') ?? []
   }
-
-  try {
-    const enr = await api.getActiveEnrollment(pid)
-    enrollments.value = enr.response
-  } catch (e) {
-    error.value = e?.message ?? String(e)
-    console.error('getActiveEnrollment Failed:', e)
-    window.alert('Failed to refresh data. Please refresh after a moment. However, old data may be displayed for your convenience. Contact an admin if the problem persists. ')
-    console.log('Loading cached data from localStorage due to error')
-    enrollments.value = null
-    enrollments.value = api.attemptLoadFromLocal('getActiveEnrollment', enrollments)
-  } finally {
-    loading.value = false
+  if (enrollmentsResult.status === 'fulfilled') {
+    enrollments.value = enrollmentsResult.value.response ?? []
+  } else {
+    console.log('Failed to load enrollments from API, attempting to load from sessionStorage...')
+    enrollments.value = api.loadFromSession('getActiveEnrollment') ?? []
   }
+  if (invoicesResult.status === 'fulfilled') {
+    invoices.value = invoicesResult.value.response ?? []
+  } else {
+    invoices.value = api.loadFromSession('getInvoices') ?? []
+  }
+  const failedResults = results.filter((result) => result.status === 'rejected')
 
-  try {
-    for (const v of enrollments.value) {
-      const c = await api.getCourseGrades(v.enrollid)
-      grades.value[v.enrollid] = c.response ?? []
+  const gradeRequests = enrollments.value.map((v) => ({
+    enrollid: v.enrollid,
+    promise: api.getCourseGrades(v.enrollid),
+  }))
+
+  const gradeResults = await Promise.allSettled(
+    gradeRequests.map((item) => item.promise)
+  )
+  gradeRequests.forEach((item, index) => {
+    const result = gradeResults[index]
+    const key = "getCourseGrades-"+item.enrollid
+    if (result.status === 'fulfilled') {
+      const courseGrades = result.value.response ?? []
+      grades.value[item.enrollid] = courseGrades
     }
-    console.log('Grades loaded successfully:', grades.value)
-  } catch (e) {
-    error.value = e?.message ?? String(e)
-    console.error('getCourseGrades Failed:', e)
-    window.alert('Failed to refresh data. Please refresh after a moment. However, old data may be displayed for your convenience. Contact an admin if the problem persists. ')
-    console.log('Loading cached data from localStorage due to error')
-    grades.value = null
-    grades.value = api.attemptLoadFromLocal('getCourseGrades', grades)
-  } finally {
-    loading.value = false
-  }
-
-  try {
-    const inv = await api.getInvoices(pid)
-    invoices.value = inv.response
-  } catch (e) {
-    error.value = e?.message ?? String(e)
-    console.error('getInvoices Failed:', e)
-    window.alert('Failed to refresh data. Please refresh after a moment. However, old data may be displayed for your convenience. Contact an admin if the problem persists. ')
-    console.log('Loading cached data from localStorage due to error')
-    invoices.value = null
-    invoices.value = api.attemptLoadFromLocal('getInvoices', invoices)
-  } finally {
-    loading.value = false
-  }
-
-  try {
-    for (const v of invoices.value) {
-      const c = await api.getInvoiceData(v.invoicenum)
-      invoicedata.value[v.invoicenum] = c.response ?? []
+    else {
+      grades.value[item.enrollid] =  api.loadFromSession(key) ?? []
     }
-  } catch (e) {
-    error.value = e?.message ?? String(e)
-    console.error('getInvoiceData Failed:', e)
-    window.alert('Failed to refresh data. Please refresh after a moment. However, old data may be displayed for your convenience. Contact an admin if the problem persists. ')
-    console.log('Loading cached data from localStorage due to error')
-    invoicedata.value = null
-    invoicedata.value = api.attemptLoadFromLocal('getInvoiceData', invoicedata)
-  } finally {
-    loading.value = false
+  })
+  const failedGradeRequests = gradeResults.filter(
+    (result) => result.status === 'rejected'
+  )
+
+  const invoiceRequests = invoices.value.map((v) => ({
+    invoicenum: v.invoicenum,
+    promise: api.getInvoiceData(v.invoicenum),
+  }))
+
+  const invoiceResults = await Promise.allSettled(
+    invoiceRequests.map((item) => item.promise)
+  )
+  invoiceRequests.forEach((item, index) => {
+    const result = invoiceResults[index]
+    const key = "getInvoiceData-"+item.invoicenum
+    if (result.status === 'fulfilled') {
+      invoicedata.value[item.invoicenum] = result.value.response ?? []
+    }
+    else {
+      invoicedata.value[item.invoicenum] = api.loadFromSession(key) ?? []
+    }
+  })
+  const failedInvoiceRequests = invoiceResults.filter(
+    (result) => result.status === 'rejected'
+  )
+
+  if (failedResults.length > 0 || failedGradeRequests.length > 0 || failedInvoiceRequests.length > 0) {
+    alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.')
   }
 
   await loadMessages()

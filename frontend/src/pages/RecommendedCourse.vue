@@ -4,6 +4,7 @@ import { useRoute } from "vue-router";
 import {
   getInvoices,
   getInvoiceData,
+  loadFromSession
 } from "@/services/owpAPI.js";
 
 // keep this only if you still want placeholder recommended data for testing
@@ -57,20 +58,44 @@ async function loadSidebarData() {
   sidebarError.value = "";
 
   try {
-    const inv = await getInvoices(pid);
-    invoices.value = inv?.response ?? [];
+    try {
+      const inv = await getInvoices(pid.value);
+      invoices.value = inv?.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      console.log("error");
+      invoices.value = loadFromSession("getInvoices") ?? [];
+    }
 
-    await Promise.all(
-      invoices.value.map(async (invoice) => {
-        const details = await getInvoiceData(invoice.invoicenum);
-        invoicedata.value[invoice.invoicenum] = details?.response ?? [];
-      })
+    const invoiceRequests = invoices.value.map((v) => ({
+    invoicenum: v.invoicenum,
+    promise: getInvoiceData(v.invoicenum),
+    }));
+
+    const invoiceResults = await Promise.allSettled(
+      invoiceRequests.map((item) => item.promise)
     );
-  } catch (e) {
-    console.error("Failed to load sidebar purchase history:", e);
+
+    invoiceRequests.forEach((item, index) => {
+      const result = invoiceResults[index];
+      const key = "getInvoiceData-"+item.invoicenum;
+      if (result.status === 'fulfilled') {
+        invoicedata.value[item.invoicenum] = result.value.response ?? [];
+      }
+      else {
+        hadFailure.value = true;
+        invoicedata.value[item.invoicenum] = loadFromSession(key) ?? [];
+        console.log(invoicedata.value);
+      }
+    })
+  }
+  catch (err) {
+    console.error("Failed to load purchase history:", err);
     sidebarError.value = "load-failed";
     invoices.value = [];
-  } finally {
+  }
+  finally {
     loadingSidebar.value = false;
   }
 }

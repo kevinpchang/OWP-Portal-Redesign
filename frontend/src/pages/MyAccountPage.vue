@@ -8,13 +8,6 @@ import contactcard from "@/assets/icons/owp-2color/contact-card-icon.svg";
 import transcript from "@/assets/icons/owp-2color/transcipt-icon.svg";
 import history from "@/assets/icons/owp-2color/history-icon.svg";
 
-import {
-  getAccountDetails,
-  getActiveEnrollment,
-  getCourseGrades,
-  getOperatorList,
-} from "@/services/myAccountAPI";
-
 import * as api from "@/services/owpAPI";
 
 const route = useRoute();
@@ -28,7 +21,6 @@ const error = ref("");
 const account = ref(null);
 const enrollments = ref([]);
 const selectedEnrollId = ref(null);
-const grades = ref([]);
 const operatorList = ref([]);
 
 // --- Transcripts preview (from enrollments) ---
@@ -42,6 +34,9 @@ const purchasesError = ref("");
 const invoices = ref([]);
 const invoiceDataByNum = ref({});
 
+// Failure Checking
+const hadFailure = ref(false)
+
 function getInvoiceName(invoicenum) {
   const items = invoiceDataByNum.value?.[invoicenum] ?? [];
   const match = items.find((item) => item?.coursetitle != null);
@@ -53,30 +48,36 @@ async function loadAccount() {
   error.value = "";
 
   try {
+    try {
     const acc = await api.getAccountDetails(pid);
     account.value = acc.response;
+    }
+    catch {
+      hadFailure.value = true;
+      account.value = api.loadFromSession("getAccountDetails") ?? [];
+    }
 
-    const enr = await api.getActiveEnrollment(pid);
-    enrollments.value = enr.response ?? [];
+    try {
+      const enr = await api.getActiveEnrollment(pid);
+      enrollments.value = enr.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      enrollments.value = api.loadFromSession("getActiveEnrollment") ?? [];
+    }
 
-    const op = await api.getOperatorList(pid);
-    operatorList.value = op.response ?? [];
-
-    const preferred =
-      enrollments.value.find((e) => e.statustxt === "Enrolled") ??
-      enrollments.value[0];
-
-    if (preferred?.enrollid) {
-      selectedEnrollId.value = preferred.enrollid;
-      const g = await api.getCourseGrades(preferred.enrollid);
-      grades.value = g.response ?? [];
-    } else {
-      grades.value = [];
+    try {
+      const op = await api.getOperatorList(pid);
+      operatorList.value = op.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      operatorList.value = api.loadFromSession("getOperatorList") ?? [];
     }
 
     await Promise.all([
       loadTranscriptsPreview(),
-      loadPurchaseHistoryPreview(),
+      loadPurchaseHistoryPreview()
     ]);
   } catch (e) {
     error.value = e?.message ?? String(e);
@@ -91,17 +92,37 @@ async function loadPurchaseHistoryPreview() {
   purchasesError.value = "";
 
   try {
-    const inv = await api.getInvoices(pid);
-    invoices.value = inv?.response ?? [];
+    try {
+      const inv = await api.getInvoices(pid);
+      invoices.value = inv?.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      invoices.value = api.loadFromSession("getInvoices") ?? [];
+    }
+    
 
-    const pairs = await Promise.all(
-      invoices.value.map(async (invoice) => {
-        const details = await api.getInvoiceData(invoice.invoicenum);
-        return [invoice.invoicenum, details?.response ?? []];
-      })
+    const invoiceRequests = invoices.value.map((v) => ({
+    invoicenum: v.invoicenum,
+    promise: api.getInvoiceData(v.invoicenum),
+    }));
+
+    const invoiceResults = await Promise.allSettled(
+      invoiceRequests.map((item) => item.promise)
     );
 
-    invoiceDataByNum.value = Object.fromEntries(pairs);
+    invoiceRequests.forEach((item, index) => {
+      const result = invoiceResults[index];
+      const key = "getInvoiceData-"+item.invoicenum;
+      if (result.status === 'fulfilled') {
+        invoiceDataByNum.value[item.invoicenum] = result.value.response ?? [];
+      }
+      else {
+        hadFailure.value = true;
+        invoiceDataByNum.value[item.invoicenum] = api.loadFromSession(key) ?? [];
+        console.log(invoiceDataByNum.value);
+      }
+    })
   } catch (e) {
     console.error("Failed to load purchase history preview:", e);
     purchasesError.value = e?.message ?? "load-failed";
@@ -120,7 +141,7 @@ async function loadTranscriptsPreview() {
     const rows = enrollments.value ?? [];
 
     const transcriptRows = rows.filter(
-      (r) => r.statustxt === "Complete" || r.statustxt === "Dropped"
+      (r) => r.grade === "CR "
     );
 
     transcriptItems.value = transcriptRows.slice(0, 2).map((r) => ({
@@ -136,7 +157,10 @@ async function loadTranscriptsPreview() {
   }
 }
 
-onMounted(loadAccount);
+onMounted(async () => {
+  await loadAccount()
+  if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
+});
 
 const contactForm = reactive({
   street_1: null,
@@ -284,6 +308,7 @@ async function saveContactInfo() {
     contactDialog.value = false;
   } catch (e) {
     console.error("updateContactInfo failed:", e);
+    alert("Error updating contact information. Please wait a moment and try again. If problem persists contact a site admin.");
     contactError.value = e?.message ?? String(e);
   } finally {
     savingContact.value = false;

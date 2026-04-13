@@ -7,10 +7,10 @@ const BASE = "https://owp-portal-redesign-php.onrender.com/api"; //<-- frontend 
 // activeEnrollment
 export async function getActiveEnrollment(pid) {
   const request = await fetch(`${BASE}/activeEnrollment/${pid}`);
-  throw new Error('Manual error for testing purposes'); // <-- temporary error to test localStorage fallback
+  //throw new Error('Manual error for testing purposes'); // <-- temporary error to test sessionStorage fallback
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('getActiveEnrollment', data);
+  storeToSession('getActiveEnrollment', data);
   return data;
 }
 
@@ -19,7 +19,7 @@ export async function getEnrollmentRecord(enrollId) {
   const request = await fetch(`${BASE}/enrollmentRecord/${enrollId}`);
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('getEnrollmentRecord', data);
+  storeToSession('getEnrollmentRecord-'+enrollId, data);
   return data;
 }
 
@@ -28,7 +28,7 @@ export async function getCourseExams(enrollId) {
   const request = await fetch(`${BASE}/courseExams/${enrollId}`);
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('getCourseExams', data);
+  storeToSession('getCourseExams', data);
   return data;
 }
 
@@ -37,7 +37,7 @@ export async function getCourseGrades(enrollId) {
   const request = await fetch(`${BASE}/getCourseGrades/${enrollId}`);
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('getCourseGrades', data);
+  storeToSession('getCourseGrades-'+enrollId, data);
   return data;
 }
 
@@ -46,7 +46,7 @@ export async function getOperatorList(pid) {
   const request = await fetch(`${BASE}/getOperatorList/${pid}`);
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('getOperatorList', data);
+  storeToSession('getOperatorList', data);
   return data;
 }
 
@@ -62,7 +62,7 @@ export async function getAccountDetails(pid) {
   const request = await fetch(`${BASE}/accountDetails/${pid}`);
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('getAccountDetails', data);
+  storeToSession('getAccountDetails', data);
   return data;
 }
 
@@ -71,7 +71,7 @@ export async function getInvoices(pid) {
   const request = await fetch(`${BASE}/getInvoices/${pid}`);
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('getInvoices', data);
+  storeToSession('getInvoices', data);
   return data;
 }
 
@@ -80,7 +80,7 @@ export async function getInvoiceData(invoiceNumber) {
   const request = await fetch(`${BASE}/getInvoiceData/${invoiceNumber}`);
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('getInvoiceData', data);
+  storeToSession('getInvoiceData-'+invoiceNumber, data);
   return data;
 }
 
@@ -89,7 +89,7 @@ export async function getActiveSection(sectionId) {
   const request = await fetch(`${BASE}/chk_active_section/${sectionId}`);
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('getActiveSection', data);
+  storeToSession('getActiveSection', data);
   return data;
 }
 
@@ -98,7 +98,7 @@ export async function downloadReceipt(invoiceNum) {
   const request = await fetch(`${BASE}/receipt/download/${invoiceNum}`);
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('downloadReceipt', data);
+  storeToSession('downloadReceipt', data);
   return data;
 }
 
@@ -107,7 +107,7 @@ export async function downloadEnrollment(enrollmentId) {
   const request = await fetch(`${BASE}/enrollment/download/${enrollmentId}`);
   if (!request.ok) throw new Error(await request.text());
   const data = await request.json();
-  storeJsonInLocal('downloadEnrollment', data);
+  storeToSession('downloadEnrollment', data);
   return data;
 }
 
@@ -228,50 +228,37 @@ export async function updateContactInfo(pid, form) {
   }
 }
 
-function storeJsonInLocal(key, data) {
+function storeToSession(key, data) {
   const payload = {
-    data: data,
-    timestamp: Date.now(),
+    data: data
   }
-  localStorage.setItem(key, JSON.stringify(payload));
+  sessionStorage.setItem(key, JSON.stringify(payload));
 }
 
-export function getJsonFromLocal(key) {
-  const item = localStorage.getItem(key);
+export function getFromSession(key) {
+  const item = sessionStorage.getItem(key);
   if (!item) return null;
   try {
     const payload = JSON.parse(item);
-    const EXPIRE_TIME = 1 * 24 * 60 * 60 * 1000; // 1 day
-    if (Date.now() - payload.timestamp > EXPIRE_TIME) {
-      localStorage.removeItem(key);
-      return null;
-    }
     return payload.data;
   } catch {
     return null;
   }
 }
 
-export function attemptLoadFromLocal(key, array) {
+export function loadFromSession(key, array) {
   try {
-    console.log('Checking localStorage for cached details...')
-    if (array.value === null || array.value === undefined || array === []) {
-      console.log('Attempting to load from localStorage...')
-      const data = getJsonFromLocal(key)
+    console.log('Checking sessionStorage for cached details...')
+      console.log('Attempting to load from sessionStorage...')
+      const data = getFromSession(key)
       if (data.response) { 
-        array.value = data.response
-        console.log('Data value after loading from localStorage:', array.value)
-        return array.value;
+        return data.response;
       }
       else { 
-        console.log('No cached enrollment details found in localStorage.')
+        console.log('No cached details found in sessionStorage.')
         return null;
       }
     }
-    else {
-      console.log('Details already loaded, skipping localStorage check.')
-    }
-  }
   catch {
     return null;
   }

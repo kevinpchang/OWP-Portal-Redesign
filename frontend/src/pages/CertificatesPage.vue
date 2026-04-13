@@ -5,6 +5,7 @@ import {
   getAccountDetails,
   getActiveEnrollment,
   getEnrollmentRecord,
+  loadFromSession,
 } from "@/services/owpAPI.js";
 
 import certificate from '@/assets/icons/owp-2color/certificate-icon.svg'
@@ -12,7 +13,9 @@ import transcript from '@/assets/icons/owp-2color/transcipt-icon.svg'
 import history from '@/assets/icons/owp-2color/history-icon.svg'
 import mail from '@/assets/icons/owp-2color/mail-icon.svg'
 
-const pid = Number(localStorage.getItem("pid")) || 458860;
+const pid = 458860;
+const hadFailure = ref(false);
+
 
 // --- Account state ---
 const loadingAccount = ref(true);
@@ -47,7 +50,10 @@ async function loadAccount() {
     const data = await getAccountDetails(pid);
     accountName.value = data?.response?.fullname ?? "";
   } catch (e) {
+    hadFailure.value = true
     accountError.value = e?.message ?? String(e);
+    const data = loadFromSession("getAccountDetails")  ?? [];
+    accountName.value = data?.response?.fullname ?? "";
   } finally {
     loadingAccount.value = false;
   }
@@ -58,8 +64,15 @@ async function loadCertificates() {
   loadingCerts.value = true;
   certsError.value = "";
   try {
-    const data = await getActiveEnrollment(pid);
-    const rows = data?.response ?? [];
+    let rows = [];
+    try {
+      const data = await getActiveEnrollment(pid);
+      rows = data?.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      rows = loadFromSession("getActiveEnrollment") ?? [];
+    }
 
     const completed = rows.filter(
       (r) =>
@@ -67,34 +80,55 @@ async function loadCertificates() {
         String(r.grade ?? "").trim() === "CR"
     );
 
-    const enriched = await Promise.all(
-      completed.map(async (r) => {
-        let ceus = "—";
-        let contactHours = "—";
-        try {
-          const rec = await getEnrollmentRecord(r.enrollid);
-          const record = Array.isArray(rec?.response)
-            ? rec.response[0]
-            : rec?.response;
-          if (record) {
-            const rawCeu = Number(record.ceus ?? record.ceu);
-            ceus = Number.isFinite(rawCeu) ? rawCeu.toFixed(1) : "—";
-            contactHours = record.contacthour ?? record.contacthours ?? "—";
-          }
-        } catch {
-          // silently fallback
-        }
-        return {
-          id: r.enrollid,
-          enrollId: r.enrollid,
-          title: r.title || "Course title unavailable",
-          completedDate: r.completedate || "—",
-          grade: "CR (Pass)",
-          ceus,
-          contactHours,
-        };
-      })
+    const recordRequests = completed.map((r) => ({
+      row: r,
+      promise: getEnrollmentRecord(r.enrollid),
+    }));
+
+    const recordResults = await Promise.allSettled(
+      recordRequests.map((item) => item.promise)
     );
+
+    const enriched = recordRequests.map((item, index) => {
+      const result = recordResults[index];
+      const recordKey = "getEnrollmentRecord-"+item.row.enrollid;
+      let ceus = "—";
+      let contactHours = "—";
+
+      if (result.status === "fulfilled") {
+        const record = Array.isArray(result.value?.response)
+          ? result.value.response[0]
+          : result.value?.response;
+
+        if (record) {
+          const rawCeu = Number(record.ceus ?? record.ceu);
+          ceus = Number.isFinite(rawCeu) ? rawCeu.toFixed(1) : "—";
+          contactHours = record.contacthour ?? record.contacthours ?? "—";
+        }
+      } else {
+        hadFailure.value = true;
+
+        const cachedRecord = loadFromSession(recordKey);
+        const record = Array.isArray(cachedRecord)
+          ? cachedRecord[0]
+          : cachedRecord;
+
+        if (record) {
+          const rawCeu = Number(record.ceus ?? record.ceu);
+          ceus = Number.isFinite(rawCeu) ? rawCeu.toFixed(1) : "—";
+          contactHours = record.contacthour ?? record.contacthours ?? "—";
+        }
+      }
+      return {
+        id: item.row.enrollid,
+        enrollId: item.row.enrollid,
+        title: item.row.title || "Course title unavailable",
+        completedDate: item.row.completedate || "—",
+        grade: "CR (Pass)",
+        ceus,
+        contactHours,
+      };
+    });
 
     certificates.value = enriched;
   } catch (e) {
@@ -231,6 +265,7 @@ async function downloadCertificate(cert) {
 
 onMounted(async () => {
   await Promise.all([loadAccount(), loadCertificates()]);
+  if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
 });
 </script>
 
