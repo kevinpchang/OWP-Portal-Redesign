@@ -6,6 +6,10 @@
 
 import { test, expect } from '@playwright/test'
 
+// Page structure tests
+// Verifies the Courses page loads its main sections and sidebar
+// cards correctly.
+
 test('Courses page loads main sections correctly', async ({ page }) => {
   await page.goto('/courses')
 
@@ -17,13 +21,23 @@ test('Courses page loads main sections correctly', async ({ page }) => {
   await expect(page.locator('.side-card', { hasText: 'Purchase History' })).toBeVisible()
 })
 
+// Recommended courses tests
+// Verifies the recommended courses section shows its default
+// empty state and catalog link correctly.
+
 test('Courses page shows recommended empty state correctly', async ({ page }) => {
   await page.goto('/courses')
 
   await expect(page.locator('.recommended-empty')).toContainText('No Recommended Courses')
-  await expect(page.locator('.recommended-empty')).toContainText('You have no recommended courses available at this time.')
+  await expect(page.locator('.recommended-empty')).toContainText(
+    'You have no recommended courses available at this time.'
+  )
   await expect(page.locator('.catalog-link')).toContainText('Browse Course Catalog')
 })
+
+// Active enrollment navigation tests
+// Verifies clicking an active enrollment card navigates to the
+// correct dynamic course details page.
 
 test('Clicking an active enrollment card navigates to the correct course page', async ({ page }) => {
   await page.goto('/courses')
@@ -35,6 +49,10 @@ test('Clicking an active enrollment card navigates to the correct course page', 
   await expect(page).toHaveURL(/\/courses\/\d+/)
 })
 
+// Messages navigation tests
+// Verifies the Messages footer link routes the user to the
+// messages page.
+
 test('Messages footer link navigates to the messages page', async ({ page }) => {
   await page.goto('/courses')
 
@@ -45,6 +63,11 @@ test('Messages footer link navigates to the messages page', async ({ page }) => 
   await expect(page).toHaveURL(/\/messages/)
 })
 
+
+// Purchase history navigation tests
+// Verifies the Purchase History footer link routes the user to
+// the purchase history page.
+
 test('Purchase history footer link navigates to the purchase history page', async ({ page }) => {
   await page.goto('/courses')
 
@@ -53,4 +76,11 @@ test('Purchase history footer link navigates to the purchase history page', asyn
   await purchaseHistoryCard.locator('.side-footer').click()
 
   await expect(page).toHaveURL(/\/purchase-history/)
+})
+
+// Verifies the messages card shows its empty state when no messages are available
+test('Courses page shows messages empty state correctly', async ({ page }) => {
+  await page.goto('/courses')
+
+  await expect(page.locator('.side-card', { hasText: 'Messages' })).toContainText('No messages available.')
 })
