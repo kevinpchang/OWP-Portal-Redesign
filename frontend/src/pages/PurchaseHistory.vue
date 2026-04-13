@@ -179,6 +179,9 @@ const pid = 458860;
 const router = useRouter();
 const route = useRoute();
 
+// Failure Checking
+const hadFailure = ref(false);
+
 function toStr(x) {
   return x == null ? "" : String(x);
 }
@@ -252,8 +255,15 @@ async function loadInvoices() {
   error.value = null;
 
   try {
-    const raw = await api.getInvoices(pid);
-    const list = Array.isArray(raw?.response) ? raw.response : [];
+    let list = [];
+    try {
+      const raw = await api.getInvoices(pid);
+      list = Array.isArray(raw?.response) ? raw.response : [];
+    }
+    catch {
+      hadFailure.value = true;
+      list = api.loadFromSession("getInvoices") ?? [];
+    }
 
     invoices.value = list
       .map((x) => {
@@ -298,8 +308,20 @@ async function open(inv) {
   error.value = null;
 
   try {
-    const raw = await api.getInvoiceData(inv.id);
-    const rows = Array.isArray(raw?.response) ? raw.response : [];
+    let rows = [];
+    const key = "getInvoiceData-"+inv.id;
+    try {
+      console.log("invoice id:", inv.id);
+      const raw = await api.getInvoiceData(inv.id);
+      console.log("in try")
+      rows = Array.isArray(raw?.response) ? raw.response : [];
+    }
+    catch {
+      hadFailure.value = true;
+      const sessionResponse = api.loadFromSession(key) ?? [];
+      rows = Array.isArray(sessionResponse) ? sessionResponse : [];
+      console.log(rows.value);
+    }
 
     if (rows.length === 0) {
       selected.value = inv;
@@ -402,9 +424,14 @@ async function downloadAndOpenReceipt() {
 
   try {
     // owp.js has: fetch(`${BASE}/receipt/download/${invoiceNum}`)
-    const raw = await api.downloadReceipt(selected.value.id);
-
-    const b64 = raw?.response;
+    let b64 = null;
+    try {
+      const raw = await api.downloadReceipt(selected.value.id);
+      b64 = raw?.response;
+    }
+    catch {
+      alert("Error retrieving receipt. Please wait a moment and try again. If problem persists contact a site admin.");
+    }
     if (!b64 || typeof b64 !== "string") throw new Error("Receipt API returned no PDF data.");
 
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
@@ -436,6 +463,7 @@ onMounted(async () => {
     await loadInvoiceFromRoute();
   }
 
+  if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
 });
 
 

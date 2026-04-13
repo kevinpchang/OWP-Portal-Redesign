@@ -6,6 +6,7 @@ import {
   getCourseGrades,
   getInvoices,
   getInvoiceData,
+  loadFromSession
 } from "@/services/owpAPI.js";
 
 import book from '@/assets/icons/owp-2color/book-icon.svg'
@@ -20,6 +21,8 @@ import owtp3rd8th from "@/assets/manual-imgs/owtp-3-8th-cvr.jpg";
 import um3rd from "@/assets/manual-imgs/um-3rd-cvr.jpg";
 import wtpo1st7th from "@/assets/manual-imgs/wtpo-1-7th-cvr.jpg";
 import wtpo2nd7th from "@/assets/manual-imgs/wtpo-2-7th-cvr.jpg";
+import sws from "@/assets/manual-imgs/sws.png";
+import pfi from "@/assets/manual-imgs/pfi.png";
 
 //course image map
 const courseImageMap = {
@@ -30,6 +33,10 @@ const courseImageMap = {
   OWTP2: owtp2nd8th,
   OWTP3: owtp3rd8th,
   MBR: MBR2nd,
+
+  //Silicon addition
+  CE29: sws,
+  PFI: pfi,
 };
 
 const courseImage = ref(null);
@@ -42,6 +49,10 @@ const enrollId = String(
   route.params.enrollmentId ??
   ""
 );
+
+// Dashboard-style messaging DB connection
+const MESSAGING_API_BASE = "https://owp-portal-redesign-db.onrender.com";
+const messagingUserId = 1;
 
 // main page state
 const loadingCourse = ref(true);
@@ -76,6 +87,9 @@ const invoices = ref([]);
 const invoicedata = ref({});
 const loadingSidebar = ref(true);
 const sidebarError = ref("");
+
+// failure checking
+const hadFailure = ref(false)
 
 function animateToProgress(progressValue) {
   const targetAngle = (progressValue / 100) * 360;
@@ -130,10 +144,24 @@ async function loadMessages() {
   messagesError.value = "";
 
   try {
-    messages.value = [];
+    const url = new URL(`${MESSAGING_API_BASE}/api/messaging/threads`);
+    url.searchParams.set("userId", String(messagingUserId));
+
+    const res = await fetch(url.toString());
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+
+    messages.value = (data.threads || []).slice(0, 3).map((row) => ({
+      id: Number(row.ThreadId),
+      sender: row.LastSenderName || row.LastSenderEmail || "Unknown",
+      date: formatInboxDate(
+        row.LastSentAt || row.LastMessageAt || row.CreatedAt
+      ),
+    }));
   } catch (err) {
     console.error("Failed to load messages:", err);
-    messagesError.value = "load-failed";
+    messagesError.value = err?.message ?? "load-failed";
     messages.value = [];
   } finally {
     loadingMessages.value = false;
@@ -145,22 +173,45 @@ async function loadSidebarData() {
   sidebarError.value = "";
 
   try {
-    const inv = await getInvoices(pid.value);
-    invoices.value = inv?.response ?? [];
+    try {
+      const inv = await getInvoices(pid.value);
+      invoices.value = inv?.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      console.log("error");
+      invoices.value = loadFromSession("getInvoices") ?? [];
+    }
 
-    await Promise.all(
-      invoices.value.map(async (invoice) => {
-        const details = await getInvoiceData(invoice.invoicenum);
-        invoicedata.value[invoice.invoicenum] = details?.response ?? [];
-      })
+    const invoiceRequests = invoices.value.map((v) => ({
+    invoicenum: v.invoicenum,
+    promise: getInvoiceData(v.invoicenum),
+    }));
+
+    const invoiceResults = await Promise.allSettled(
+      invoiceRequests.map((item) => item.promise)
     );
-  } catch (err) {
+    invoiceRequests.forEach((item, index) => {
+      const result = invoiceResults[index];
+      const key = "invoiceData-"+item.invoicenum;
+      if (result.status === 'fulfilled') {
+        invoicedata.value[item.invoicenum] = result.value.response ?? [];
+      }
+      else {
+        hadFailure.value = true;
+        invoicedata.value[item.invoicenum] = loadFromSession(key) ?? [];
+      }
+    })
+  }
+  catch (err) {
     console.error("Failed to load purchase history:", err);
     sidebarError.value = "load-failed";
     invoices.value = [];
-  } finally {
+  }
+  finally {
     loadingSidebar.value = false;
   }
+
 }
 
 async function loadCourse() {
@@ -172,7 +223,16 @@ async function loadCourse() {
       throw new Error("Missing route param (enrollId)");
     }
 
-    const recordData = await getEnrollmentRecord(enrollId);
+    const recordKey = "getEnrollmentRecord-" + enrollId
+    let recordData;
+    try {
+      recordData = await getEnrollmentRecord(enrollId);
+    }
+    catch { 
+      recordData = { response: loadFromSession(recordKey) ?? [] }
+      hadFailure.value = true
+    }
+    
     const record = Array.isArray(recordData?.response)
       ? recordData.response[0]
       : recordData?.response;
@@ -193,16 +253,15 @@ async function loadCourse() {
       record.editionid ?? record.editionId ?? record.edition ?? ""
     );
 
-    let gradesData = await getCourseGrades(enrollId);
-    let sections = Array.isArray(gradesData?.response)
-      ? gradesData.response
-      : [];
-
-    if (sections.length === 0 && editionId) {
-      gradesData = await getCourseGrades(editionId);
-      sections = Array.isArray(gradesData?.response)
-        ? gradesData.response
-        : [];
+    const gradesKey = "getCourseGrades-"+enrollId
+    let sections = [];
+    try {
+      const gradesData = await getCourseGrades(enrollId);
+      sections = Array.isArray(gradesData?.response) ? gradesData.response : [];
+    }
+    catch {
+      sections = loadFromSession(gradesKey)
+      hadFailure.value = true
     }
 
     totalChapters.value = sections.length || 0;
@@ -258,12 +317,14 @@ async function loadCourse() {
   }
 }
 
+
 onMounted(async () => {
   await Promise.all([
     loadCourse(),
     loadMessages(),
     loadSidebarData(),
   ]);
+  if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
 });
 </script>
 
@@ -414,7 +475,6 @@ onMounted(async () => {
       <div class="side-title">Messages</div>
     </div>
     <div class="divider"></div>
-
     <div class="side-body">
       <div v-if="loadingMessages" class="state-message loading-message">
         Loading messages…
@@ -428,15 +488,16 @@ onMounted(async () => {
         No messages available.
       </div>
 
-      <div
+      <router-link
         v-else
         v-for="message in messages"
         :key="message.id"
+        :to="`/messages?threadId=${message.id}`"
         class="side-link"
       >
-        {{ message.subject || "Message unavailable" }}
-        <span v-if="message.date">({{ message.date }})</span>
-      </div>
+        Email Message from: {{ message.sender || "Unknown" }}
+        <span v-if="message.date"> {{ message.date }}</span>
+      </router-link>
     </div>
 
       <router-link to="/messages" class="side-footer">
@@ -487,8 +548,6 @@ onMounted(async () => {
     </div>
 </template>
 
-
-
 <style scoped>
 .active-course-page {
   display: flex;
@@ -500,111 +559,109 @@ onMounted(async () => {
 }
 
 .courses-top {
-  max-width: 1000px;
+  max-width: 1000rem;
   width: 100%;
-  margin:  auto;
+  margin: auto;
   display: flex;
   justify-content: flex-start;
-  margin-top: 32px;
+  margin-top: 32rem;
 }
 
 .courses-header {
-  font-size: 32px;
+  font-size: 32rem;
   font-weight: 700;
   color: #034750;
 }
 
 .page-container,
 .courses-bottom {
-  max-width: 1000px;
+  max-width: 1000rem;
   margin: 0 auto;
   width: 100%;
 }
 
 .summary-tile {
   background-color: #F2F1F2;
-  border-radius: 14px;
-  padding: 20px;
-  margin: 32px auto 0 auto;
+  border-radius: 14rem;
+  padding: 20rem;
+  margin: 32rem auto 0 auto;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1000rem;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16rem;
 }
 
 .card-header,
 .side-header {
   display: flex;
   align-items: center;
-  gap: 8px; 
+  gap: 8rem;
 }
 
-
 .header-icon {
-  width: 32px;
-  height: 40px;
+  width: 32rem;
+  height: 40rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;   
-  border-radius: 0; 
+  background: none;
+  border-radius: 0;
   padding: 0;
 }
 
 .side-icon {
-  width: 36px;
-  height: 44px;
+  width: 36rem;
+  height: 44rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none; 
+  background: none;
   padding: 0;
 }
 
 .side-icon img {
-  width: 28px;
-  height: 28px;
+  width: 28rem;
+  height: 28rem;
 }
 
 .card-title {
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 700;
   color: #034750;
   font-family: 'Roboto Semibold', sans-serif;
 }
 
 .summary-tile .card-header {
-  transform: translateY(-4px); 
-  margin-bottom: 4px; 
+  transform: translateY(-4rem);
+  margin-bottom: 4rem;
 }
 
 .summary-tile .divider {
-  border-top: 1px solid #FFFFFF;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  margin-top: -15px;  
-  margin-bottom: 14px;
+  border-top: 1rem solid #FFFFFF;
+  width: calc(100% + 40rem);
+  margin-left: -20rem;
+  margin-top: -15rem;
+  margin-bottom: 14rem;
 }
 
 .summary-body {
   display: flex;
-  align-items: flex-start; 
-  justify-content: flex-start; 
-  gap: 48px; 
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 48rem;
 }
-
 
 .summary-left {
   display: flex;
   align-items: flex-start;
-  gap: 16px; 
+  gap: 16rem;
 }
 
 .course-image-large {
-  width: 100px;
-  height: 120px;
-  border-radius: 4px;
+  width: 100rem;
+  height: 120rem;
+  border-radius: 4rem;
   object-fit: cover;
   display: block;
   flex-shrink: 0;
@@ -618,29 +675,29 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 120px;                   
+  height: 120rem;
 }
 
 .course-header-info h2,
 .course-header-info p {
-  margin: 0;         
-  line-height: 1.1;    
+  margin: 0;
+  line-height: 1.1;
 }
 
 .course-title {
   font-family: 'Roboto Semibold', sans-serif;
-  font-size: 16px;
+  font-size: 16rem;
   color: #707070;
   margin: 0;
   line-height: 1.3;
-  max-width: 260px;   
+  max-width: 260rem;
   white-space: normal;
   overflow-wrap: break-word;
 }
 
 .course-expiration,
 .course-completed {
-  font-size: 14px;
+  font-size: 14rem;
   color: #555;
 }
 
@@ -648,14 +705,14 @@ onMounted(async () => {
   background-color: #00A5B5;
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 4px 14px;         
+  border-radius: 4rem;
+  padding: 4rem 14rem;
   font-family: 'Roboto Semibold', sans-serif;
-  font-size: 14px;
+  font-size: 14rem;
   cursor: pointer;
-  width: fit-content;          
+  width: fit-content;
   display: inline-block;
-  margin-top: 6px;
+  margin-top: 6rem;
   transition: background-color 0.2s ease;
 }
 
@@ -666,16 +723,16 @@ onMounted(async () => {
 .course-metrics {
   display: flex;
   align-items: center;
-  gap: 32px;
-  margin-left: 24px;
-  transform: translateY(10px);
+  gap: 32rem;
+  margin-left: 24rem;
+  transform: translateY(10rem);
 }
 
 .course-progress {
   display: flex;
-  align-items: center; 
-  margin-top: -10px;   
-  margin-left: 8px;
+  align-items: center;
+  margin-top: -10rem;
+  margin-left: 8rem;
 }
 
 .metric {
@@ -685,20 +742,20 @@ onMounted(async () => {
 }
 
 .metric-value {
-  font-size: 36px;
+  font-size: 36rem;
   font-weight: 700;
   color: #00A5B5;
 }
 
 .metric-label {
-  font-size: 14px;
+  font-size: 14rem;
   color: #707070;
 }
 
 .donut {
   position: relative;
-  width: 105px; 
-  height: 105px;
+  width: 105rem;
+  height: 105rem;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -714,76 +771,75 @@ onMounted(async () => {
 
 .donut-inner {
   position: relative;
-  width: 68px;  
-  height: 68px;
+  width: 68rem;
+  height: 68rem;
   border-radius: 50%;
   background-color: #F2F1F2;
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: 'Roboto Semibold', sans-serif;
-  font-size: 18px;
+  font-size: 18rem;
   color: #555;
 }
 
 .courses-bottom {
-  max-width: 1000px;
+  max-width: 1000rem;
   width: 100%;
-  margin: 32px auto;
+  margin: 32rem auto;
   display: grid;
-  grid-template-columns: 1.6fr 0.8fr; 
-  gap: 8px;
+  grid-template-columns: 1.6fr 0.8fr;
+  gap: 8rem;
   align-items: flex-start;
 }
 
 .chapter-progress-tile {
   background-color: #F2F1F2;
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 14rem;
+  padding: 20rem;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  width: 100%;  
+  gap: 24rem;
+  width: 100%;
 }
 
 .chapter-table {
-  margin-top: 4px;
+  margin-top: 4rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 8rem;
 }
 
 .chapter-table-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #dcdcdc;
-  padding-bottom: 6px;
+  border-bottom: 1rem solid #dcdcdc;
+  padding-bottom: 6rem;
   font-family: 'Roboto Semibold', sans-serif;
-  font-size: 15px;         
-  color: #034750;           
-  letter-spacing: 0.2px;    
+  font-size: 15rem;
+  color: #034750;
+  letter-spacing: 0.2rem;
 }
 
 .chapter-progress-tile .card-header {
-  transform: translateY(-4px); 
-  margin-bottom: -18px;      
+  transform: translateY(-4rem);
+  margin-bottom: -18rem;
 }
 
 .chapter-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #e2e2e2;
-  color: #034750; 
-  font-size: 14px;
+  padding: 8rem 0;
+  border-bottom: 1rem solid #e2e2e2;
+  color: #034750;
+  font-size: 14rem;
 }
-
 
 .chapter-col {
   flex: 1.4;
   display: flex;
-  gap: 8px;
+  gap: 8rem;
 }
 
 .date-col {
@@ -806,16 +862,18 @@ onMounted(async () => {
   cursor: pointer;
   color: #034750;
 }
+
 .exam-link:hover {
   color: #00A5B5;
 }
 
 .back-link {
-  margin-top: 12px;
+  margin-top: 12rem;
   display: inline-block;
-  font-size: 14px;
+  font-size: 14rem;
   color: #034750;
 }
+
 .back-link:hover {
   text-decoration: underline;
 }
@@ -823,26 +881,26 @@ onMounted(async () => {
 .courses-right {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-width: 260px;   
-  margin-left: auto; 
+  gap: 16rem;
+  max-width: 260rem;
+  margin-left: auto;
 }
 
 .divider {
-  border-top: 1px solid #FFFFFF;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  margin-top: 2px;
-  margin-bottom: 8px;
+  border-top: 1rem solid #FFFFFF;
+  width: calc(100% + 40rem);
+  margin-left: -20rem;
+  margin-top: 2rem;
+  margin-bottom: 8rem;
 }
 
 .side-card {
   background-color: #F2F1F2;
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 14rem;
+  padding: 20rem;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 12rem;
   font-family: 'Roboto', sans-serif;
   width: 100%;
 }
@@ -850,11 +908,11 @@ onMounted(async () => {
 .side-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 10rem;
 }
 
 .side-title {
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 700;
   color: #034750;
 }
@@ -862,18 +920,18 @@ onMounted(async () => {
 .side-body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding-top: 4px;
+  gap: 14rem;
+  padding-top: 4rem;
 }
 
 .side-link {
-  font-size: 16px;
+  font-size: 16rem;
   color: #007c8a;
   cursor: pointer;
   text-decoration: underline;
-  padding: 5px 16px;
-  margin: 0 -20px;
-  width: calc(100% + 7px);
+  padding: 5rem 16rem;
+  margin: 0 -20rem;
+  width: calc(100% + 7rem);
   transition: background-color 0.2s ease;
 }
 
@@ -883,13 +941,13 @@ onMounted(async () => {
 }
 
 .side-footer {
-  height: 32px;
+  height: 32rem;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 400;
-  margin-bottom: 8px;
+  margin-bottom: 8rem;
   cursor: pointer;
   color: #034750;
   transition: color 0.2s ease;
@@ -901,8 +959,8 @@ onMounted(async () => {
 }
 
 .state-message {
-  padding: 8px 0;
-  font-size: 16px;
+  padding: 8rem 0;
+  font-size: 16rem;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -915,7 +973,5 @@ onMounted(async () => {
   color: #9F3323;
   font-weight: 600;
 }
-
 </style>
-
 

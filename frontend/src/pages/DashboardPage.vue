@@ -19,6 +19,8 @@ import owtp3rd8th from "@/assets/manual-imgs/owtp-3-8th-cvr.jpg";
 import um3rd from "@/assets/manual-imgs/um-3rd-cvr.jpg";
 import wtpo1st7th from "@/assets/manual-imgs/wtpo-1-7th-cvr.jpg";
 import wtpo2nd7th from "@/assets/manual-imgs/wtpo-2-7th-cvr.jpg";
+import sws from "@/assets/manual-imgs/sws.png";
+import pfi from "@/assets/manual-imgs/pfi.png";
 
 const courseImageMap = {
   UM: um3rd,
@@ -28,12 +30,14 @@ const courseImageMap = {
   OWTP2: owtp2nd8th,
   OWTP3: owtp3rd8th,
   MBR: MBR2nd,
+  //Silicon addition
+  CE29: sws,
+  PFI: pfi,
 };
 
 function getCourseImage(owpabbr) {
   return courseImageMap[owpabbr] || null;
 }
-
 
 const route = useRoute()
 const currentDate = ref(formatDate())
@@ -82,52 +86,89 @@ async function loadMessages() {
   }
 }
 
-
 // --- OWP API ---
 const pid = 458860 // later: come from auth/session
 
-const loading = ref(false)
-const error = ref('')
-
-const account = ref(null)
+const account = ref([])
 const enrollments = ref([])
 const grades = ref([])
 const invoices = ref([])
 const invoicedata = ref([])
 
 async function loadDash() {
-  console.log('loadAccount called')
-  loading.value = true
-  error.value = ''
+  console.log('loadDash called')
 
-  try {
-    const acc = await api.getAccountDetails(pid)
-    account.value = acc.response
-    console.log('Account JSON:', acc)
+  const results = await Promise.allSettled([
+    api.getAccountDetails(pid),
+    api.getActiveEnrollment(pid),
+    api.getInvoices(pid),
+  ])
+  const [accountResult, enrollmentsResult, invoicesResult] = results
+  if (accountResult.status === 'fulfilled') {
+    account.value = accountResult.value.response
+  } else {
+    account.value = api.loadFromSession('getAccountDetails') ?? []
+  }
+  if (enrollmentsResult.status === 'fulfilled') {
+    enrollments.value = enrollmentsResult.value.response ?? []
+  } else {
+    console.log('Failed to load enrollments from API, attempting to load from sessionStorage...')
+    enrollments.value = api.loadFromSession('getActiveEnrollment') ?? []
+  }
+  if (invoicesResult.status === 'fulfilled') {
+    invoices.value = invoicesResult.value.response ?? []
+  } else {
+    invoices.value = api.loadFromSession('getInvoices') ?? []
+  }
+  const failedResults = results.filter((result) => result.status === 'rejected')
 
-    const enr = await api.getActiveEnrollment(pid)
-    enrollments.value = enr.response
-    console.log('Enrollments JSON:', enr)
+  const gradeRequests = enrollments.value.map((v) => ({
+    enrollid: v.enrollid,
+    promise: api.getCourseGrades(v.enrollid),
+  }))
 
-    for (const v of enr.response) {
-      const c = await api.getCourseGrades(v.enrollid)
-      grades.value[v.enrollid] = c.response ?? []
+  const gradeResults = await Promise.allSettled(
+    gradeRequests.map((item) => item.promise)
+  )
+  gradeRequests.forEach((item, index) => {
+    const result = gradeResults[index]
+    const key = "getCourseGrades-"+item.enrollid
+    if (result.status === 'fulfilled') {
+      const courseGrades = result.value.response ?? []
+      grades.value[item.enrollid] = courseGrades
     }
-    console.log('Grades JSON:', grades)
-
-    const inv = await api.getInvoices(pid)
-    invoices.value = inv.response
-    console.log('Invoices JSON:', inv)
-
-    for (const v of inv.response) {
-      const c = await api.getInvoiceData(v.invoicenum)
-      invoicedata.value[v.invoicenum] = c.response ?? []
+    else {
+      grades.value[item.enrollid] =  api.loadFromSession(key) ?? []
     }
-    console.log('Invoice Data', invoicedata)
-  } catch (e) {
-    error.value = e?.message ?? String(e)
-  } finally {
-    loading.value = false
+  })
+  const failedGradeRequests = gradeResults.filter(
+    (result) => result.status === 'rejected'
+  )
+
+  const invoiceRequests = invoices.value.map((v) => ({
+    invoicenum: v.invoicenum,
+    promise: api.getInvoiceData(v.invoicenum),
+  }))
+
+  const invoiceResults = await Promise.allSettled(
+    invoiceRequests.map((item) => item.promise)
+  )
+  invoiceRequests.forEach((item, index) => {
+    const result = invoiceResults[index]
+    const key = "getInvoiceData-"+item.invoicenum
+    if (result.status === 'fulfilled') {
+      invoicedata.value[item.invoicenum] = result.value.response ?? []
+    }
+    else {
+      invoicedata.value[item.invoicenum] = api.loadFromSession(key) ?? []
+    }
+  })
+  const failedInvoiceRequests = invoiceResults.filter(
+    (result) => result.status === 'rejected'
+  )
+
+  if (failedResults.length > 0 || failedGradeRequests.length > 0 || failedInvoiceRequests.length > 0) {
+    alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.')
   }
 
   await loadMessages()
@@ -139,6 +180,7 @@ const activeEnrollments = computed(() =>
 
 function getCourseCompletion(enrollid) {
   const sections = grades.value[enrollid] ?? []
+  if (!sections.length) return 0
   const completed = sections?.filter((section) => section.grade != null).length
   return Math.round((completed / sections.length) * 100)
 }
@@ -235,7 +277,6 @@ function scheduleNextUpdate() {
                   </div>
                 </div>
               </div>
-              
             </router-link>
           </div>
           <div class="view-all">

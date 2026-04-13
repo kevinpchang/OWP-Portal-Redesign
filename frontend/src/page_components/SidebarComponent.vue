@@ -60,11 +60,7 @@ const route = useRoute()
       </router-link>
 
       <!-- Media -->
-      <router-link
-        to="/media"
-        class="media-button"
-        :class="{ active: route.name === 'MediaPage' }"
-      >
+      <router-link to="/media" class="media-button" :class="{ active: route.name === 'MediaPage' }">
         <Images class="button-icon" color="#034750" :size="20" />
         <div class="button-text">Media</div>
       </router-link>
@@ -138,30 +134,30 @@ const route = useRoute()
   left: 295rem;
   top: 0;
   height: 100vh; /* full viewport height */
-  border-left: 1px solid #D9D9D9;
+  border-left: 1px solid #d9d9d9;
   z-index: 0; /* below header and logout */
 }
 
 /* Horizontal divider above footer */
 .bottom-line {
   position: fixed;
-  bottom: 80px; /* sits above logout button */
+  bottom: 80rem; /* sits above logout button */
   left: 0;
-  width: 295px; /* match sidebar width */
-  border-top: 1px solid #D9D9D9;
+  width: 295rem; /* match sidebar width */
+  border-top: 1px solid #d9d9d9;
   z-index: 2;
 }
 
 /* White background under bottom line */
 .sidebar-footer-bg {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 295px;
-    height: 100px;
-    background-color: white;
-    z-index: 1; /* stays under logout button */
-  }
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 295rem;
+  height: 100rem;
+  background-color: white;
+  z-index: 1; /* stays under logout button */
+}
 
 /* Sidebar layout */
 .sidebar {
@@ -177,10 +173,9 @@ const route = useRoute()
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
-  background-color: white;   /* keep background consistent */
-  z-index: 2;                /* below header, above background */
+  background-color: white; /* keep background consistent */
+  z-index: 2; /* below header, above background */
 }
-
 
 /* Button text style */
 .button-text {
@@ -227,11 +222,11 @@ const route = useRoute()
 /* Logout button (fixed on top of white footer) */
 .logout-button {
   position: fixed;
-  bottom: 20px;
-  left: 10px;
-  width: 250px;
-  height: 47px;
-  border-radius: 8px;
+  bottom: 20rem;
+  left: 10rem;
+  width: 250rem;
+  height: 47rem;
+  border-radius: 8rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -239,7 +234,7 @@ const route = useRoute()
   background-color: white;
   color: #034750;
   font-weight: 600;
-  font-size: 20px;
+  font-size: 20rem;
   z-index: 2; /* ensure it’s above footer */
 }
 
