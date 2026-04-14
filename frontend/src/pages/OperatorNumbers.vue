@@ -109,6 +109,7 @@
     }
 
     addPopup.value = false
+    window.location.reload()
   }
 
   async function updateNumber(){
@@ -141,6 +142,7 @@
     }
 
     editPopup.value = false
+    window.location.reload()
   }
 
   async function deleteNumber(){
@@ -162,6 +164,7 @@
     }
 
     deletePopup.value = false
+    window.location.reload()
   }
 
   async function loadMessages() {
