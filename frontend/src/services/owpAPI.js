@@ -172,9 +172,10 @@ export function buildUpdateContactInfoPayload(pid, form) {
   // we should preserve that exact field contract rather than inventing
   // phone_country_code / fax_country_code keys.
 
-  const phoneCountryCode = digitsOnly(form.phone_country_code ?? form.phone_area_code ?? "").slice(0, 3);
-  const phoneAreaCode = digitsOnly(form.phone_local ?? "").slice(0, 3);
-  const phoneNumber = digitsOnly(form.phone_extension ?? "").slice(0, 7);
+  const phoneAreaCode = digitsOnly(form.phone_area_code ?? "").slice(0, 3);
+  const phoneNumber = digitsOnly(form.phone_local ?? "").slice(0, 7);
+  const phoneExtension = digitsOnly(form.phone_extension ?? "").slice(0, 7);
+
 
   const faxCountryCode = digitsOnly(form.fax_country_code ?? form.fax_area_code ?? "").slice(0, 3);
   const faxNumber = digitsOnly(form.fax_local ?? "").slice(0, 10);
@@ -192,9 +193,9 @@ export function buildUpdateContactInfoPayload(pid, form) {
 
     // IMPORTANT:
     // These names match the working Postman request exactly.
-    phone_area_code: toApiValue(phoneCountryCode),
-    phone_local: toApiValue(phoneAreaCode),
-    phone_extension: toApiValue(phoneNumber),
+    phone_area_code: toApiValue(phoneAreaCode),
+    phone_local: toApiValue(phoneNumber),
+    phone_extension: phoneExtension,
 
     fax_area_code: toApiValue(faxCountryCode),
     fax_local: toApiValue(faxNumber),
