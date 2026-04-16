@@ -432,8 +432,6 @@
                   {{ name }}
                 </option>
               </optgroup>
-              
-              <!-- Add more as needed -->
             </select><br><br>
             <input type="text" id="opnum" class="input-box" placeholder="Operator Number" v-model="addOpNum"><br><br>
             <!-- Method=POST for button /api/v1/account/addOperator-->
@@ -458,7 +456,19 @@
             <h1 class="popup-title">
               Edit Operator Number
             </h1>
-            <input type="text" id="state" class="input-box" placeholder="State/Province Abbreviation" v-model="editState"><br><br>
+            <select id="state" class="input-box" v-model="editState">
+              <option disabled value="">Select State/Province</option>
+              <optgroup label="United States">
+                <option v-for="(name, abbr) in states":key="abbr":value="abbr">
+                  {{ name }}
+                </option>
+              </optgroup>
+              <optgroup label="Canada">
+                <option v-for="(name, abbr) in territories":key="abbr":value="abbr">
+                  {{ name }}
+                </option>
+              </optgroup>
+            </select><br><br>
             <input type="text" id="opnum" class="input-box" placeholder="Operator Number" v-model="editOpNum"><br><br>
             <!-- Method=POST for button /api/v1/account/updateOperatorNumber-->
             <button class = popup-button-left @click="updateNumber">Edit</button>
