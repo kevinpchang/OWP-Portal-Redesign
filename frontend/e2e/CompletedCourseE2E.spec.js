@@ -12,8 +12,8 @@ test('Completed course page loads main sections correctly', async ({ page }) => 
   await expect(page.locator('.courses-header')).toContainText('Courses')
   await expect(page.locator('.summary-tile')).toContainText('Completed Enrollments')
   await expect(page.locator('.chapter-progress-tile')).toContainText('Chapter Progress')
-  await expect(page.locator('.side-card')).toContainText('Messages')
-  await expect(page.locator('.side-card')).toContainText('Purchase History')
+  await expect(page.locator('.side-card', { hasText: 'Messages' })).toBeVisible()
+  await expect(page.locator('.side-card', { hasText: 'Purchase History' })).toBeVisible()
 })
 
 test('Completed course page shows chapter progress rows', async ({ page }) => {
