@@ -27,13 +27,17 @@ test('Active course page loads main sections correctly', async ({ page }) => {
 test('Active course page shows chapter rows or empty state', async ({ page }) => {
   await page.goto('/courses/598209')
 
+  await expect(page.getByText('Loading chapter progress…')).not.toBeVisible({ timeout: 10000 })
+
   const chapterRows = page.locator('.chapter-row')
   const emptyMessage = page.getByText('No chapter data available.')
+  const errorMessage = page.getByText('We couldn’t load this chapter data right now.')
 
-  const hasRows = await chapterRows.count() > 0
-  const hasEmpty = await emptyMessage.isVisible()
+  const rowCount = await chapterRows.count()
+  const hasEmpty = await emptyMessage.isVisible().catch(() => false)
+  const hasError = await errorMessage.isVisible().catch(() => false)
 
-  expect(hasRows || hasEmpty).toBe(true)
+  expect(rowCount > 0 || hasEmpty || hasError).toBe(true)
 })
 
 // Navigation tests

@@ -69,37 +69,59 @@ const normalizedCourseStatus = computed(() => {
   return String(courseStatus.value || "").trim().toUpperCase();
 });
 
-const isCompletedCourse = computed(() => {
-  const status = normalizedCourseStatus.value;
-  return status === "CR" || status === "PASS" || status === "COMPLETED";
+const normalizedCourseGrade = computed(() => {
+  return String(courseGrade.value || "").trim().toUpperCase();
 });
 
-const isDroppedOrFailed = computed(() => {
+const isDroppedCourse = computed(() => {
   const status = normalizedCourseStatus.value;
   return (
-    status === "F" ||
-    status === "FAIL" ||
-    status === "FAILED" ||
+    status === "DROPPED" ||
+    status.includes("DROP") ||
     status === "D" ||
-    status === "DR" ||
-    status === "DROP" ||
-    status === "DROPPED"
+    status === "DR"
   );
 });
 
+const isFailedCourse = computed(() => {
+  const grade = normalizedCourseGrade.value;
+  return (
+    grade === "F" ||
+    grade === "FAIL" ||
+    grade === "FAILED" ||
+    grade.includes("FAIL")
+  );
+});
+
+const isPassedCompletedCourse = computed(() => {
+  const status = normalizedCourseStatus.value;
+  const grade = normalizedCourseGrade.value;
+
+  const completedStatus =
+    status === "COMPLETE" ||
+    status === "COMPLETED" ||
+    status === "CR" ||
+    status === "PASS";
+
+  const passingGrade =
+    grade === "CR" ||
+    grade === "PASS" ||
+    grade === "P";
+
+  return completedStatus && !isFailedCourse.value && !isDroppedCourse.value && passingGrade;
+});
+
+const showReEnroll = computed(() => {
+  return isDroppedCourse.value || isFailedCourse.value;
+});
+
 const courseActionLabel = computed(() => {
-  return isDroppedOrFailed.value ? "Re-Enroll" : "Completed";
+  return showReEnroll.value ? "Re-Enroll" : "Completed";
 });
 
 // donut logic
 const donutColor = computed(() => {
-  const status = normalizedCourseStatus.value;
-
-  if (
-    status === "F" ||
-    status === "FAIL" ||
-    status === "FAILED"
-  ) {
+  if (isDroppedCourse.value || isFailedCourse.value) {
     return "#9F3323";
   }
 
@@ -290,22 +312,21 @@ async function loadCourse() {
       ? recordData.response[0]
       : recordData?.response;
 
-    if (!record) {
-      throw new Error("No enrollment record found");
-    }
+
+    if (!record) throw new Error("No enrollment record found");
 
     courseTitle.value = record.title || "Course title unavailable";
-    courseCompletedDate.value = record.completedate || "—";
+    courseCompletedDate.value = record.completedate || record.dropdate || "—";
 
-    courseStatus.value = String(
-      record.grade ??
-      record.enrollmentstatus ??
-      record.status ??
-      record.enrollmentstatusdesc ??
-      ""
-    ).trim();
+        courseStatus.value = String(
+          record.statustxt ??
+          record.enrollmentstatus ??
+          record.status ??
+          record.enrollmentstatusdesc ??
+          ""
+        ).trim();
 
-    courseGrade.value = record.grade || "—";
+courseGrade.value = String(record.grade ?? "").trim() || "—";
 
     const rawCeu = Number(record.ceus ?? record.ceu);
     ceus.value = Number.isFinite(rawCeu)
@@ -398,6 +419,13 @@ onMounted(async () => {
   ]);
   if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
 });
+
+
+function goToCart() {
+  window.open("https://www.owp.csus.edu/cart/", "_blank");
+}
+
+
 </script>
 
 <template>
@@ -446,9 +474,11 @@ onMounted(async () => {
               <p class="course-grade">Final Grade: {{ courseGrade }}</p>
 
               <button
+                v-if="!loadingCourse"
                 class="course-action-button"
-                :class="{ disabled: isCompletedCourse }"
-                :disabled="isCompletedCourse"
+                :class="{ disabled: isPassedCompletedCourse }"
+                :disabled="isPassedCompletedCourse"
+                @click="goToCart"
               >
                 {{ courseActionLabel }}
               </button>
