@@ -52,6 +52,7 @@ vi.mock('@/services/owpAPI', () => ({
   getInvoices: vi.fn(),
   getInvoiceData: vi.fn(),
   updateContactInfo: vi.fn(),
+  loadFromSession: vi.fn(), // FIX: added because MyAccountPage now uses cache fallback
 }))
 
 function mountPage() {
@@ -71,8 +72,8 @@ describe('MyAccountPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-   api.getAccountDetails.mockResolvedValue({
-    response: {
+    api.getAccountDetails.mockResolvedValue({
+      response: {
         firstname: 'Silicon',
         fullname: 'Silicon Scribes',
         hmemail: 'siliconscribes@gmail.com',
@@ -88,7 +89,7 @@ describe('MyAccountPage', () => {
         hmphncity: '916',
         hmphnlocal: '5551234',
         hmphnext: '77',
-    },
+      },
     })
 
     api.getActiveEnrollment.mockResolvedValue({
@@ -114,6 +115,9 @@ describe('MyAccountPage', () => {
     api.updateContactInfo.mockResolvedValue({
       response: { success: true },
     })
+
+    api.loadFromSession.mockReturnValue(null) // FIX: default no-cache fallback
+    vi.stubGlobal('alert', vi.fn()) // FIX: avoid test noise from alert in onMounted/save paths
   })
 
   it('loads and displays firstname in the profile card', async () => {
@@ -149,13 +153,14 @@ describe('MyAccountPage', () => {
     expect(wrapper.text()).toContain('NV-67890')
   })
 
-  it('loads transcript preview from Complete and Dropped enrollments only', async () => {
+  it('loads transcript preview from CR grade enrollments only', async () => {
+    // FIX: matches current component logic, which filters by grade === "CR "
     api.getActiveEnrollment.mockResolvedValue({
       response: [
-        { enrollid: 1, title: 'Course A', statustxt: 'Enrolled' },
-        { enrollid: 2, title: 'Course B', statustxt: 'Complete' },
-        { enrollid: 3, title: 'Course C', statustxt: 'Dropped' },
-        { enrollid: 4, title: 'Course D', statustxt: 'Complete' },
+        { enrollid: 1, title: 'Course A', grade: 'IP' },
+        { enrollid: 2, title: 'Course B', grade: 'CR ' },
+        { enrollid: 3, title: 'Course C', grade: 'CR ' },
+        { enrollid: 4, title: 'Course D', grade: 'F' },
       ],
     })
 
@@ -297,7 +302,7 @@ describe('MyAccountPage', () => {
   it('shows transcript empty state when no transcript items are available', async () => {
     api.getActiveEnrollment.mockResolvedValue({
       response: [
-        { enrollid: 1, title: 'Course A', statustxt: 'Enrolled' },
+        { enrollid: 1, title: 'Course A', grade: 'IP' },
       ],
     })
 
@@ -318,12 +323,92 @@ describe('MyAccountPage', () => {
     expect(wrapper.text()).toContain('No purchase history available.')
   })
 
-  it('shows error state when account loading fails', async () => {
+  it('falls back to cached account data when account request fails', async () => {
+    // FIX: replaces old error-state test
     api.getAccountDetails.mockRejectedValue(new Error('Failed to load account'))
+
+    api.loadFromSession.mockImplementation((key) => {
+      if (key === 'getAccountDetails') {
+        return {
+          firstname: 'Cached Silicon',
+          hmemail: 'cached@gmail.com',
+          hmstreet1: '100 Cached St',
+          hmcity: 'Sacramento',
+          hmstate: 'CA',
+          hmzip: '99999',
+          hmfmtdphn: '(916)-000-1111',
+          hmmobilefmtdphn: '(279)-000-2222',
+        }
+      }
+      return null
+    })
 
     const wrapper = mountPage()
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Failed to load account')
+    expect(api.loadFromSession).toHaveBeenCalledWith('getAccountDetails')
+    expect(wrapper.text()).toContain('Cached Silicon')
+    expect(wrapper.text()).toContain('cached@gmail.com')
+    expect(wrapper.text()).toContain('100 Cached St')
+    expect(wrapper.text()).not.toContain('Failed to load account')
+  })
+
+  it('falls back to cached operator list when operator request fails', async () => {
+    // FIX: adds coverage for another cache path in loadAccount()
+    api.getOperatorList.mockRejectedValue(new Error('Operator API failed'))
+
+    api.loadFromSession.mockImplementation((key) => {
+      if (key === 'getOperatorList') {
+        return [
+          { oprlicid: 1, stateid: 'CA', operatornumber: '54321' },
+          { oprlicid: 2, stateid: 'AZ', operatornumber: '77777' },
+        ]
+      }
+      return null
+    })
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    expect(api.loadFromSession).toHaveBeenCalledWith('getOperatorList')
+    expect(wrapper.text()).toContain('CA-54321')
+    expect(wrapper.text()).toContain('AZ-77777')
+  })
+
+  it('falls back to cached invoices and invoice data when purchase history requests fail', async () => {
+    // FIX: adds coverage for cache behavior inside loadPurchaseHistoryPreview()
+    api.getInvoices.mockRejectedValue(new Error('Invoices API failed'))
+    api.getInvoiceData.mockRejectedValue(new Error('Invoice data API failed'))
+
+    api.loadFromSession.mockImplementation((key) => {
+      if (key === 'getInvoices') {
+        return [{ invoicenum: '2001' }]
+      }
+
+      if (key === 'getInvoiceData-2001') {
+        return [{ coursetitle: 'Cached Water Course' }]
+      }
+
+      return null
+    })
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    expect(api.loadFromSession).toHaveBeenCalledWith('getInvoices')
+    expect(wrapper.text()).toContain('Invoice: 2001 - Cached Water Course')
+  })
+
+  it('uses loading placeholders when account request fails and no cache exists', async () => {
+    // FIX: verifies new behavior when API fails and session cache is empty
+    api.getAccountDetails.mockRejectedValue(new Error('Failed to load account'))
+    api.loadFromSession.mockReturnValue(null)
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    expect(api.loadFromSession).toHaveBeenCalledWith('getAccountDetails')
+    expect(wrapper.find('.user-name').text()).toContain('Loading...')
+    expect(wrapper.text()).not.toContain('Failed to load account')
   })
 })
