@@ -193,7 +193,7 @@ async function loadSidebarData() {
     );
     invoiceRequests.forEach((item, index) => {
       const result = invoiceResults[index];
-      const key = "invoiceData-"+item.invoicenum;
+      const key = "getInvoiceData-" + item.invoicenum;
       if (result.status === 'fulfilled') {
         invoicedata.value[item.invoicenum] = result.value.response ?? [];
       }
@@ -212,6 +212,15 @@ async function loadSidebarData() {
     loadingSidebar.value = false;
   }
 
+}
+
+function formatInboxDate(dt) {
+  if (!dt) return "";
+  return new Date(dt).toLocaleDateString(undefined, {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 async function loadCourse() {

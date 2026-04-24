@@ -25,7 +25,6 @@ import wtpo2nd7th from "@/assets/manual-imgs/wtpo-2-7th-cvr.jpg";
 import sws from "@/assets/manual-imgs/sws.png";
 import pfi from "@/assets/manual-imgs/pfi.png";
 
-// course image map
 const courseImageMap = {
   UM: um3rd,
   WTPO1: wtpo1st7th,
@@ -40,7 +39,6 @@ const courseImageMap = {
 
 const pid = 458860;
 
-// Dashboard-style messaging DB connection
 const MESSAGING_API_BASE = "https://owp-portal-redesign-db.onrender.com";
 const messagingUserId = 1;
 
@@ -67,8 +65,16 @@ const messagesError = ref("");
 const invoices = ref([]);
 const invoicedata = ref({});
 
-// Failure Checking
 const hadFailure = ref(false);
+
+function formatInboxDate(dt) {
+  if (!dt) return "";
+  return new Date(dt).toLocaleDateString(undefined, {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 function getInvoiceName(invoicenum) {
   const items = invoicedata.value[invoicenum] ?? [];
@@ -92,9 +98,7 @@ async function loadMessages() {
     messages.value = (data.threads || []).slice(0, 3).map((row) => ({
       id: Number(row.ThreadId),
       sender: row.LastSenderName || row.LastSenderEmail || "Unknown",
-      date: formatInboxDate(
-        row.LastSentAt || row.LastMessageAt || row.CreatedAt
-      ),
+      date: formatInboxDate(row.LastSentAt || row.LastMessageAt || row.CreatedAt),
     }));
   } catch (e) {
     console.error("Failed to load messages:", e);
@@ -111,18 +115,16 @@ async function loadSidebarData() {
 
   try {
     try {
-      const inv = await getInvoices(pid.value);
+      const inv = await getInvoices(pid);
       invoices.value = inv?.response ?? [];
-    }
-    catch {
+    } catch {
       hadFailure.value = true;
-      console.log("error");
       invoices.value = loadFromSession("getInvoices") ?? [];
     }
 
     const invoiceRequests = invoices.value.map((v) => ({
-    invoicenum: v.invoicenum,
-    promise: getInvoiceData(v.invoicenum),
+      invoicenum: v.invoicenum,
+      promise: getInvoiceData(v.invoicenum),
     }));
 
     const invoiceResults = await Promise.allSettled(
@@ -131,23 +133,20 @@ async function loadSidebarData() {
 
     invoiceRequests.forEach((item, index) => {
       const result = invoiceResults[index];
-      const key = "getInvoiceData-"+item.invoicenum;
-      if (result.status === 'fulfilled') {
+      const key = "getInvoiceData-" + item.invoicenum;
+
+      if (result.status === "fulfilled") {
         invoicedata.value[item.invoicenum] = result.value.response ?? [];
-      }
-      else {
+      } else {
         hadFailure.value = true;
         invoicedata.value[item.invoicenum] = loadFromSession(key) ?? [];
-        console.log(invoicedata.value);
       }
-    })
-  }
-  catch (err) {
+    });
+  } catch (err) {
     console.error("Failed to load purchase history:", err);
     sidebarError.value = "load-failed";
     invoices.value = [];
-  }
-  finally {
+  } finally {
     loadingSidebar.value = false;
   }
 }
@@ -157,7 +156,6 @@ async function loadRecommendedCourses() {
   recommendedError.value = "";
 
   try {
-    // in place for future integration
     recommendedCourses.value = [];
   } catch (e) {
     console.error("Failed to load recommended courses:", e);
@@ -177,12 +175,12 @@ onMounted(async () => {
   recommendedError.value = "";
 
   try {
-    let rows = []
+    let rows = [];
+
     try {
       const data = await getActiveEnrollment(pid);
       rows = data?.response ?? [];
-    }
-    catch {
+    } catch {
       hadFailure.value = true;
       rows = loadFromSession("getActiveEnrollment") ?? [];
     }
@@ -194,16 +192,16 @@ onMounted(async () => {
 
     const activeGradeRequests = activeRows.map((r) => ({
       row: r,
-      promise: getCourseGrades(r.enrollid)
+      promise: getCourseGrades(r.enrollid),
     }));
 
     const activeGradeResults = await Promise.allSettled(
       activeGradeRequests.map((item) => item.promise)
-    )
+    );
 
-    activeCourses.value = activeGradeRequests.map((item, index) =>  {
+    activeCourses.value = activeGradeRequests.map((item, index) => {
       const result = activeGradeResults[index];
-      const gradesKey = "getCourseGrades-"+item.row.enrollid;
+      const gradesKey = "getCourseGrades-" + item.row.enrollid;
 
       let sections = [];
 
@@ -213,9 +211,11 @@ onMounted(async () => {
         hadFailure.value = true;
         sections = loadFromSession(gradesKey) ?? [];
       }
-    
+
       const total = sections.length;
-      const graded = sections.filter((s) => String(s.grade ?? "").trim() !== null).length;
+      const graded = sections.filter(
+        (s) => String(s.grade ?? "").trim() !== ""
+      ).length;
 
       const percent = total === 0 ? 0 : Math.round((graded / total) * 100);
 
@@ -229,7 +229,6 @@ onMounted(async () => {
       };
     });
 
-    
     completedCourses.value = completedRows.map((r) => {
       if (r.statustxt === "Dropped") {
         return {
@@ -265,7 +264,12 @@ onMounted(async () => {
     loadSidebarData(),
     loadRecommendedCourses(),
   ]);
- if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
+
+  if (hadFailure.value) {
+    alert(
+      "Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data."
+    );
+  }
 });
 </script>
 

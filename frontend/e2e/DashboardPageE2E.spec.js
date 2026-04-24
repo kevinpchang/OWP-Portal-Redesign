@@ -28,3 +28,41 @@ test('Clicking on a Purchase History card navigates to the correct invoice page'
     await page.locator('.purchase-history .body .object', {hasText: '963522',}).click()
     await expect(page).toHaveURL(/\/purchase-history\/963522/)
 })
+
+test('Ensure that page correctly handles bad API responses, loads data from session instead', async ({ page }) => {
+    let sawAlert = false
+
+    await page.goto('/')
+    await expect(page.locator('.welcome-message')).toContainText('Hello, Silicon')
+    await expect(page.locator('.active-enrollments .body .object')).toHaveCount(1)
+    await expect(page.locator('.active-enrollments .body')).toContainText('Drinking Water Specialist: Small Water System Operation and Maintenance')
+    await expect(page.locator('.active-enrollments .body')).toContainText('Jan 01, 2050')
+    await expect(page.locator('.active-enrollments .body .object .percent .text')).toContainText('88%')
+    await expect(page.locator('.purchase-history .body')).toContainText('963522')
+    await expect(page.locator('.purchase-history .body')).toContainText('963500')
+
+    await page.reload()
+
+    await page.route('**/api/accountDetails/**', route => route.abort())
+    await page.route('**/api/activeEnrollment/**', route => route.abort())
+    await page.route('**/api/getInvoices/**', route => route.abort())
+    await page.route('**/api/getCourseGrades/**', route => route.abort())
+    await page.route('**/api/getInvoiceData/**', route => route.abort())
+
+    const dialogPromise = page.waitForEvent('dialog')
+    const dialog = await dialogPromise
+    const message = dialog.message()
+    expect(
+        message.includes('Some data could not be refreshed') ||
+        message.includes('Please wait a moment and try again.')
+    )
+    await dialog.accept()
+
+    await expect(page.locator('.welcome-message')).toContainText('Hello, Silicon')
+    await expect(page.locator('.active-enrollments .body .object')).toHaveCount(1)
+    await expect(page.locator('.active-enrollments .body')).toContainText('Drinking Water Specialist: Small Water System Operation and Maintenance')
+    await expect(page.locator('.active-enrollments .body')).toContainText('Jan 01, 2050')
+    await expect(page.locator('.active-enrollments .body .object .percent .text')).toContainText('88%')
+    await expect(page.locator('.purchase-history .body')).toContainText('963522')
+    await expect(page.locator('.purchase-history .body')).toContainText('963500')
+})

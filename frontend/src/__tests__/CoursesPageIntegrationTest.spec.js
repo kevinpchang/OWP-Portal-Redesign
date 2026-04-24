@@ -4,7 +4,7 @@
 // To run individually: npm run test:front -- src/__tests__/CoursesPageIntegrationTest.spec.js
 // To run all frontend tests: npm run test:front
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import CoursesPage from '../pages/CoursesPage.vue'
 import * as api from '@/services/owpAPI'
@@ -18,15 +18,34 @@ vi.mock('@/services/owpAPI', () => ({
 }))
 
 describe('CoursesPage', () => {
-  // Clears all previous mock calls and values before each test
   beforeEach(() => {
     vi.clearAllMocks()
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ threads: [] }),
+    })
   })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  function mountPage() {
+    return mount(CoursesPage, {
+      global: {
+        stubs: {
+          'router-link': {
+            template: '<a><slot /></a>',
+          },
+        },
+      },
+    })
+  }
 
   // Active enrollment integration tests
   // Verifies active courses are filtered and rendered correctly
   // with title and expiration date information.
- 
   it('loads and displays active enrollments correctly', async () => {
     api.getActiveEnrollment.mockResolvedValue({
       response: [
@@ -58,7 +77,8 @@ describe('CoursesPage', () => {
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CoursesPage)
+    const wrapper = mountPage()
+    await flushPromises()
     await flushPromises()
 
     const activeCourses = wrapper.findAll('.active-card .course-row')
@@ -77,17 +97,16 @@ describe('CoursesPage', () => {
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CoursesPage)
+    const wrapper = mountPage()
+    await flushPromises()
     await flushPromises()
 
     expect(wrapper.text()).toContain('No active enrollments.')
   })
 
-  
   // Completed enrollment integration tests
   // Verifies completed and dropped courses render correctly in
   // the completed enrollments section.
- 
   it('loads and displays completed enrollments correctly', async () => {
     api.getActiveEnrollment.mockResolvedValue({
       response: [
@@ -112,7 +131,8 @@ describe('CoursesPage', () => {
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CoursesPage)
+    const wrapper = mountPage()
+    await flushPromises()
     await flushPromises()
 
     const completedCourses = wrapper.findAll(
@@ -128,7 +148,6 @@ describe('CoursesPage', () => {
 
   // Verifies the completed enrollments section shows its empty
   // state when no completed or dropped courses are returned.
-
   it('shows empty state when no completed enrollments exist', async () => {
     api.getActiveEnrollment.mockResolvedValue({
       response: [
@@ -146,7 +165,8 @@ describe('CoursesPage', () => {
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CoursesPage)
+    const wrapper = mountPage()
+    await flushPromises()
     await flushPromises()
 
     expect(wrapper.text()).toContain('No completed enrollments.')
@@ -155,14 +175,14 @@ describe('CoursesPage', () => {
   // Recommended course integration tests
   // Verifies the recommended courses section shows its empty
   // state when no recommended courses are available.
-
   it('shows empty state for recommended courses', async () => {
     api.getActiveEnrollment.mockResolvedValue({ response: [] })
     api.getCourseGrades.mockResolvedValue({ response: [] })
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CoursesPage)
+    const wrapper = mountPage()
+    await flushPromises()
     await flushPromises()
 
     expect(wrapper.text()).toContain('No Recommended Courses')
@@ -195,7 +215,8 @@ describe('CoursesPage', () => {
       return { response: [] }
     })
 
-    const wrapper = mount(CoursesPage)
+    const wrapper = mountPage()
+    await flushPromises()
     await flushPromises()
 
     const invoices = wrapper.findAll('.side-card:nth-of-type(2) .side-link')
@@ -213,23 +234,29 @@ describe('CoursesPage', () => {
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CoursesPage)
+    const wrapper = mountPage()
+    await flushPromises()
     await flushPromises()
 
     expect(wrapper.text()).toContain('No purchase history available.')
   })
 
   // Messages integration tests
-  // Verifies the messages section shows its default empty state
-  // since messages currently load as an empty array.
-
+  // Verifies the messages section shows its empty state when
+  // the messaging API returns no threads.
   it('shows empty state for messages', async () => {
     api.getActiveEnrollment.mockResolvedValue({ response: [] })
     api.getCourseGrades.mockResolvedValue({ response: [] })
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CoursesPage)
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ threads: [] }),
+    })
+
+    const wrapper = mountPage()
+    await flushPromises()
     await flushPromises()
 
     expect(wrapper.text()).toContain('No messages available.')

@@ -4,7 +4,7 @@
 // To run individually: npm run test:front -- src/__tests__/CompletedCourseIntegrationTest.spec.js
 // To run all frontend tests: npm run test:front
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import CompletedCourse from '../pages/CompletedCourse.vue'
 import * as api from '@/services/owpAPI'
@@ -23,6 +23,33 @@ vi.mock('@/services/owpAPI', () => ({
 }))
 
 describe('CompletedCourse', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ threads: [] }),
+    })
+  })
+
+  afterEach(() => {
+    vi.clearAllTimers()
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
+
+  function mountPage() {
+    return mount(CompletedCourse, {
+      global: {
+        stubs: {
+          'router-link': {
+            template: '<a><slot /></a>',
+          },
+        },
+      },
+    })
+  }
+
   it('loads and displays completed course summary information correctly', async () => {
     api.getEnrollmentRecord.mockResolvedValue({
       response: {
@@ -38,19 +65,39 @@ describe('CompletedCourse', () => {
 
     api.getCourseGrades.mockResolvedValue({
       response: [
-        { examid: '1', ordinal: 1, examname: 'Chapter 1', attempted: '1', pct: '100', gradefraction: '10/10', gradedate: '2026-01-10', grade: '100' },
-        { examid: '2', ordinal: 2, examname: 'Chapter 2', attempted: '1', pct: '90', gradefraction: '9/10', gradedate: '2026-01-11', grade: '90' },
+        {
+          examid: '1',
+          ordinal: 1,
+          examname: 'Chapter 1',
+          attempted: '1',
+          pct: '100',
+          gradefraction: '10/10',
+          gradedate: '2026-01-10',
+          grade: '100',
+        },
+        {
+          examid: '2',
+          ordinal: 2,
+          examname: 'Chapter 2',
+          attempted: '1',
+          pct: '90',
+          gradefraction: '9/10',
+          gradedate: '2026-01-11',
+          grade: '90',
+        },
       ],
     })
 
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CompletedCourse)
+    const wrapper = mountPage()
     await flushPromises()
+    await flushPromises()
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
     expect(wrapper.find('.course-title').text()).toContain('Water Treatment Operations II')
-    expect(wrapper.text()).toContain('Completed: 2026-02-01')
+    expect(wrapper.text()).toContain('Status Date: 2026-02-01')
     expect(wrapper.text()).toContain('Final Grade: CR')
     expect(wrapper.text()).toContain('4.0')
     expect(wrapper.text()).toContain('40')
@@ -71,16 +118,36 @@ describe('CompletedCourse', () => {
 
     api.getCourseGrades.mockResolvedValue({
       response: [
-        { examid: '1', ordinal: 1, examname: 'Chapter 1', attempted: '1', pct: '100', gradefraction: '10/10', gradedate: '2026-01-10', grade: '100' },
-        { examid: '2', ordinal: 2, examname: 'Chapter 2', attempted: '1', pct: '80', gradefraction: '8/10', gradedate: '2026-01-11', grade: '80' },
+        {
+          examid: '1',
+          ordinal: 1,
+          examname: 'Chapter 1',
+          attempted: '1',
+          pct: '100',
+          gradefraction: '10/10',
+          gradedate: '2026-01-10',
+          grade: '100',
+        },
+        {
+          examid: '2',
+          ordinal: 2,
+          examname: 'Chapter 2',
+          attempted: '1',
+          pct: '80',
+          gradefraction: '8/10',
+          gradedate: '2026-01-11',
+          grade: '80',
+        },
       ],
     })
 
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CompletedCourse)
+    const wrapper = mountPage()
     await flushPromises()
+    await flushPromises()
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
     expect(wrapper.text()).toContain('Final Grade: 90%')
   })
@@ -100,16 +167,36 @@ describe('CompletedCourse', () => {
 
     api.getCourseGrades.mockResolvedValue({
       response: [
-        { examid: '2', ordinal: 2, examname: 'Chapter 2', attempted: '1', pct: '90', gradefraction: '9/10', gradedate: '--', grade: '90' },
-        { examid: '1', ordinal: 1, examname: 'Chapter 1', attempted: '1', pct: '100', gradefraction: '10/10', gradedate: '2026-01-10', grade: '100' },
+        {
+          examid: '2',
+          ordinal: 2,
+          examname: 'Chapter 2',
+          attempted: '1',
+          pct: '90',
+          gradefraction: '9/10',
+          gradedate: '--',
+          grade: '90',
+        },
+        {
+          examid: '1',
+          ordinal: 1,
+          examname: 'Chapter 1',
+          attempted: '1',
+          pct: '100',
+          gradefraction: '10/10',
+          gradedate: '2026-01-10',
+          grade: '100',
+        },
       ],
     })
 
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CompletedCourse)
+    const wrapper = mountPage()
     await flushPromises()
+    await flushPromises()
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
     const rows = wrapper.findAll('.chapter-row')
 
@@ -136,7 +223,9 @@ describe('CompletedCourse', () => {
       },
     })
 
-    api.getCourseGrades.mockResolvedValue({ response: [] })
+    api.getCourseGrades
+      .mockResolvedValueOnce({ response: [] })
+      .mockResolvedValueOnce({ response: [] })
 
     api.getInvoices.mockResolvedValue({
       response: [
@@ -152,10 +241,13 @@ describe('CompletedCourse', () => {
       if (invoicenum === '2') {
         return { response: [{ coursetitle: 'Course B' }] }
       }
+      return { response: [] }
     })
 
-    const wrapper = mount(CompletedCourse)
+    const wrapper = mountPage()
     await flushPromises()
+    await flushPromises()
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
     const invoiceLinks = wrapper.findAll('.side-link')
 
@@ -164,6 +256,8 @@ describe('CompletedCourse', () => {
   })
 
   it('shows empty chapter state when no chapter data exists', async () => {
+    vi.useFakeTimers()
+
     api.getEnrollmentRecord.mockResolvedValue({
       response: {
         title: 'Water Treatment Operations II',
@@ -176,15 +270,26 @@ describe('CompletedCourse', () => {
       },
     })
 
-    api.getCourseGrades.mockResolvedValue({ response: [] })
+    api.getCourseGrades
+      .mockResolvedValueOnce({ response: [] })
+      .mockResolvedValueOnce({ response: [] })
+
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CompletedCourse)
+    const wrapper = mountPage()
+
+    await flushPromises()
+    await flushPromises()
+
+    vi.advanceTimersByTime(1200)
     await flushPromises()
 
     expect(wrapper.text()).toContain('No chapter data available.')
     expect(wrapper.find('.donut-inner').text()).toContain('100%')
+
+    wrapper.unmount()
+    vi.useRealTimers()
   })
 
   it('shows error state when enrollment record fails to load', async () => {
@@ -193,8 +298,10 @@ describe('CompletedCourse', () => {
     api.getInvoices.mockResolvedValue({ response: [] })
     api.getInvoiceData.mockResolvedValue({ response: [] })
 
-    const wrapper = mount(CompletedCourse)
+    const wrapper = mountPage()
     await flushPromises()
+    await flushPromises()
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
     expect(wrapper.text()).toContain('Failed to load completed course data')
   })

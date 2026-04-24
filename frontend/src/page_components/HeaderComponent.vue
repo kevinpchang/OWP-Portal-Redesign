@@ -21,8 +21,8 @@
             <div class="info">
               <div class="left"><SquareUserRound class="icon" color="#034750"/></div>
               <div class="right">
-                <div class="name"><div class="text">{{ account?.firstname ?? "Null" }}</div></div>
-                <div class="email"><div class="text">{{ account?.prfdemailval ?? "Null" }}</div></div>
+                <div class="name"><div class="text">{{ account?.firstname ?? "User" }}</div></div>
+                <div class="email"><div class="text">{{ account?.prfdemailval ?? "" }}</div></div>
               </div>
             </div>
           </div>
@@ -35,7 +35,7 @@
               >
               <div class="object"><div class="text">My Account</div></div>
             </router-link>
-            <div class="object" @click.left="openContactDialog"><div class="text">Contact Info</div></div>
+            <div id="contact-info-button" class="object" @click.left="openContactDialog"><div class="text">Contact Info</div></div>
             <div class="object"><div class="text">Log Out</div></div>
           </div>
         </div>
@@ -53,41 +53,60 @@
               <div class="object">
                 <div class="left">
                   <div class="text">Email</div>
-                  <input type=text :placeholder="account?.prfdemailval" class="input-large"/>
+                  <input type=text  :placeholder="account?.prfdemailval" disabled class="input-large"/>
                 </div>
                 <div class="right"></div>
               </div>
               <div class="object">
                 <div class="left">
                   <div class="text">Phone</div>
-                  <input type=text :placeholder="account?.hmfmtdphnlocal" class="input-large"/>
-                </div>
-                <div class="right">
-                  <div class="text">Mobile</div>
-                  <input type=text :placeholder="account?.hmfmtdphn" class="input-large"/>
+                  <div class="left-subdiv">
+                    <input type=text v-model="contactForm.phone_area_code" class="input-tiny"/>
+                    <input type=text v-model="contactForm.phone_local" class="input-small"/>
+                    <input type=text v-model="contactForm.phone_extension" class="input-tiny"/>
+                  </div>
                 </div>
               </div>
               <div class="object-large">
                 <div class="left">
-                  <div class="text">Address</div>
-                  <input type=text placeholder='6000 J Street' class="input-large"/>
+                  <div class="text">Home Address (Preferred)</div>
+                  <input type=text v-model="contactForm.street_1" class="input-large"/>
                   <div class="whitespace"></div>
-                  <input type=text placeholder='Sacramento' class="input-large"/>
+                  <input type=text v-model="contactForm.city" class="input-large"/>
                 </div>
                 <div class="right">
                   <div class="whitespace"></div>
-                  <input type=text placeholder='Suite 1001' class="input-medium"/>
+                  <div class="whitespace"></div>
+                  <div class="whitespace"></div>
                   <div class="whitespace"></div>
                   <div class="right-subdiv">
-                    <input type=text placeholder='CA' class="input-tiny"/>
-                    <input type=text placeholder='95819' class="input-small"/>
+                    <input type=text v-model="contactForm.state" class="input-tiny"/>
+                    <input type=text v-model="contactForm.postal_code" class="input-small"/>
+                  </div>
+                </div>
+              </div>
+              <div class="object-large">
+                <div class="left">
+                  <div class="text">Business</div>
+                  <input type=text v-model="contactForm.street_1" class="input-large"/>
+                  <div class="whitespace"></div>
+                  <input type=text v-model="contactForm.city" class="input-large"/>
+                </div>
+                <div class="right">
+                  <div class="whitespace"></div>
+                  <div class="whitespace"></div>
+                  <div class="whitespace"></div>
+                  <div class="whitespace"></div>
+                  <div class="right-subdiv">
+                    <input type=text v-model="contactForm.state" class="input-tiny"/>
+                    <input type=text v-model="contactForm.postal_code" class="input-small"/>
                   </div>
                 </div>
               </div>
             </div>
             <div class="bottom">
               <div class="cancel" @click=closeContactDialog>Cancel</div>
-              <div class="save" @click="closeContactDialog">Save</div>
+              <div class="save" @click="saveContactInfo">Save</div>
             </div>
           </div>
         </div>
@@ -97,7 +116,7 @@
 
 <script setup>
   import { CircleQuestionMark, Mail, Bell, SquareUserRound } from 'lucide-vue-next';
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, onMounted, reactive } from 'vue'
   import { useRoute } from 'vue-router'
 
   import * as api from "@/services/owpAPI";
@@ -119,14 +138,69 @@
     try {
       const acc = await api.getAccountDetails(pid);
       account.value = acc.response;
-      console.log("Account JSON:", acc);
 
     } catch (e) {
       error.value = e?.message ?? String(e);
-    } finally {
+      account.value = api.loadFromSession('getAccountDetails') ?? [];
       loading.value = false;
     }
   }
+
+  // Update Contact Info
+  const contactForm = reactive({
+    street_1: account?.hmstreet1 ?? "",
+    street_2: account?.hmstreet2 ?? "",
+    street_3: account?.hmstreet3 ?? "",
+    city: account?.hmcity ?? "",
+    state: account?.hmstate ?? "",
+    postal_code: account?.hmzip ?? "",
+    country: account?.hmcountry ?? "",
+
+    phone_country_code: account?.hmphncountryid ?? "",
+    phone_area_code: account?.hmphncity ?? "",
+    phone_local: account?.hmphnlocal ?? "",
+    phone_extension: account?.hmphnext ?? "",
+
+    fax_country_code: account?.hmfaxcountryid ?? "",
+    fax_area_code: "",
+    fax_local: account?.hmfaxlocal ?? "",
+
+    ipAddr: null,
+  })
+
+  async function saveContactInfo() {
+    try {
+      const formForApi = {
+      street_1: contactForm.street_1,
+      street_2: contactForm.street_2,
+      street_3: contactForm.street_3,
+      city: contactForm.city,
+      state: contactForm.state,
+      postal_code: contactForm.postal_code,
+      country: contactForm.country,
+
+      phone_country_code: contactForm.phone_country_code ?? "1",
+      phone_area_code: contactForm.phone_area_code,
+      phone_local: contactForm.phone_local,
+      phone_extension: contactForm.phone_extension,
+
+      fax_country_code: contactForm.fax_country_code ?? "1",
+      fax_area_code: contactForm.fax_area_code,
+      fax_local: contactForm.fax_local,
+
+      ipAddr: contactForm.ipAddr,
+    };
+
+      const resp = await api.updateContactInfo(pid, formForApi);
+      console.log("updateContactInfo response:", resp);
+    } catch (e) {
+      console.error("Error updating contact info:", e);
+      alert("Error updating contact information. Please wait a moment and try again. If problem persists contact a site admin.");
+    }
+    closeContactDialog();
+    await loadHeader();
+  }
+
 
   onMounted(loadHeader);
 
@@ -143,6 +217,27 @@
 
   const contactDialog = ref(false);
   function openContactDialog() {
+    const a = account.value ?? {};
+
+    contactForm.street_1 = a.hmstreet1 ?? "";
+    contactForm.street_2 = a.hmstreet2 ?? "";
+    contactForm.street_3 = a.hmstreet3 ?? "";
+    contactForm.city = a.hmcity ?? "";
+    contactForm.state = a.hmstate ?? "";
+    contactForm.postal_code = a.hmzip ?? "";
+    contactForm.country = a.hmcountry ?? "1";
+
+    contactForm.phone_country_code = a.hmphncountry ?? "1";
+    contactForm.phone_area_code = a.hmphncity ?? "";
+    contactForm.phone_local = a.hmphnlocal ?? "";
+    contactForm.phone_extension = a.hmphnext ?? "";
+
+    contactForm.fax_country_code = a.hmfaxncountry ?? "1";
+    contactForm.fax_area_code = a.hmfaxcity ?? "";
+    contactForm.fax_local = a.hmfaxlocal ?? "";
+
+    contactForm.ipAddr = null;
+
     contactDialog.value = true;
   }
 
@@ -186,7 +281,7 @@
 
   .account-button-dialog .top .info .left {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
   }
@@ -281,7 +376,6 @@
 
   .contact-info-dialog .dialog {
     width: 700rem;
-    height: 500rem;
     display: flex;
     flex-direction: column;
     border-radius: 14rem;
@@ -356,7 +450,6 @@
 
   .contact-info-dialog .dialog .body .input-small{
     width: 100rem;
-    
     font-size: 15rem;
     font-weight: 400;
     border: 0.75rem solid #747474;
@@ -365,8 +458,7 @@
   }
 
   .contact-info-dialog .dialog .body .input-tiny{
-    width: 31rem;
-    
+    width: 41rem;
     font-size: 15rem;
     font-weight: 400;
     border: 0.75rem solid #747474;
@@ -409,12 +501,20 @@
 
   }
 
+  .contact-info-dialog .dialog .body .object .left .left-subdiv{
+    width: 176rem;
+    height: 31rem;
+    display: flex;
+    flex-direction: row;
+    gap: 10rem;
+  }
+
   .contact-info-dialog .dialog .body .right{
     width: 50%;
     height: 78rem;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: bottom;
     align-items: flex-start;
 
   }
@@ -428,7 +528,7 @@
   }
 
   .contact-info-dialog .dialog .bottom{
-    height: 29;
+    height: 29rem;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
