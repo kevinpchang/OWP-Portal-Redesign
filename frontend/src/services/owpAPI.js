@@ -7,36 +7,47 @@ const BASE = "https://owp-portal-redesign-php.onrender.com/api"; //<-- frontend 
 // activeEnrollment
 export async function getActiveEnrollment(pid) {
   const request = await fetch(`${BASE}/activeEnrollment/${pid}`);
+  //throw new Error('Manual error for testing purposes'); // <-- temporary error to test sessionStorage fallback
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('getActiveEnrollment', data);
+  return data;
 }
 
 // enrollmentRecord
 export async function getEnrollmentRecord(enrollId) {
   const request = await fetch(`${BASE}/enrollmentRecord/${enrollId}`);
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('getEnrollmentRecord-'+enrollId, data);
+  return data;
 }
 
 // courseExams
 export async function getCourseExams(enrollId) {
   const request = await fetch(`${BASE}/courseExams/${enrollId}`);
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('getCourseExams', data);
+  return data;
 }
 
 // getCourseGrades
 export async function getCourseGrades(enrollId) {
   const request = await fetch(`${BASE}/getCourseGrades/${enrollId}`);
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('getCourseGrades-'+enrollId, data);
+  return data;
 }
 
 // getOperatorList
 export async function getOperatorList(pid) {
   const request = await fetch(`${BASE}/getOperatorList/${pid}`);
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('getOperatorList', data);
+  return data;
 }
 
 // deleteOperator
@@ -50,42 +61,54 @@ export async function deleteOperator(ip, id, pid) {
 export async function getAccountDetails(pid) {
   const request = await fetch(`${BASE}/accountDetails/${pid}`);
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('getAccountDetails', data);
+  return data;
 }
 
 // getInvoices
 export async function getInvoices(pid) {
   const request = await fetch(`${BASE}/getInvoices/${pid}`);
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('getInvoices', data);
+  return data;
 }
 
 // getInvoiceData
 export async function getInvoiceData(invoiceNumber) {
   const request = await fetch(`${BASE}/getInvoiceData/${invoiceNumber}`);
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('getInvoiceData-'+invoiceNumber, data);
+  return data;
 }
 
 // chk_active_section
 export async function getActiveSection(sectionId) {
   const request = await fetch(`${BASE}/chk_active_section/${sectionId}`);
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('getActiveSection', data);
+  return data;
 }
 
 // receipt download
 export async function downloadReceipt(invoiceNum) {
   const request = await fetch(`${BASE}/receipt/download/${invoiceNum}`);
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('downloadReceipt', data);
+  return data;
 }
 
 // enrollment download
 export async function downloadEnrollment(enrollmentId) {
   const request = await fetch(`${BASE}/enrollment/download/${enrollmentId}`);
   if (!request.ok) throw new Error(await request.text());
-  return request.json();
+  const data = await request.json();
+  storeToSession('downloadEnrollment', data);
+  return data;
 }
 
 // ==========================
@@ -149,9 +172,10 @@ export function buildUpdateContactInfoPayload(pid, form) {
   // we should preserve that exact field contract rather than inventing
   // phone_country_code / fax_country_code keys.
 
-  const phoneCountryCode = digitsOnly(form.phone_country_code ?? form.phone_area_code ?? "").slice(0, 3);
-  const phoneAreaCode = digitsOnly(form.phone_local ?? "").slice(0, 3);
-  const phoneNumber = digitsOnly(form.phone_extension ?? "").slice(0, 7);
+  const phoneAreaCode = digitsOnly(form.phone_area_code ?? "").slice(0, 3);
+  const phoneNumber = digitsOnly(form.phone_local ?? "").slice(0, 7);
+  const phoneExtension = digitsOnly(form.phone_extension ?? "").slice(0, 7);
+
 
   const faxCountryCode = digitsOnly(form.fax_country_code ?? form.fax_area_code ?? "").slice(0, 3);
   const faxNumber = digitsOnly(form.fax_local ?? "").slice(0, 10);
@@ -169,9 +193,9 @@ export function buildUpdateContactInfoPayload(pid, form) {
 
     // IMPORTANT:
     // These names match the working Postman request exactly.
-    phone_area_code: toApiValue(phoneCountryCode),
-    phone_local: toApiValue(phoneAreaCode),
-    phone_extension: toApiValue(phoneNumber),
+    phone_area_code: toApiValue(phoneAreaCode),
+    phone_local: toApiValue(phoneNumber),
+    phone_extension: phoneExtension,
 
     fax_area_code: toApiValue(faxCountryCode),
     fax_local: toApiValue(faxNumber),
@@ -202,5 +226,41 @@ export async function updateContactInfo(pid, form) {
     return JSON.parse(text);
   } catch {
     return text;
+  }
+}
+
+function storeToSession(key, data) {
+  const payload = {
+    data: data
+  }
+  sessionStorage.setItem(key, JSON.stringify(payload));
+}
+
+export function getFromSession(key) {
+  const item = sessionStorage.getItem(key);
+  if (!item) return null;
+  try {
+    const payload = JSON.parse(item);
+    return payload.data;
+  } catch {
+    return null;
+  }
+}
+
+export function loadFromSession(key, array) {
+  try {
+    console.log('Checking sessionStorage for cached details...')
+      console.log('Attempting to load from sessionStorage...')
+      const data = getFromSession(key)
+      if (data.response) { 
+        return data.response;
+      }
+      else { 
+        console.log('No cached details found in sessionStorage.')
+        return null;
+      }
+    }
+  catch {
+    return null;
   }
 }

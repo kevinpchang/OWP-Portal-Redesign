@@ -6,6 +6,7 @@ import {
   getCourseGrades,
   getInvoices,
   getInvoiceData,
+  loadFromSession,
 } from "@/services/owpAPI.js";
 
 import book from '@/assets/icons/owp-2color/book-icon.svg'
@@ -151,6 +152,9 @@ const invoicedata = ref({});
 const loadingSidebar = ref(true);
 const sidebarError = ref("");
 
+//failure checking
+const hadFailure = ref(false)
+
 let animInterval = null;
 
 function formatInboxDate(dt) {
@@ -246,22 +250,45 @@ async function loadSidebarData() {
   sidebarError.value = "";
 
   try {
-    const inv = await getInvoices(pid.value);
-    invoices.value = inv?.response ?? [];
+    try {
+      const inv = await getInvoices(pid.value);
+      invoices.value = inv?.response ?? [];
+    }
+    catch {
+      hadFailure.value = true;
+      console.log("error");
+      invoices.value = loadFromSession("getInvoices") ?? [];
+    }
 
-    await Promise.all(
-      invoices.value.map(async (invoice) => {
-        const details = await getInvoiceData(invoice.invoicenum);
-        invoicedata.value[invoice.invoicenum] = details?.response ?? [];
-      })
+    const invoiceRequests = invoices.value.map((v) => ({
+    invoicenum: v.invoicenum,
+    promise: getInvoiceData(v.invoicenum),
+    }));
+
+    const invoiceResults = await Promise.allSettled(
+      invoiceRequests.map((item) => item.promise)
     );
-  } catch (err) {
+    invoiceRequests.forEach((item, index) => {
+      const result = invoiceResults[index];
+      const key = "invoiceData-"+item.invoicenum;
+      if (result.status === 'fulfilled') {
+        invoicedata.value[item.invoicenum] = result.value.response ?? [];
+      }
+      else {
+        hadFailure.value = true;
+        invoicedata.value[item.invoicenum] = loadFromSession(key) ?? [];
+      }
+    })
+  }
+  catch (err) {
     console.error("Failed to load purchase history:", err);
     sidebarError.value = "load-failed";
     invoices.value = [];
-  } finally {
+  }
+  finally {
     loadingSidebar.value = false;
   }
+
 }
 
 async function loadCourse() {
@@ -271,7 +298,16 @@ async function loadCourse() {
   try {
     if (!enrollId) throw new Error("Missing route param (enrollId)");
 
-    const recordData = await getEnrollmentRecord(enrollId);
+    const recordKey = "getEnrollmentRecord-" + enrollId
+    let recordData;
+    try {
+      recordData = await getEnrollmentRecord(enrollId);
+    }
+    catch { 
+      recordData = { response: loadFromSession(recordKey) ?? [] }
+      hadFailure.value = true
+    }
+    
     const record = Array.isArray(recordData?.response)
       ? recordData.response[0]
       : recordData?.response;
@@ -305,16 +341,15 @@ courseGrade.value = String(record.grade ?? "").trim() || "—";
       record.editionid ?? record.editionId ?? record.edition ?? ""
     );
 
-    let gradesData = await getCourseGrades(enrollId);
-    let sections = Array.isArray(gradesData?.response)
-      ? gradesData.response
-      : [];
-
-    if (sections.length === 0 && editionId) {
-      gradesData = await getCourseGrades(editionId);
-      sections = Array.isArray(gradesData?.response)
-        ? gradesData.response
-        : [];
+    const gradesKey = "getCourseGrades-"+enrollId
+    let sections = [];
+    try {
+      const gradesData = await getCourseGrades(enrollId);
+      sections = Array.isArray(gradesData?.response) ? gradesData.response : [];
+    }
+    catch {
+      sections = loadFromSession(gradesKey) ?? [];
+      hadFailure.value = true
     }
 
     totalChapters.value = sections.length || 0;
@@ -382,6 +417,7 @@ onMounted(async () => {
     loadMessages(),
     loadSidebarData(),
   ]);
+  if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
 });
 
 
