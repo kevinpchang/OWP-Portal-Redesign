@@ -60,19 +60,19 @@
               <div class="object">
                 <div class="left">
                   <div class="text">Phone</div>
-                  <div class="left-subdiv">
-                    <input type=text v-model="contactForm.phone_area_code" class="input-tiny"/>
-                    <input type=text v-model="contactForm.phone_local" class="input-small"/>
-                    <input type=text v-model="contactForm.phone_extension" class="input-tiny"/>
+                  <div class="left-subdiv"> 
+                    <input type=text v-model="contactForm.phone_area_code" maxlength="3" placeholder="Area Code" class="input-tiny"/>
+                    <input type=text v-model="contactForm.phone_local" maxlength="7" placeholder="Phone" class="input-small"/>
+                    <input type=text v-model="contactForm.phone_extension" maxlength="6" placeholder="Extension" class="input-small"/>
                   </div>
                 </div>
               </div>
               <div class="object-large">
                 <div class="left">
                   <div class="text">Home Address (Preferred)</div>
-                  <input type=text v-model="contactForm.street_1" class="input-large"/>
+                  <input type=text v-model="contactForm.street_1" maxlength="100" class="input-large"/>
                   <div class="whitespace"></div>
-                  <input type=text v-model="contactForm.city" class="input-large"/>
+                  <input type=text v-model="contactForm.city" maxlength="100" class="input-large"/>
                 </div>
                 <div class="right">
                   <div class="whitespace"></div>
@@ -80,17 +80,17 @@
                   <div class="whitespace"></div>
                   <div class="whitespace"></div>
                   <div class="right-subdiv">
-                    <input type=text v-model="contactForm.state" class="input-tiny"/>
-                    <input type=text v-model="contactForm.postal_code" class="input-small"/>
+                    <input type=text v-model="contactForm.state" maxlength="2" class="input-tiny"/>
+                    <input type=text v-model="contactForm.postal_code" maxlength="10" class="input-small"/>
                   </div>
                 </div>
               </div>
               <div class="object-large">
                 <div class="left">
                   <div class="text">Business</div>
-                  <input type=text v-model="contactForm.street_1" class="input-large"/>
+                  <input type=text v-model="contactForm.street_1" maxlength="100" class="input-large"/>
                   <div class="whitespace"></div>
-                  <input type=text v-model="contactForm.city" class="input-large"/>
+                  <input type=text v-model="contactForm.city" maxlength="100" class="input-large"/>
                 </div>
                 <div class="right">
                   <div class="whitespace"></div>
@@ -98,8 +98,8 @@
                   <div class="whitespace"></div>
                   <div class="whitespace"></div>
                   <div class="right-subdiv">
-                    <input type=text v-model="contactForm.state" class="input-tiny"/>
-                    <input type=text v-model="contactForm.postal_code" class="input-small"/>
+                    <input type=text v-model="contactForm.state" maxlength="2" class="input-tiny"/>
+                    <input type=text v-model="contactForm.postal_code" maxlength="10" class="input-small"/>
                   </div>
                 </div>
               </div>
@@ -169,26 +169,27 @@
   })
 
   async function saveContactInfo() {
+    const a = account.value ?? {};
     try {
       const formForApi = {
-      street_1: contactForm.street_1,
-      street_2: contactForm.street_2,
-      street_3: contactForm.street_3,
-      city: contactForm.city,
-      state: contactForm.state,
-      postal_code: contactForm.postal_code,
-      country: contactForm.country,
+      street_1: checkString(contactForm.street_1) ?? a.hmstreet1 ?? "",
+      street_2: checkString(contactForm.street_2) ?? a.hmstreet2 ?? "",
+      street_3: checkString(contactForm.street_3) ?? a.hmstreet3 ?? "",
+      city: checkString(contactForm.city) ?? a.hmcity ?? "",
+      state: checkString(contactForm.state) ?? a.hmstate ?? "",
+      postal_code: checkString(contactForm.postal_code) ?? a.hmzip ?? "",
+      country: checkString(contactForm.country) ?? a.hmcountry ?? "1",
 
-      phone_country_code: contactForm.phone_country_code ?? "1",
-      phone_area_code: contactForm.phone_area_code,
-      phone_local: contactForm.phone_local,
-      phone_extension: contactForm.phone_extension,
+      phone_country_code: checkString(contactForm.phone_country_code) ?? "1",
+      phone_area_code: checkString(contactForm.phone_area_code) ?? a.hmphncity ?? "",
+      phone_local: checkString(contactForm.phone_local) ?? a.hmphnlocal ?? "",
+      phone_extension: checkString(contactForm.phone_extension) ?? a.hmphnext ?? "",
 
-      fax_country_code: contactForm.fax_country_code ?? "1",
-      fax_area_code: contactForm.fax_area_code,
-      fax_local: contactForm.fax_local,
+      fax_country_code: checkString(contactForm.fax_country_code) ?? "1",
+      fax_area_code: checkString(contactForm.fax_area_code) ?? a.hmfaxcity ?? "",
+      fax_local: checkString(contactForm.fax_local) ?? a.hmfaxlocal ?? "",
 
-      ipAddr: contactForm.ipAddr,
+      ipAddr: null,
     };
 
       const resp = await api.updateContactInfo(pid, formForApi);
@@ -199,6 +200,11 @@
     }
     closeContactDialog();
     await loadHeader();
+  }
+
+  function checkString(str) {
+    const value = String(str ?? "");
+    return /[^a-zA-Z0-9 ]/.test(value) ? null : value;
   }
 
 
