@@ -2,7 +2,7 @@
 
 export const activeCourses = [
   { 
-    id: 1, 
+    id: 4, 
     title: "Operation of Wastewater Treatment Plants, Vol 2", 
     progress: "50%",
     expires: "10/11/2025"
@@ -26,7 +26,7 @@ export const completedCourses = [
 
 export const recommendedCourses = [
   {
-    id: 3,
+    id: 1,
     title: "Operation of Wastewater Treatment Plants, Vol 3",
     description: "1st Edition, 2023",
     chapterCount: 3,
@@ -37,4 +37,5 @@ export const recommendedCourses = [
     ],
     longDescription: "This course uses the following chapters from Operation of Wastewater Treatment Plants, Volume 3: Chapter 1, “Introduction to Wastewater Treatment”; Chapter 2, “Effluent Discharge and Reuse”; and Chapter 3, “Odor Control”. This course is designed to give operators an overview of wastewater treatment plants and effluent discharge and reuse processes as well as train operators to prevent and control odors from wastewater facilities. "
   }
+  
 ];

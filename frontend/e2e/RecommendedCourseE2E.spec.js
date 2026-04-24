@@ -16,8 +16,16 @@ test('Recommended course page loads main sections correctly', async ({ page }) =
   await expect(page.locator('.courses-header')).toContainText('Courses')
   await expect(page.locator('.summary-tile')).toContainText('Recommended Course')
   await expect(page.locator('.chapter-progress-tile')).toContainText('Course Contents')
-  await expect(page.locator('.side-card', { hasText: 'Messages' })).toBeVisible()
-  await expect(page.locator('.side-card', { hasText: 'Purchase History' })).toBeVisible()
+
+  const messagesCard = page.locator('.side-card', { hasText: 'Messages' })
+  await expect(messagesCard).toBeVisible()
+
+  const purchaseHistoryCard = page.locator('.side-card', { hasText: 'Purchase History' })
+  await expect(purchaseHistoryCard).toBeVisible()
+
+  // Verify purchase history data loads
+  await expect(purchaseHistoryCard).toContainText('963522')
+  await expect(purchaseHistoryCard).toContainText('963500')
 })
 
 // Course content tests
@@ -65,4 +73,36 @@ test('Purchase history footer link navigates to the purchase history page', asyn
   await purchaseHistoryCard.locator('.side-footer').click()
 
   await expect(page).toHaveURL(/\/purchase-history/)
+})
+
+// Negative test section
+// Verifies the Recommended Course page handles API failures without crashing
+// and displays fallback states.
+
+test('Recommended course page handles API failures with fallback states', async ({ page }) => {
+  await page.route('**/api/getInvoices/**', route => route.abort())
+  await page.route('**/api/getInvoiceData/**', route => route.abort())
+  await page.route('**/api/messaging/threads**', route => route.abort())
+
+  await page.goto('/recommended/1')
+
+  await expect(page.locator('.courses-header')).toContainText('Courses')
+
+  await expect(page.locator('.summary-tile')).toContainText(
+    /Recommended Course|Course title unavailable/
+  )
+
+  await expect(page.locator('.chapter-progress-tile')).toContainText(
+    /Course Contents|No chapter data available.|We couldn’t load this chapter data right now./
+  )
+
+  const messagesCard = page.locator('.side-card', { hasText: 'Messages' })
+  await expect(messagesCard).toContainText(
+    /No messages available.|We couldn’t load your messages right now./
+  )
+
+  const purchaseHistoryCard = page.locator('.side-card', { hasText: 'Purchase History' })
+  await expect(purchaseHistoryCard).toContainText(
+    /No purchase history available.|We couldn’t load your purchase history right now./
+  )
 })
