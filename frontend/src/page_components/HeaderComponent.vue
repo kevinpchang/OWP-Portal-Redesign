@@ -35,7 +35,7 @@
               >
               <div class="object"><div class="text">My Account</div></div>
             </router-link>
-            <div class="object" @click.left="openContactDialog"><div class="text">Contact Info</div></div>
+            <div id="contact-info-button" class="object" @click.left="openContactDialog"><div class="text">Contact Info</div></div>
             <div class="object"><div class="text">Log Out</div></div>
           </div>
         </div>
@@ -138,11 +138,10 @@
     try {
       const acc = await api.getAccountDetails(pid);
       account.value = acc.response;
-      console.log("Account JSON:", acc);
 
     } catch (e) {
       error.value = e?.message ?? String(e);
-    } finally {
+      account.value = api.loadFromSession('getAccountDetails') ?? [];
       loading.value = false;
     }
   }
