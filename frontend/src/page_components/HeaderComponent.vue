@@ -62,7 +62,7 @@
                   <div class="text">Phone</div>
                   <div class="left-subdiv"> 
                     <input type=text v-model="contactForm.phone_area_code" maxlength="3" placeholder="Area Code" class="input-tiny"/>
-                    <input type=text v-model="contactForm.phone_local" maxlength="7" placeholder="Phone" class="input-small"/>
+                    <input type=text v-model="contactForm.phone_local" maxlength="7" placeholder="Phone" id="phone-local" class="input-small"/>
                     <input type=text v-model="contactForm.phone_extension" maxlength="6" placeholder="Extension" class="input-small"/>
                   </div>
                 </div>
@@ -70,9 +70,9 @@
               <div class="object-large">
                 <div class="left">
                   <div class="text">Home Address (Preferred)</div>
-                  <input type=text v-model="contactForm.street_1" maxlength="100" class="input-large"/>
+                  <input type=text v-model="contactForm.street_1" maxlength="100" placeholder="Street Address" id="home-address" class="input-large"/>
                   <div class="whitespace"></div>
-                  <input type=text v-model="contactForm.city" maxlength="100" class="input-large"/>
+                  <input type=text v-model="contactForm.city" maxlength="100" placeholder="City" class="input-large"/>
                 </div>
                 <div class="right">
                   <div class="whitespace"></div>
@@ -80,17 +80,17 @@
                   <div class="whitespace"></div>
                   <div class="whitespace"></div>
                   <div class="right-subdiv">
-                    <input type=text v-model="contactForm.state" maxlength="2" class="input-tiny"/>
-                    <input type=text v-model="contactForm.postal_code" maxlength="10" class="input-small"/>
+                    <input type=text v-model="contactForm.state" maxlength="2" placeholder="State" class="input-tiny"/>
+                    <input type=text v-model="contactForm.postal_code" maxlength="10" placeholder="Postal Code" class="input-small"/>
                   </div>
                 </div>
               </div>
               <div class="object-large">
                 <div class="left">
                   <div class="text">Business</div>
-                  <input type=text v-model="contactForm.street_1" maxlength="100" class="input-large"/>
+                  <input type=text v-model="contactForm.street_1" maxlength="100" placeholder="Street Address" class="input-large"/>
                   <div class="whitespace"></div>
-                  <input type=text v-model="contactForm.city" maxlength="100" class="input-large"/>
+                  <input type=text v-model="contactForm.city" maxlength="100" placeholder="City" class="input-large"/>
                 </div>
                 <div class="right">
                   <div class="whitespace"></div>
@@ -98,8 +98,8 @@
                   <div class="whitespace"></div>
                   <div class="whitespace"></div>
                   <div class="right-subdiv">
-                    <input type=text v-model="contactForm.state" maxlength="2" class="input-tiny"/>
-                    <input type=text v-model="contactForm.postal_code" maxlength="10" class="input-small"/>
+                    <input type=text v-model="contactForm.state" maxlength="2" placeholder="State" class="input-tiny"/>
+                    <input type=text v-model="contactForm.postal_code" maxlength="10" placeholder="Postal Code" class="input-small"/>
                   </div>
                 </div>
               </div>
@@ -170,6 +170,7 @@
 
   async function saveContactInfo() {
     const a = account.value ?? {};
+    console.log(a.hmcity);
     try {
       const formForApi = {
       street_1: checkString(contactForm.street_1) ?? a.hmstreet1 ?? "",
@@ -204,6 +205,7 @@
 
   function checkString(str) {
     const value = String(str ?? "");
+    if (value.trim() === "") return null;
     return /[^a-zA-Z0-9 ]/.test(value) ? null : value;
   }
 
