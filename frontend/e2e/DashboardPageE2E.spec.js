@@ -41,22 +41,28 @@ test('Ensure that page correctly handles bad API responses, loads data from sess
     await expect(page.locator('.purchase-history .body')).toContainText('963522')
     await expect(page.locator('.purchase-history .body')).toContainText('963500')
 
-    await page.reload()
-
     await page.route('**/api/accountDetails/**', route => route.abort())
     await page.route('**/api/activeEnrollment/**', route => route.abort())
     await page.route('**/api/getInvoices/**', route => route.abort())
     await page.route('**/api/getCourseGrades/**', route => route.abort())
     await page.route('**/api/getInvoiceData/**', route => route.abort())
 
-    const dialogPromise = page.waitForEvent('dialog')
-    const dialog = await dialogPromise
-    const message = dialog.message()
-    expect(
-        message.includes('Some data could not be refreshed') ||
-        message.includes('Please wait a moment and try again.')
-    )
-    await dialog.accept()
+    const dialogHandled = new Promise((resolve, reject) => {
+        page.once('dialog', async dialog => {
+            try {
+                expect(dialog.type()).toBe('alert')
+                expect(dialog.message()).toContain('Some data could not be refreshed')
+
+                await dialog.accept()
+                resolve()
+            } catch (error) {
+                reject(error)
+            }
+        })
+    })
+
+    await page.reload()
+    await dialogHandled
 
     await expect(page.locator('.welcome-message')).toContainText('Hello, Silicon')
     await expect(page.locator('.active-enrollments .body .object')).toHaveCount(1)
