@@ -115,3 +115,47 @@ test('My Tasks page alerts when account details fail to load', async ({ page }) 
     await page.goto('/my-tasks')
     await dialogHandled
 })
+
+test('Operator Numbers page alerts when account details fail to load', async ({ page }) => {
+    await page.goto('/operatornumbers')
+    await page.route('**/api/getOperatorList/**', route => route.abort())
+
+    const dialogHandled = new Promise((resolve, reject) => {
+        page.once('dialog', async dialog => {
+            try {
+                expect(dialog.type()).toBe('alert')
+                expect(dialog.message()).toContain('Some data could not be refreshed')
+
+                await dialog.accept()
+                resolve()
+            } catch (error) {
+                reject(error)
+            }
+        })
+    })
+    
+    await page.goto('/operatornumbers')
+    await dialogHandled
+})
+
+test('Purchase History page alerts when account details fail to load', async ({ page }) => {
+    await page.goto('/purchase-history')
+    await page.route('**/api/getInvoices/**', route => route.abort())
+
+    const dialogHandled = new Promise((resolve, reject) => {
+        page.once('dialog', async dialog => {
+            try {
+                expect(dialog.type()).toBe('alert')
+                expect(dialog.message()).toContain('Some data could not be refreshed')
+
+                await dialog.accept()
+                resolve()
+            } catch (error) {
+                reject(error)
+            }
+        })
+    })
+    
+    await page.goto('/purchase-history')
+    await dialogHandled
+})
