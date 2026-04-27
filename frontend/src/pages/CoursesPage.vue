@@ -259,6 +259,12 @@ onMounted(async () => {
     loadingCompleted.value = false;
   }
 
+  if (hadFailure.value) {
+    alert(
+      "Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data."
+    );
+  }
+
   await Promise.all([
     loadMessages(),
     loadSidebarData(),
