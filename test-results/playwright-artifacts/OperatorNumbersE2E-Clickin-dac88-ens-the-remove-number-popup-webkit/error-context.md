@@ -1,0 +1,115 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e13]: Silicon
+      - link [ref=e14]:
+        - /url: https://www.owp.csus.edu/helpful-links/
+        - img [ref=e15] [cursor=pointer]
+      - link [ref=e18]:
+        - /url: /messages
+        - img [ref=e19] [cursor=pointer]
+  - generic [ref=e22]:
+    - navigation [ref=e23]:
+      - link "Dashboard" [ref=e24]:
+        - /url: /
+        - img [ref=e25]
+        - generic [ref=e30]: Dashboard
+      - link "My Account" [ref=e31]:
+        - /url: /MyAccountPage
+        - img [ref=e32]
+        - generic [ref=e36]: My Account
+      - link "My Tasks" [ref=e37]:
+        - /url: /my-tasks
+        - img [ref=e38]
+        - generic [ref=e41]: My Tasks
+      - link "Slides" [ref=e42]:
+        - /url: /slides
+        - img [ref=e43]
+        - generic [ref=e45]: Slides
+      - link "Media" [ref=e46]:
+        - /url: /media
+        - img [ref=e47]
+        - generic [ref=e52]: Media
+      - link "Courses" [ref=e53]:
+        - /url: /courses
+        - img [ref=e54]
+        - generic [ref=e55]: Courses
+      - link "Operator Numbers" [ref=e56]:
+        - /url: /operatornumbers
+        - img [ref=e57]
+        - generic [ref=e60]: Operator Numbers
+      - link "Certificates" [ref=e61]:
+        - /url: /certificates
+        - img [ref=e62]
+        - generic [ref=e64]: Certificates
+      - link "Purchase History" [ref=e65]:
+        - /url: /purchase-history
+        - img [ref=e66]
+        - generic [ref=e70]: Purchase History
+    - link "Logout" [ref=e71]:
+      - /url: /logout
+      - img [ref=e72]
+      - generic [ref=e75]: Logout
+  - main [ref=e79]:
+    - generic [ref=e80]:
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - generic [ref=e83]: Operator Numbers
+          - paragraph [ref=e84]: View and edit your Operator Numbers
+          - button "Add Operator Number" [ref=e85]
+        - table [ref=e87]:
+          - rowgroup [ref=e88]:
+            - row "State/Province Operator Number" [ref=e89]:
+              - columnheader "State/Province" [ref=e90]
+              - columnheader "Operator Number" [ref=e91]
+              - columnheader [ref=e92]
+          - rowgroup [ref=e93]:
+            - row "California ScribesTest Edit Remove" [ref=e94]:
+              - cell "California" [ref=e95]
+              - cell "ScribesTest" [ref=e96]
+              - cell "Edit Remove" [ref=e97]:
+                - button "Edit" [ref=e98] [cursor=pointer]
+                - button "Remove" [ref=e99] [cursor=pointer]
+            - row "Colorado 13451 Edit Remove" [ref=e100]:
+              - cell "Colorado" [ref=e101]
+              - cell "13451" [ref=e102]
+              - cell "Edit Remove" [ref=e103]:
+                - button "Edit" [ref=e104] [cursor=pointer]
+                - button "Remove" [ref=e105] [cursor=pointer]
+            - row "Florida 222 Edit Remove" [ref=e106]:
+              - cell "Florida" [ref=e107]
+              - cell "222" [ref=e108]
+              - cell "Edit Remove" [ref=e109]:
+                - button "Edit" [ref=e110] [cursor=pointer]
+                - button "Remove" [ref=e111] [cursor=pointer]
+            - row "Utah 1 Edit Remove" [ref=e112]:
+              - cell "Utah" [ref=e113]
+              - cell "1" [ref=e114]
+              - cell "Edit Remove" [ref=e115]:
+                - button "Edit" [ref=e116] [cursor=pointer]
+                - button "Remove" [ref=e117] [cursor=pointer]
+      - generic [ref=e118]:
+        - generic [ref=e119]:
+          - generic [ref=e120]:
+            - img [ref=e121]
+            - generic [ref=e122]: Messages
+          - generic [ref=e125]: No messages available.
+          - link "(View all messages)" [ref=e126]:
+            - /url: /messages
+            - generic [ref=e127]: (View all messages)
+        - generic [ref=e128]:
+          - generic [ref=e129]:
+            - img [ref=e130]
+            - generic [ref=e131]: Certificates
+          - list [ref=e133]:
+            - listitem [ref=e134]: Loading certificates…
+          - link "(View all certificates)" [ref=e135]:
+            - /url: /Certificates
+            - generic [ref=e136]: (View all certificates)
+```

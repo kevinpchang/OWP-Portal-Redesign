@@ -1,0 +1,65 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e13]: Silicon
+      - link [ref=e14]:
+        - /url: https://www.owp.csus.edu/helpful-links/
+        - img [ref=e15] [cursor=pointer]
+      - link [ref=e18]:
+        - /url: /messages
+        - img [ref=e19] [cursor=pointer]
+  - generic [ref=e22]:
+    - navigation [ref=e23]:
+      - link "Dashboard" [ref=e24]:
+        - /url: /
+        - img [ref=e25]
+        - generic [ref=e30]: Dashboard
+      - link "My Account" [ref=e31]:
+        - /url: /MyAccountPage
+        - img [ref=e32]
+        - generic [ref=e36]: My Account
+      - link "My Tasks" [ref=e37]:
+        - /url: /my-tasks
+        - img [ref=e38]
+        - generic [ref=e41]: My Tasks
+      - link "Slides" [ref=e42]:
+        - /url: /slides
+        - img [ref=e43]
+        - generic [ref=e45]: Slides
+      - link "Media" [ref=e46]:
+        - /url: /media
+        - img [ref=e47]
+        - generic [ref=e52]: Media
+      - link "Courses" [ref=e53]:
+        - /url: /courses
+        - img [ref=e54]
+        - generic [ref=e55]: Courses
+      - link "Operator Numbers" [ref=e56]:
+        - /url: /operatornumbers
+        - img [ref=e57]
+        - generic [ref=e60]: Operator Numbers
+      - link "Certificates" [ref=e61]:
+        - /url: /certificates
+        - img [ref=e62]
+        - generic [ref=e64]: Certificates
+      - link "Purchase History" [ref=e65]:
+        - /url: /purchase-history
+        - img [ref=e66]
+        - generic [ref=e70]: Purchase History
+    - link "Logout" [ref=e71]:
+      - /url: /logout
+      - img [ref=e72]
+      - generic [ref=e75]: Logout
+  - main [ref=e79]:
+    - generic [ref=e80]:
+      - heading "404 - Page Not Found" [level=1] [ref=e81]
+      - paragraph [ref=e82]: The page you’re looking for doesn’t exist.
+      - link "Go back to Dashboard" [ref=e83]:
+        - /url: /
+```

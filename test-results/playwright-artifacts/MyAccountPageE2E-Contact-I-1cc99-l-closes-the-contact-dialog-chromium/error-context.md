@@ -1,0 +1,65 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e13]: Silicon
+      - link [ref=e15] [cursor=pointer]:
+        - /url: https://www.owp.csus.edu/helpful-links/
+        - img [ref=e16]
+      - link [ref=e19] [cursor=pointer]:
+        - /url: /messages
+        - img [ref=e20]
+  - generic [ref=e24]:
+    - navigation [ref=e25]:
+      - link "Dashboard" [ref=e26] [cursor=pointer]:
+        - /url: /
+        - img [ref=e27]
+        - generic [ref=e32]: Dashboard
+      - link "My Account" [ref=e33] [cursor=pointer]:
+        - /url: /MyAccountPage
+        - img [ref=e34]
+        - generic [ref=e38]: My Account
+      - link "My Tasks" [ref=e39] [cursor=pointer]:
+        - /url: /my-tasks
+        - img [ref=e40]
+        - generic [ref=e43]: My Tasks
+      - link "Slides" [ref=e44] [cursor=pointer]:
+        - /url: /slides
+        - img [ref=e45]
+        - generic [ref=e47]: Slides
+      - link "Media" [ref=e48] [cursor=pointer]:
+        - /url: /media
+        - img [ref=e49]
+        - generic [ref=e54]: Media
+      - link "Courses" [ref=e55] [cursor=pointer]:
+        - /url: /courses
+        - img [ref=e56]
+        - generic [ref=e57]: Courses
+      - link "Operator Numbers" [ref=e58] [cursor=pointer]:
+        - /url: /operatornumbers
+        - img [ref=e59]
+        - generic [ref=e62]: Operator Numbers
+      - link "Certificates" [ref=e63] [cursor=pointer]:
+        - /url: /certificates
+        - img [ref=e64]
+        - generic [ref=e66]: Certificates
+      - link "Purchase History" [ref=e67] [cursor=pointer]:
+        - /url: /purchase-history
+        - img [ref=e68]
+        - generic [ref=e72]: Purchase History
+    - link "Logout" [ref=e73] [cursor=pointer]:
+      - /url: /logout
+      - img [ref=e74]
+      - generic [ref=e77]: Logout
+  - main [ref=e81]:
+    - generic [ref=e82]:
+      - heading "404 - Page Not Found" [level=1] [ref=e83]
+      - paragraph [ref=e84]: The page you’re looking for doesn’t exist.
+      - link "Go back to Dashboard" [ref=e85] [cursor=pointer]:
+        - /url: /
+```

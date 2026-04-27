@@ -1,0 +1,130 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img [ref=e6]
+    - generic [ref=e7]:
+      - generic [active] [ref=e8] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e13]: Silicon
+      - link [ref=e14] [cursor=pointer]:
+        - /url: https://www.owp.csus.edu/helpful-links/
+        - img [ref=e15]
+      - link [ref=e19] [cursor=pointer]:
+        - /url: /messages
+        - img [ref=e20]
+      - generic [ref=e23]:
+        - generic [ref=e25]:
+          - img [ref=e27]
+          - generic [ref=e31]:
+            - generic [ref=e33]: Silicon
+            - generic [ref=e35]: siliconscribes@gmail.com
+        - generic [ref=e37]:
+          - link "My Account" [ref=e38] [cursor=pointer]:
+            - /url: /MyAccountPage
+            - generic [ref=e40]: My Account
+          - generic [ref=e42]: Contact Info
+          - generic [ref=e44]: Log Out
+  - generic [ref=e45]:
+    - navigation [ref=e46]:
+      - link "Dashboard" [ref=e47] [cursor=pointer]:
+        - /url: /
+        - img [ref=e48]
+        - generic [ref=e53]: Dashboard
+      - link "My Account" [ref=e54] [cursor=pointer]:
+        - /url: /MyAccountPage
+        - img [ref=e55]
+        - generic [ref=e59]: My Account
+      - link "My Tasks" [ref=e60] [cursor=pointer]:
+        - /url: /my-tasks
+        - img [ref=e61]
+        - generic [ref=e67]: My Tasks
+      - link "Slides" [ref=e68] [cursor=pointer]:
+        - /url: /slides
+        - img [ref=e69]
+        - generic [ref=e72]: Slides
+      - link "Media" [ref=e73] [cursor=pointer]:
+        - /url: /media
+        - img [ref=e74]
+        - generic [ref=e79]: Media
+      - link "Courses" [ref=e80] [cursor=pointer]:
+        - /url: /courses
+        - img [ref=e81]
+        - generic [ref=e88]: Courses
+      - link "Operator Numbers" [ref=e89] [cursor=pointer]:
+        - /url: /operatornumbers
+        - img [ref=e90]
+        - generic [ref=e95]: Operator Numbers
+      - link "Certificates" [ref=e96] [cursor=pointer]:
+        - /url: /certificates
+        - img [ref=e97]
+        - generic [ref=e102]: Certificates
+      - link "Purchase History" [ref=e103] [cursor=pointer]:
+        - /url: /purchase-history
+        - img [ref=e104]
+        - generic [ref=e108]: Purchase History
+    - link "Logout" [ref=e109] [cursor=pointer]:
+      - /url: /logout
+      - img [ref=e110]
+      - generic [ref=e114]: Logout
+  - main [ref=e118]:
+    - generic [ref=e119]:
+      - generic [ref=e120]:
+        - generic [ref=e121]:
+          - generic [ref=e122]: Sunday, April 26, 2026
+          - generic [ref=e123]: Hello, Silicon
+          - generic [ref=e124]: Here is a quick look at your active and completed enrollments. You can also view a snapshot of your previous purchases.
+        - img [ref=e126]
+      - generic [ref=e127]:
+        - generic [ref=e128]:
+          - generic [ref=e129]:
+            - generic [ref=e130]:
+              - img [ref=e131]
+              - generic [ref=e132]: Active Enrollments
+            - 'link "Course image Drinking Water Specialist: Small Water System Operation and Maintenance Completion Enrollment expires: Jan 01, 2050 88%" [ref=e135] [cursor=pointer]':
+              - /url: /courses/598209
+              - img "Course image" [ref=e137]
+              - generic [ref=e138]:
+                - generic [ref=e140]: "Drinking Water Specialist: Small Water System Operation and Maintenance"
+                - generic [ref=e141]:
+                  - generic [ref=e142]: Completion
+                  - generic [ref=e143]: "Enrollment expires: Jan 01, 2050"
+                - generic [ref=e146]: 88%
+            - link "(View all enrollments)" [ref=e148] [cursor=pointer]:
+              - /url: /courses
+              - generic [ref=e149]: (View all enrollments)
+          - generic [ref=e150]:
+            - generic [ref=e151]:
+              - img [ref=e152]
+              - generic [ref=e153]: Instructor Slides
+            - generic [ref=e155]:
+              - generic [ref=e157]: Advanced Water Treatment
+              - generic [ref=e159]: Operation and Maintenance of Wastewater Collection Systems, Vol I
+              - generic [ref=e161]: Operation and Maintenance of Wastewater Collection Systems, Vol II
+            - link "(View all slides)" [ref=e163] [cursor=pointer]:
+              - /url: /slides
+              - generic [ref=e164]: (View all slides)
+        - generic [ref=e165]:
+          - generic [ref=e166]:
+            - generic [ref=e167]:
+              - img [ref=e168]
+              - generic [ref=e169]: Messages
+            - link "(View all messages)" [ref=e173] [cursor=pointer]:
+              - /url: /messages
+              - generic [ref=e174]: (View all messages)
+          - generic [ref=e175]:
+            - generic [ref=e176]:
+              - img [ref=e177]
+              - generic [ref=e178]: Purchase History
+            - generic [ref=e180]:
+              - 'link "Invoice: 963522 - WTPO1 - Water Treatment Plant Operation, Vol 1, Ed 7" [ref=e181] [cursor=pointer]':
+                - /url: /purchase-history/963522
+                - generic [ref=e182]: "Invoice: 963522 - WTPO1 - Water Treatment Plant Operation, Vol 1, Ed 7"
+              - 'link "Invoice: 963500 - WTPO1 - Water Treatment Plant Operation, Vol 1, Ed 7" [ref=e183] [cursor=pointer]':
+                - /url: /purchase-history/963500
+                - generic [ref=e184]: "Invoice: 963500 - WTPO1 - Water Treatment Plant Operation, Vol 1, Ed 7"
+            - link "(View all purchases)" [ref=e186] [cursor=pointer]:
+              - /url: /purchase-history
+              - generic [ref=e187]: (View all purchases)
+```

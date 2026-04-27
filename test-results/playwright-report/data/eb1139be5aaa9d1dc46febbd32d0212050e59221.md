@@ -1,0 +1,137 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e13]: Silicon
+      - link [ref=e14] [cursor=pointer]:
+        - /url: https://www.owp.csus.edu/helpful-links/
+        - img [ref=e15]
+      - link [ref=e19] [cursor=pointer]:
+        - /url: /messages
+        - img [ref=e20]
+  - generic [ref=e23]:
+    - navigation [ref=e24]:
+      - link "Dashboard" [ref=e25] [cursor=pointer]:
+        - /url: /
+        - img [ref=e26]
+        - generic [ref=e31]: Dashboard
+      - link "My Account" [ref=e32] [cursor=pointer]:
+        - /url: /MyAccountPage
+        - img [ref=e33]
+        - generic [ref=e37]: My Account
+      - link "My Tasks" [ref=e38] [cursor=pointer]:
+        - /url: /my-tasks
+        - img [ref=e39]
+        - generic [ref=e45]: My Tasks
+      - link "Slides" [ref=e46] [cursor=pointer]:
+        - /url: /slides
+        - img [ref=e47]
+        - generic [ref=e50]: Slides
+      - link "Media" [ref=e51] [cursor=pointer]:
+        - /url: /media
+        - img [ref=e52]
+        - generic [ref=e57]: Media
+      - link "Courses" [ref=e58] [cursor=pointer]:
+        - /url: /courses
+        - img [ref=e59]
+        - generic [ref=e66]: Courses
+      - link "Operator Numbers" [ref=e67] [cursor=pointer]:
+        - /url: /operatornumbers
+        - img [ref=e68]
+        - generic [ref=e73]: Operator Numbers
+      - link "Certificates" [ref=e74] [cursor=pointer]:
+        - /url: /certificates
+        - img [ref=e75]
+        - generic [ref=e80]: Certificates
+      - link "Purchase History" [ref=e81] [cursor=pointer]:
+        - /url: /purchase-history
+        - img [ref=e82]
+        - generic [ref=e86]: Purchase History
+    - link "Logout" [ref=e87] [cursor=pointer]:
+      - /url: /logout
+      - img [ref=e88]
+      - generic [ref=e92]: Logout
+  - main [ref=e96]:
+    - generic [ref=e97]:
+      - generic [ref=e99]:
+        - heading "Purchase History" [level=1] [ref=e100]
+        - paragraph [ref=e101]: View your invoices and payment details for your purchases.
+      - generic [ref=e103]:
+        - generic [ref=e104]:
+          - generic [ref=e106]: Invoice Details
+          - generic [ref=e107]:
+            - button "Receipt" [ref=e108] [cursor=pointer]
+            - button "Return to Purchase History" [ref=e109] [cursor=pointer]
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - generic [ref=e112]: Invoice Num
+            - generic [ref=e113]: "#963522"
+            - generic [ref=e114]: Invoice Date
+            - generic [ref=e115]: 02/17/2026
+            - generic [ref=e116]: Invoice Due Date
+            - generic [ref=e117]: 03/19/2026
+          - generic [ref=e118]:
+            - generic [ref=e119]: Shipped
+            - generic [ref=e120]: "Yes"
+            - generic [ref=e121]: Balance Due
+            - generic [ref=e122]: $0.00
+            - generic [ref=e123]: Order Method
+            - generic [ref=e124]: CSS Agent
+          - generic [ref=e125]:
+            - generic [ref=e126]: Order Placed By
+            - generic [ref=e127]: David Benjamin
+            - generic [ref=e128]: Billing Address & Phone
+            - generic [ref=e129]:
+              - generic [ref=e130]: SCRIBES, SILICON
+              - generic [ref=e131]: 6000 J ST
+              - generic [ref=e132]: SACRAMENTO, CA 95819
+              - generic [ref=e133]: (123) 123-1234
+        - generic [ref=e134]: Invoice Items
+        - generic [ref=e135]:
+          - generic [ref=e136]:
+            - generic [ref=e137]: Product Name
+            - generic [ref=e138]: Item Quantity
+            - generic [ref=e139]: Total Cost
+          - generic [ref=e140]:
+            - generic [ref=e141]: "Sales Tax: City of Sacramento"
+            - generic [ref=e142]: "0"
+            - generic [ref=e143]: ($8.75)
+          - generic [ref=e144]:
+            - generic [ref=e145]: "Shipping: UPS Ground"
+            - generic [ref=e146]: "0"
+            - generic [ref=e147]: ($18.00)
+          - generic [ref=e148]:
+            - generic [ref=e149]: "Enrollment: WTPO1 - Water Treatment Plant Operation, Vol 1, Ed 7"
+            - generic [ref=e150]: "-1"
+            - generic [ref=e151]: ($75.00)
+          - generic [ref=e152]:
+            - generic [ref=e153]: "Manual: WTPO1 - Water Treatment Plant Operation, Vol I, Ed 7, Manual"
+            - generic [ref=e154]: "-1"
+            - generic [ref=e155]: ($100.00)
+        - generic [ref=e156]: Payment
+        - generic [ref=e157]:
+          - generic [ref=e158]:
+            - generic [ref=e159]: Amount Refunded
+            - generic [ref=e160]: ($201.75)
+            - generic [ref=e161]: Pay Date
+            - generic [ref=e162]: 02/17/2026
+            - generic [ref=e163]: Pay Method
+            - generic [ref=e164]: PayPal Express
+          - generic [ref=e165]:
+            - generic [ref=e166]: Description
+            - generic [ref=e167]: "Refund Transaction ID: 4SL83150RF612960D"
+            - generic [ref=e168]: Payment Made By
+            - generic [ref=e169]: David Benjamin
+            - generic [ref=e170]: Payment Phone
+            - generic [ref=e171]: (123) 123-1234
+          - generic [ref=e172]:
+            - generic [ref=e173]: Payment Address
+            - generic [ref=e174]:
+              - generic [ref=e175]: 6000 J ST
+              - generic [ref=e176]: SACRAMENTO, CA 95819
+```

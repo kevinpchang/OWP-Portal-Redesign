@@ -1,0 +1,142 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e13]: Silicon
+      - link [ref=e14] [cursor=pointer]:
+        - /url: https://www.owp.csus.edu/helpful-links/
+        - img [ref=e15]
+      - link [ref=e19] [cursor=pointer]:
+        - /url: /messages
+        - img [ref=e20]
+  - generic [ref=e23]:
+    - navigation [ref=e24]:
+      - link "Dashboard" [ref=e25] [cursor=pointer]:
+        - /url: /
+        - img [ref=e26]
+        - generic [ref=e31]: Dashboard
+      - link "My Account" [ref=e32] [cursor=pointer]:
+        - /url: /MyAccountPage
+        - img [ref=e33]
+        - generic [ref=e37]: My Account
+      - link "My Tasks" [ref=e38] [cursor=pointer]:
+        - /url: /my-tasks
+        - img [ref=e39]
+        - generic [ref=e45]: My Tasks
+      - link "Slides" [ref=e46] [cursor=pointer]:
+        - /url: /slides
+        - img [ref=e47]
+        - generic [ref=e50]: Slides
+      - link "Media" [ref=e51] [cursor=pointer]:
+        - /url: /media
+        - img [ref=e52]
+        - generic [ref=e57]: Media
+      - link "Courses" [ref=e58] [cursor=pointer]:
+        - /url: /courses
+        - img [ref=e59]
+        - generic [ref=e66]: Courses
+      - link "Operator Numbers" [ref=e67] [cursor=pointer]:
+        - /url: /operatornumbers
+        - img [ref=e68]
+        - generic [ref=e73]: Operator Numbers
+      - link "Certificates" [ref=e74] [cursor=pointer]:
+        - /url: /certificates
+        - img [ref=e75]
+        - generic [ref=e80]: Certificates
+      - link "Purchase History" [ref=e81] [cursor=pointer]:
+        - /url: /purchase-history
+        - img [ref=e82]
+        - generic [ref=e86]: Purchase History
+    - link "Logout" [ref=e87] [cursor=pointer]:
+      - /url: /logout
+      - img [ref=e88]
+      - generic [ref=e92]: Logout
+  - main [ref=e96]:
+    - generic [ref=e97]:
+      - generic [ref=e99]:
+        - heading "Courses" [level=1] [ref=e100]
+        - paragraph [ref=e101]: View your active, completed, and recommended courses
+      - generic [ref=e102]:
+        - generic [ref=e104]:
+          - generic [ref=e105]:
+            - generic [ref=e106]:
+              - img "Active enrollments icon" [ref=e108]
+              - heading "Active Enrollments" [level=2] [ref=e109]
+            - 'link "Course image Drinking Water Specialist: Small Water System Operation and Maintenance Completion Expires: Jan 01, 2050 88%" [ref=e112] [cursor=pointer]':
+              - /url: /courses/598209
+              - generic [ref=e113]:
+                - img "Course image" [ref=e114]
+                - generic [ref=e115]:
+                  - generic [ref=e116]: "Drinking Water Specialist: Small Water System Operation and Maintenance"
+                  - generic [ref=e117]:
+                    - generic [ref=e118]: Completion
+                    - generic [ref=e119]: "Expires: Jan 01, 2050"
+                  - generic [ref=e122]: 88%
+          - generic [ref=e123]:
+            - generic [ref=e124]:
+              - img "Completed enrollments icon" [ref=e126]
+              - heading "Completed Enrollments" [level=2] [ref=e127]
+            - generic [ref=e129]:
+              - link "Course image Water Treatment Plant Operation, Volume 2 Dropped" [ref=e130] [cursor=pointer]:
+                - /url: /completed/606457
+                - generic [ref=e131]:
+                  - img "Course image" [ref=e132]
+                  - generic [ref=e133]:
+                    - generic [ref=e134]: Water Treatment Plant Operation, Volume 2
+                    - generic [ref=e136]: Dropped
+              - link "Course image Pretreatment Facility Inspection Completed Fail status icon 100%" [ref=e137] [cursor=pointer]:
+                - /url: /completed/579078
+                - generic [ref=e138]:
+                  - img "Course image" [ref=e139]
+                  - generic [ref=e140]:
+                    - generic [ref=e141]: Pretreatment Facility Inspection
+                    - generic [ref=e142]:
+                      - generic [ref=e143]: Completed
+                      - generic [ref=e144]:
+                        - text: Fail
+                        - img "status icon" [ref=e145]
+                    - generic [ref=e148]: 100%
+              - link "Course image Utility Management Completed Pass status icon 100%" [ref=e149] [cursor=pointer]:
+                - /url: /completed/586576
+                - generic [ref=e150]:
+                  - img "Course image" [ref=e151]
+                  - generic [ref=e152]:
+                    - generic [ref=e153]: Utility Management
+                    - generic [ref=e154]:
+                      - generic [ref=e155]: Completed
+                      - generic [ref=e156]:
+                        - text: Pass
+                        - img "status icon" [ref=e157]
+                    - generic [ref=e160]: 100%
+          - generic [ref=e161]:
+            - generic [ref=e162]:
+              - img "Recommended enrollments icon" [ref=e164]
+              - heading "Recommended Courses" [level=2] [ref=e165]
+            - generic [ref=e168]:
+              - generic [ref=e169]: No Recommended Courses
+              - generic [ref=e170]: You have no recommended courses available at this time.
+              - link "Browse Course Catalog" [ref=e171] [cursor=pointer]:
+                - /url: https://www.owp.csus.edu/operator-training/
+        - generic [ref=e172]:
+          - generic [ref=e173]:
+            - generic [ref=e174]:
+              - img [ref=e176]
+              - generic [ref=e177]: Messages
+            - generic [ref=e180]: Loading messages…
+            - link "(View all messages)" [ref=e181] [cursor=pointer]:
+              - /url: /messages
+          - generic [ref=e182]:
+            - generic [ref=e183]:
+              - img [ref=e185]
+              - generic [ref=e186]: Purchase History
+            - generic [ref=e188]:
+              - generic [ref=e189] [cursor=pointer]: "Invoice: 963522 - WTPO1 - Water Treatment Plant Operation, Vol 1, Ed 7"
+              - generic [ref=e190] [cursor=pointer]: "Invoice: 963500 - WTPO1 - Water Treatment Plant Operation, Vol 1, Ed 7"
+            - link "(View all purchases)" [ref=e191] [cursor=pointer]:
+              - /url: /purchase-history
+```
