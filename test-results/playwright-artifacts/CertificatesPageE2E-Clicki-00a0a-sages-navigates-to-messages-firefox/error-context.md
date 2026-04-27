@@ -1,0 +1,116 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e13]: Silicon
+      - link [ref=e14] [cursor=pointer]:
+        - /url: https://www.owp.csus.edu/helpful-links/
+        - img [ref=e15]
+      - link [ref=e19] [cursor=pointer]:
+        - /url: /messages
+        - img [ref=e20]
+  - generic [ref=e23]:
+    - navigation [ref=e24]:
+      - link "Dashboard" [ref=e25] [cursor=pointer]:
+        - /url: /
+        - img [ref=e26]
+        - generic [ref=e31]: Dashboard
+      - link "My Account" [ref=e32] [cursor=pointer]:
+        - /url: /MyAccountPage
+        - img [ref=e33]
+        - generic [ref=e37]: My Account
+      - link "My Tasks" [ref=e38] [cursor=pointer]:
+        - /url: /my-tasks
+        - img [ref=e39]
+        - generic [ref=e45]: My Tasks
+      - link "Slides" [ref=e46] [cursor=pointer]:
+        - /url: /slides
+        - img [ref=e47]
+        - generic [ref=e50]: Slides
+      - link "Media" [ref=e51] [cursor=pointer]:
+        - /url: /media
+        - img [ref=e52]
+        - generic [ref=e57]: Media
+      - link "Courses" [ref=e58] [cursor=pointer]:
+        - /url: /courses
+        - img [ref=e59]
+        - generic [ref=e66]: Courses
+      - link "Operator Numbers" [ref=e67] [cursor=pointer]:
+        - /url: /operatornumbers
+        - img [ref=e68]
+        - generic [ref=e73]: Operator Numbers
+      - link "Certificates" [ref=e74] [cursor=pointer]:
+        - /url: /certificates
+        - img [ref=e75]
+        - generic [ref=e80]: Certificates
+      - link "Purchase History" [ref=e81] [cursor=pointer]:
+        - /url: /purchase-history
+        - img [ref=e82]
+        - generic [ref=e86]: Purchase History
+    - link "Logout" [ref=e87] [cursor=pointer]:
+      - /url: /logout
+      - img [ref=e88]
+      - generic [ref=e92]: Logout
+  - main [ref=e96]:
+    - generic [ref=e97]:
+      - heading "Certificates" [level=1] [ref=e98]
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - textbox "Search certificates..." [ref=e102]
+          - generic [ref=e103]:
+            - generic [ref=e104]:
+              - img "Certificate icon" [ref=e106]
+              - heading "Earned Certificates" [level=2] [ref=e107]
+            - generic [ref=e110]:
+              - generic [ref=e112]: OWP
+              - generic [ref=e113]:
+                - generic [ref=e114]: Utility Management
+                - generic [ref=e115]:
+                  - generic [ref=e116]:
+                    - text: "📅 Completed:"
+                    - strong [ref=e117]: Jan 13, 2022
+                  - generic [ref=e118]:
+                    - text: "🎓 Grade:"
+                    - strong [ref=e119]: CR (Pass)
+                  - generic [ref=e120]:
+                    - text: "CEUs:"
+                    - strong [ref=e121]: "1.6"
+                  - generic [ref=e122]:
+                    - text: "Contact Hours:"
+                    - strong [ref=e123]: "16.0"
+                - button "⬇ Download Certificate" [ref=e125] [cursor=pointer]
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - generic [ref=e128]:
+              - img "Messages icon" [ref=e130]
+              - generic [ref=e131]: Messages
+            - generic [ref=e133]:
+              - generic [ref=e134] [cursor=pointer]: Email message (11/10/2025)
+              - generic [ref=e135] [cursor=pointer]: Email message (11/08/2025)
+              - generic [ref=e136] [cursor=pointer]: Email message (11/05/2025)
+            - link "(View all messages)" [active] [ref=e137] [cursor=pointer]:
+              - /url: /messages
+          - generic [ref=e138]:
+            - generic [ref=e139]:
+              - img "Transcript icon" [ref=e141]
+              - generic [ref=e142]: Transcripts
+            - generic [ref=e144]:
+              - generic [ref=e145] [cursor=pointer]: View Transcript
+              - generic [ref=e146] [cursor=pointer]: Purchase Transcript
+            - generic [ref=e147] [cursor=pointer]: (View all transcripts)
+          - generic [ref=e148]:
+            - generic [ref=e149]:
+              - img "History icon" [ref=e151]
+              - generic [ref=e152]: Purchase History
+            - generic [ref=e154]:
+              - generic [ref=e155] [cursor=pointer]: Operation of Wastewater Treatment Plants, Vol 1
+              - generic [ref=e156] [cursor=pointer]: Advanced Water Treatment
+              - generic [ref=e157] [cursor=pointer]: Water Distribution System Operation
+            - link "(View all purchases)" [ref=e158] [cursor=pointer]:
+              - /url: /purchase-history
+```

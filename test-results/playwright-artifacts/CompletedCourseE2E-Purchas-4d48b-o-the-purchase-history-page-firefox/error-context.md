@@ -1,0 +1,166 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e13]: Silicon
+      - link [ref=e14] [cursor=pointer]:
+        - /url: https://www.owp.csus.edu/helpful-links/
+        - img [ref=e15]
+      - link [ref=e19] [cursor=pointer]:
+        - /url: /messages
+        - img [ref=e20]
+  - generic [ref=e23]:
+    - navigation [ref=e24]:
+      - link "Dashboard" [ref=e25] [cursor=pointer]:
+        - /url: /
+        - img [ref=e26]
+        - generic [ref=e31]: Dashboard
+      - link "My Account" [ref=e32] [cursor=pointer]:
+        - /url: /MyAccountPage
+        - img [ref=e33]
+        - generic [ref=e37]: My Account
+      - link "My Tasks" [ref=e38] [cursor=pointer]:
+        - /url: /my-tasks
+        - img [ref=e39]
+        - generic [ref=e45]: My Tasks
+      - link "Slides" [ref=e46] [cursor=pointer]:
+        - /url: /slides
+        - img [ref=e47]
+        - generic [ref=e50]: Slides
+      - link "Media" [ref=e51] [cursor=pointer]:
+        - /url: /media
+        - img [ref=e52]
+        - generic [ref=e57]: Media
+      - link "Courses" [ref=e58] [cursor=pointer]:
+        - /url: /courses
+        - img [ref=e59]
+        - generic [ref=e66]: Courses
+      - link "Operator Numbers" [ref=e67] [cursor=pointer]:
+        - /url: /operatornumbers
+        - img [ref=e68]
+        - generic [ref=e73]: Operator Numbers
+      - link "Certificates" [ref=e74] [cursor=pointer]:
+        - /url: /certificates
+        - img [ref=e75]
+        - generic [ref=e80]: Certificates
+      - link "Purchase History" [ref=e81] [cursor=pointer]:
+        - /url: /purchase-history
+        - img [ref=e82]
+        - generic [ref=e86]: Purchase History
+    - link "Logout" [ref=e87] [cursor=pointer]:
+      - /url: /logout
+      - img [ref=e88]
+      - generic [ref=e92]: Logout
+  - main [ref=e96]:
+    - generic [ref=e97]:
+      - generic [ref=e100]: Courses
+      - generic [ref=e102]:
+        - generic [ref=e103]:
+          - img "Completed enrollments icon" [ref=e105]
+          - heading "Completed Enrollments" [level=2] [ref=e106]
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - img "Course image" [ref=e110]
+            - generic [ref=e111]:
+              - 'heading "Drinking Water Specialist: Small Water System Operation and Maintenance" [level=2] [ref=e112]'
+              - paragraph [ref=e113]: "Status Date: —"
+              - paragraph [ref=e114]: "Final Grade: 83%"
+              - button "Completed" [ref=e115] [cursor=pointer]
+            - generic [ref=e116]:
+              - generic [ref=e117]:
+                - generic [ref=e118]: "8"
+                - generic [ref=e119]: Total Chapters
+              - generic [ref=e120]:
+                - generic [ref=e121]: 83%
+                - generic [ref=e122]: Grade
+              - generic [ref=e123]:
+                - generic [ref=e124]: —
+                - generic [ref=e125]: CEUs
+              - generic [ref=e126]:
+                - generic [ref=e127]: —
+                - generic [ref=e128]: Contact Hours
+          - generic [ref=e132]: 88%
+      - generic [ref=e133]:
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - generic [ref=e136]:
+              - img "Chapter progress icon" [ref=e138]
+              - heading "Chapter Progress" [level=2] [ref=e139]
+            - generic [ref=e141]:
+              - generic [ref=e142]:
+                - generic [ref=e143]: Chapter
+                - generic [ref=e144]: Date
+                - generic [ref=e145]: Grade
+              - generic [ref=e146]:
+                - generic [ref=e147]:
+                  - generic [ref=e148]: "1"
+                  - generic [ref=e149]: Introduction to Small Water Systems
+                - generic [ref=e150]: Oct 28, 2024
+                - generic [ref=e151]: 95% (47.4/50.00)
+              - generic [ref=e152]:
+                - generic [ref=e153]:
+                  - generic [ref=e154]: "2"
+                  - generic [ref=e155]: Wells
+                - generic [ref=e156]: Oct 28, 2024
+                - generic [ref=e157]: 92% (46.2/50.00)
+              - generic [ref=e158]:
+                - generic [ref=e159]:
+                  - generic [ref=e160]: "3"
+                  - generic [ref=e161]: Small Water Treatment Plants
+                - generic [ref=e162]: Oct 28, 2024
+                - generic [ref=e163]: 92% (46.2/50.00)
+              - generic [ref=e164]:
+                - generic [ref=e165]:
+                  - generic [ref=e166]: "4"
+                  - generic [ref=e167]: Disinfection
+                - generic [ref=e168]: Oct 28, 2024
+                - generic [ref=e169]: 92% (46.2/50.00)
+              - generic [ref=e170]:
+                - generic [ref=e171]:
+                  - generic [ref=e172]: "5"
+                  - generic [ref=e173]: Safety
+                - generic [ref=e174]: Oct 28, 2024
+                - generic [ref=e175]: 100% (50.0/50.00)
+              - generic [ref=e176]:
+                - generic [ref=e177]:
+                  - generic [ref=e178]: "6"
+                  - generic [ref=e179]: Laboratory Procedures
+                - generic [ref=e180]: Oct 28, 2024
+                - generic [ref=e181]: 100% (50.0/50.00)
+              - generic [ref=e182]:
+                - generic [ref=e183]:
+                  - generic [ref=e184]: "7"
+                  - generic [ref=e185]: Introduction to Small System Management
+                - generic [ref=e186]: Oct 29, 2024
+                - generic [ref=e187]: 12% (6.1/50.00)
+              - generic [ref=e188]:
+                - generic [ref=e189]:
+                  - generic [ref=e190]: "8"
+                  - generic [ref=e191]: Final Exam
+                - generic [ref=e192]: —
+                - generic [ref=e193]: 0%
+          - link "← Back to Courses" [ref=e194] [cursor=pointer]:
+            - /url: /courses
+        - generic [ref=e195]:
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - img [ref=e199]
+              - generic [ref=e200]: Messages
+            - generic [ref=e203]: Loading messages…
+            - link "(View all messages)" [ref=e204] [cursor=pointer]:
+              - /url: /messages
+          - generic [ref=e205]:
+            - generic [ref=e206]:
+              - img [ref=e208]
+              - generic [ref=e209]: Purchase History
+            - generic [ref=e211]:
+              - generic [ref=e212] [cursor=pointer]: "Invoice: 963522 - WTPO1 - Water Treatment Plant Operation, Vol 1, Ed 7"
+              - generic [ref=e213] [cursor=pointer]: "Invoice: 963500 - WTPO1 - Water Treatment Plant Operation, Vol 1, Ed 7"
+            - link "(View all purchases)" [active] [ref=e214] [cursor=pointer]:
+              - /url: /purchase-history
+```
