@@ -205,9 +205,11 @@ onMounted(async () => {
         <div class="summary-body">
           <!-- Left -->
           <div class="summary-left">
-            <div class="course-image-large recommended-image">
-              <span class="fallback-text-large">NO IMAGE</span>
-            </div>
+            <img
+              src="@/assets/manual-imgs/owtp-3-8th-cvr.jpg"
+              alt="Course image"
+              class="course-image-large"
+            />
 
             <div class="course-header-info">
               <h2 class="course-title">{{ courseTitle }}</h2>
