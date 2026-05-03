@@ -1,3 +1,7 @@
 "Hello world!"
 This is our demo file. 
+<<<<<<< HEAD
 Update
+=======
+Update.
+>>>>>>> parent of 173e52b (Deleted 'update message'.)
