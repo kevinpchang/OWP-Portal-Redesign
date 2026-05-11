@@ -1,6 +1,10 @@
-<img src="./assets/owp.png" alt="OWP Logo" width="200">
-INSERT PROJECT LOGO HERE (UDAY)
+<p align="center">
+<img width="360" height="360" alt="siliconscribes" src="https://github.com/user-attachments/assets/86113ba6-1bf6-4615-895f-5edbedafbc78" />
+</p>
 
+<br></br>
+
+<img src="./assets/owp.png" alt="OWP Logo" width="200">
 # Office of Water Programs Learning Portal Redesign
 
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?logo=vue.js)](https://vuejs.org/)
@@ -50,37 +54,47 @@ This redesign addresses these pain points by providing:
 ### Dashboard Page
 *The landing page showing active enrollments, messages, and purchase history*
 
-![Dashboard Page](./assets/Dash.png)
+![Dashboard Page](./assets/Dshbd.png)
 
 ### Instructor Slides Page
 *Access course materials and instructor presentations*
 
-![Slides Page](./assets/Slides.png)
+![Slides Page](./assets/Slds.png)
 
 ### Purchase History Page
 *View invoices, download receipts, and track payments*
 
-![Purchase History Page](./assets/Purchase.png)
+![Purchase History Page](./assets/Prchs.png)
 
 ### Certificates Page
 *Download PDF certificates for completed courses*
 
-> **Image Suggestion:** `./assets/certificates.png`
+![Certificates Page](./assets/CERT.png)
 
 ### My Account Page
 *Manage contact information and view account summary*
 
-> **Image Suggestion:** `./assets/my-account.png`
+![MyAccount Page](./assets/ACCNT.png)
 
 ### Operator Numbers Page
 *Add, edit, or remove operator certification numbers by state*
 
-> **Image Suggestion:** `./assets/operator-numbers.png`
+![OperatorNum Page](./assets/OpNm.png)
 
 ### My Tasks Page
 *Track completed, upcoming, and overdue course tasks*
 
-> **Image Suggestion:** `./assets/my-tasks.png`
+![MyTasks Page](./assets/TskOvr.png)
+
+### Courses Overview Page
+*See your past, present, and future courses*
+
+![Courses Page](./assets/Crs.png)
+
+### Course Details Pages
+*See course information in more detail*
+
+![CourseDetails Page](./assets/CrsDtls.png)
 
 ## Team Silicon Scribes
 
@@ -89,7 +103,7 @@ This redesign addresses these pain points by providing:
 | Cristobel Navarro-Miranda | Developer | cnavarro-miranda@csus.edu |
 | Ryan Crandall | Developer | racrandall@csus.edu |
 | Youssef Boujebha | Developer | youssefboujebha@csus.edu |
-| Nicholas Guzman | Developer | nguzman2@csus.edu |
+| Nicholas Guzman | Developer | iguzman2@csus.edu |
 | Uday Kyama | Developer | udaykyama@csus.edu |
 | Kevin Chang | Developer | kevinchang@csus.edu |
 | Vincent Lam | Developer | vlam3@csus.edu |
