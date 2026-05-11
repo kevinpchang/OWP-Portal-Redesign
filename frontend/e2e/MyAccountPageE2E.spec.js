@@ -7,7 +7,7 @@
 import { test, expect } from '@playwright/test'
 
 test('My Account page renders main sections', async ({ page }) => {
-  await page.goto('/my-account')
+  await page.goto('/MyAccountPage') // ->/MyAccountPage
 
   await expect(page.locator('h1.page-title')).toHaveText('My Account')
   await expect(page.locator('.profile-card')).toBeVisible()
@@ -18,7 +18,7 @@ test('My Account page renders main sections', async ({ page }) => {
 })
 
 test('Contact Info Edit opens and Cancel closes the contact dialog', async ({ page }) => {
-  await page.goto('/my-account')
+  await page.goto('/MyAccountPage')
 
   await page.locator('.contact-card button.btn.xsmall').click()
   await expect(page.locator('.contact-info-dialog')).toBeVisible()
@@ -29,21 +29,24 @@ test('Contact Info Edit opens and Cancel closes the contact dialog', async ({ pa
 })
 
 test('Clicking View all transcripts navigates to the Certificates page', async ({ page }) => {
-  await page.goto('/my-account')
+  await page.goto('/MyAccountPage')
 
   await page.locator('a.certificate-button').click()
   await expect(page).toHaveURL(/\/Certificates|\/certificates/)
 })
 
 test('Clicking View all purchases navigates to the purchase history page', async ({ page }) => {
-  await page.goto('/my-account')
+  await page.goto('/MyAccountPage')
 
-  await page.locator('a.purchase-history-button').click()
+  const viewAllPurchases = page.getByRole('link', { name: '(View all purchases)' })
+  await expect(viewAllPurchases).toBeVisible()
+  await viewAllPurchases.click()
+
   await expect(page).toHaveURL(/\/purchase-history/)
 })
 
 test('Clicking Operator Numbers Edit navigates to the operator numbers page', async ({ page }) => {
-  await page.goto('/my-account')
+  await page.goto('/MyAccountPage')
   await page.locator('.btn-link-OPnumbers-button').click()
   await expect(page).toHaveURL(/\/operatornumbers/)
 })
