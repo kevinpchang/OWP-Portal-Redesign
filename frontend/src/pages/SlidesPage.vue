@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue'
 
 // --- Sample data for slides ---
 const currentSlides = [
@@ -8,39 +7,6 @@ const currentSlides = [
   { title: "Odor Control", file: "slides_ch3.pdf" },
 ]
 
-// --- Completed course categories ---
-const categories = [
-  { id: 'drinking', name: 'Drinking Water Courses' },
-  { id: 'wastewater', name: 'Wastewater Courses' },
-  { id: 'management', name: 'Management Courses' },
-  { id: 'math', name: 'Math Courses' }
-]
-
-// --- Sample slides for each category ---
-const completedSlides = {
-  drinking: [
-    { title: "Water Distribution Basics", file: "slides_drink1.pdf" },
-    { title: "Water Treatment Operations", file: "slides_drink2.pdf" }
-  ],
-  wastewater: [
-    { title: "Wastewater Collection Systems", file: "slides_ww1.pdf" },
-    { title: "Treatment Processes and Monitoring", file: "slides_ww2.pdf" }
-  ],
-  management: [
-    { title: "Utility Management Essentials", file: "slides_mgmt1.pdf" },
-    { title: "Leadership in Operations", file: "slides_mgmt2.pdf" }
-  ],
-  math: [
-    { title: "Applied Math for Operators", file: "slides_math1.pdf" },
-    { title: "Conversion Calculations", file: "slides_math2.pdf" }
-  ]
-}
-
-// Track which category is expanded
-const activeCategory = ref('')
-const toggleCategory = (id) => {
-  activeCategory.value = activeCategory.value === id ? '' : id
-}
 </script>
 
 <template>
@@ -62,38 +28,6 @@ const toggleCategory = (id) => {
           <a :href="slide.file" class="slide-link" target="_blank">View Slides</a>
         </div>
       </div>
-    </div>
-
-    <!-- ===== COMPLETED COURSES ===== -->
-    <div class="slides-section">
-      <h2 class="section-title completed-title">Completed Courses</h2>
-
-      <!-- Category Tabs -->
-      <div class="category-tabs">
-        <div
-          v-for="cat in categories"
-          :key="cat.id"
-          class="category-tab"
-          :class="{ active: activeCategory === cat.id }"
-          @click="toggleCategory(cat.id)"
-        >
-          {{ cat.name }}
-        </div>
-      </div>
-
-      <!-- Dropdown content for active category -->
-      <transition name="fade">
-        <div v-if="activeCategory" class="slides-card dropdown">
-          <div
-            v-for="(slide, index) in completedSlides[activeCategory]"
-            :key="index"
-            class="slide-row"
-          >
-            <div class="slide-title">{{ slide.title }}</div>
-            <a :href="slide.file" class="slide-link" target="_blank">View Slides</a>
-          </div>
-        </div>
-      </transition>
     </div>
   </div>
 </template>
