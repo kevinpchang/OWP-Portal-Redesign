@@ -1,15 +1,15 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { Award, Mail, FileText, History } from "lucide-vue-next";
 import {
   getAccountDetails,
   getActiveEnrollment,
   getEnrollmentRecord,
+  getInvoiceData,
+  getInvoices,
   loadFromSession,
 } from "@/services/owpAPI.js";
 
 import certificate from '@/assets/icons/owp-2color/certificate-icon.svg'
-import transcript from '@/assets/icons/owp-2color/transcipt-icon.svg'
 import history from '@/assets/icons/owp-2color/history-icon.svg'
 import mail from '@/assets/icons/owp-2color/mail-icon.svg'
 
@@ -41,6 +41,54 @@ const filteredCertificates = computed(() => {
     c.title.toLowerCase().includes(q)
   );
 });
+
+// invoice refs
+const invoices = ref([]);
+const invoicedata = ref({});
+
+// Messaging
+const MESSAGING_API_BASE = "https://owp-portal-redesign-db.onrender.com";
+const messagingUserId = 1;
+
+const messages = ref([]);
+const loadingMessages = ref(true);
+const messagesError = ref("");
+
+function formatInboxDate(dt) {
+  if (!dt) return "";
+  return new Date(dt).toLocaleDateString(undefined, {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+async function loadMessages() {
+  loadingMessages.value = true;
+  messagesError.value = "";
+
+  try {
+    const url = new URL(`${MESSAGING_API_BASE}/api/messaging/threads`);
+    url.searchParams.set("userId", String(messagingUserId));
+
+    const res = await fetch(url.toString());
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+
+    messages.value = (data.threads || []).slice(0, 3).map((row) => ({
+      id: Number(row.ThreadId),
+      sender: row.LastSenderName || row.LastSenderEmail || "Unknown",
+      date: formatInboxDate(row.LastSentAt || row.LastMessageAt || row.CreatedAt),
+    }));
+  } catch (e) {
+    console.error("Failed to load messages:", e);
+    messagesError.value = e?.message ?? "load-failed";
+    messages.value = [];
+  } finally {
+    loadingMessages.value = false;
+  }
+}
 
 // --- Load account name ---
 async function loadAccount() {
@@ -138,6 +186,54 @@ async function loadCertificates() {
     loadingCerts.value = false;
   }
 }
+
+// Invoices
+function getInvoiceName(invoicenum) {
+  const items = invoicedata.value[invoicenum] ?? [];
+  const match = items.find((item) => item?.coursetitle != null);
+  return match?.coursetitle || "Course title unavailable";
+}
+
+async function loadInvoices() {
+
+  try {
+    try {
+      const inv = await getInvoices(pid);
+      invoices.value = inv?.response ?? [];
+    } catch {
+      hadFailure.value = true;
+      invoices.value = loadFromSession("getInvoices") ?? [];
+    }
+
+    const invoiceRequests = invoices.value.map((v) => ({
+      invoicenum: v.invoicenum,
+      promise: getInvoiceData(v.invoicenum),
+    }));
+
+    const invoiceResults = await Promise.allSettled(
+      invoiceRequests.map((item) => item.promise)
+    );
+
+    invoiceRequests.forEach((item, index) => {
+      const result = invoiceResults[index];
+      const key = "getInvoiceData-" + item.invoicenum;
+
+      if (result.status === "fulfilled") {
+        invoicedata.value[item.invoicenum] = result.value.response ?? [];
+      } else {
+        hadFailure.value = true;
+        invoicedata.value[item.invoicenum] = loadFromSession(key) ?? [];
+      }
+    });
+  } catch (err) {
+    console.error("Failed to load purchase history:", err);
+    sidebarError.value = "load-failed";
+    invoices.value = [];
+  } finally {
+    loadingSidebar.value = false;
+  }
+}
+
 
 // --- Generate and download a certificate PDF using jsPDF ---
 async function downloadCertificate(cert) {
@@ -264,7 +360,7 @@ async function downloadCertificate(cert) {
 }
 
 onMounted(async () => {
-  await Promise.all([loadAccount(), loadCertificates()]);
+  await Promise.all([loadAccount(), loadCertificates(), loadMessages(), loadInvoices()]);
   if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
 });
 </script>
@@ -352,26 +448,24 @@ onMounted(async () => {
           </div>
           <div class="divider"></div>
           <div class="side-body">
-            <div class="side-link">Email message (11/10/2025)</div>
-            <div class="side-link">Email message (11/08/2025)</div>
-            <div class="side-link">Email message (11/05/2025)</div>
+            <div v-if="loadingMessages" class="state-message loading-message">
+              Loading messages…
+            </div>
+            <div v-else-if="messages.length === 0" class="state-message empty-message">
+              No messages available.
+            </div>
+            <template v-else>
+              <router-link
+                v-for="message in messages.slice(0, 3)"
+                :key="message.id"
+                :to="`/messages?threadId=${message.id}`"
+                class="side-link"
+              >
+                Email Message from: {{ message.sender }} {{ message.date }}
+              </router-link>
+          </template>
           </div>
           <router-link to="/messages" class="side-footer">(View all messages)</router-link>
-        </div>
-
-        <div class="side-card">
-          <div class="side-header">
-            <div class="side-icon">
-              <img :src="mail" alt="Transcript icon" />
-            </div>
-            <div class="side-title">Transcripts</div>
-          </div>
-          <div class="divider"></div>
-          <div class="side-body">
-            <div class="side-link">View Transcript</div>
-            <div class="side-link">Purchase Transcript</div>
-          </div>
-          <div class="side-footer">(View all transcripts)</div>
         </div>
 
         <div class="side-card">
@@ -383,9 +477,9 @@ onMounted(async () => {
           </div>
           <div class="divider"></div>
           <div class="side-body">
-            <div class="side-link">Operation of Wastewater Treatment Plants, Vol 1</div>
-            <div class="side-link">Advanced Water Treatment</div>
-            <div class="side-link">Water Distribution System Operation</div>
+            <router-link class="side-link" v-for="v in invoices.slice(0, 3)" :key="v.invoicenum" :to="`/purchase-history/${v.invoicenum}`">
+                Invoice: {{ v.invoicenum }} - {{ getInvoiceName(v.invoicenum) }}
+            </router-link>
           </div>
           <router-link to="/purchase-history" class="side-footer">(View all purchases)</router-link>
         </div>
@@ -398,133 +492,133 @@ onMounted(async () => {
 .certificates-page {
   display: grid;
   grid-template-rows: auto 1fr;
-  row-gap: 32px;
+  row-gap: 32rem;
   justify-content: center;
   align-items: start;
-  padding: 16px 0 42px;
+  padding: 16rem 0 42rem;
   color: #034750;
 }
 
 .page-title {
   justify-self: start;
-  width: 1016px;
-  padding: 0 16px;
+  width: 1016rem;
+  padding: 0 16rem;
   margin: 0;
-  font-size: 28px;
+  font-size: 28rem;
   font-weight: 800;
   color: #034750;
 }
 
 .page-layout {
   display: grid;
-  grid-template-columns: 700px 300px;
-  column-gap: 16px;
-  row-gap: 16px;
+  grid-template-columns: 700rem 300rem;
+  column-gap: 16rem;
+  row-gap: 16rem;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 16rem;
 }
 
 .left-col {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16rem;
 }
 
 .right-col {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16rem;
 }
 
 /* Search */
 .search-container { width: 100%; }
 .search-input {
-  padding: 10px 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 16px;
+  padding: 10rem 16rem;
+  border: 1rem solid #ccc;
+  border-radius: 8rem;
+  font-size: 16rem;
   width: 100%;
   outline: none;
   box-sizing: border-box;
 }
 .search-input:focus {
   border-color: #00a5b5;
-  box-shadow: 0 0 0 3px rgba(0, 165, 181, 0.15);
+  box-shadow: 0 0 0 3rem rgba(0, 165, 181, 0.15);
 }
 .search-input::placeholder { color: #999; }
 
 /* Main card */
 .course-card {
   background-color: #f2f1f2;
-  border-radius: 14px;
-  padding: 16px 20px 20px 20px;
+  border-radius: 14rem;
+  padding: 16rem 20rem 20rem 20rem;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 12rem;
 }
 
 .card-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding-top: 4px;
-  margin-left: 20px;
+  gap: 8rem;
+  padding-top: 4rem;
+  margin-left: 20rem;
 }
 
-.header-icon { width: 26px; height: 34px; }
-.card-title { font-size: 20px; font-weight: 700; color: #034750; margin: 0; }
+.header-icon { width: 26rem; height: 34rem; }
+.card-title { font-size: 20rem; font-weight: 700; color: #034750; margin: 0; }
 
-.divider { width: 100%; border-top: 1px solid #ffffff; margin: 12px 0 8px 0; }
+.divider { width: 100%; border-top: 1rem solid #ffffff; }
 
-.state-message { padding: 12px 20px; font-size: 16px; }
+.state-message { padding: 12rem 20rem; font-size: 16rem; }
 .loading-message, .empty-message { color: #707070; }
 .error-message { color: #9f3323; font-weight: 600; }
 
 .card-body {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  max-height: 520px;
+  gap: 4rem;
+  max-height: 520rem;
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: 4rem;
 }
 
-.card-body::-webkit-scrollbar { width: 6px; }
+.card-body::-webkit-scrollbar { width: 6rem; }
 .card-body::-webkit-scrollbar-track { background: transparent; }
-.card-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+.card-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3rem; }
 
 .certificate-item {
   display: grid;
-  grid-template-columns: 70px 1fr;
-  gap: 16px;
-  padding: 16px 20px;
-  margin: 0 -20px;
-  width: calc(100% + 40px);
+  grid-template-columns: 70rem 1fr;
+  gap: 16rem;
+  padding: 16rem 20rem;
+  margin: 0 -20rem;
+  width: calc(100% + 40rem);
   transition: background-color 0.2s ease;
 }
 .certificate-item:hover { background-color: #d9d9d9; }
 
 .cert-thumbnail {
-  width: 70px;
-  height: 90px;
+  width: 70rem;
+  height: 90rem;
   background: linear-gradient(135deg, #5aa843 0%, #6dbe4b 100%);
-  border-radius: 6px;
+  border-radius: 6rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2rem 8rem rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
 }
-.owp-text { color: white; font-weight: bold; font-size: 18px; }
+.owp-text { color: white; font-weight: bold; font-size: 18rem; }
 
 .cert-info {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 7rem;
   justify-content: center;
 }
 .cert-title {
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: 600;
   color: #707070;
   text-decoration: underline;
@@ -534,27 +628,27 @@ onMounted(async () => {
 .cert-meta-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 2px;
+  gap: 6rem;
+  margin-top: 2rem;
 }
 .meta-chip {
-  font-size: 13px;
+  font-size: 13rem;
   color: #555;
   background-color: #e8e8e8;
-  border-radius: 20px;
-  padding: 3px 10px;
+  border-radius: 20rem;
+  padding: 3rem 10rem;
   white-space: nowrap;
 }
 .meta-chip strong { color: #034750; }
 
-.download-section { margin-top: 4px; }
+.download-section { margin-top: 4rem; }
 .download-btn {
   background-color: #00a5b5;
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 7px 16px;
-  font-size: 14px;
+  border-radius: 6rem;
+  padding: 7rem 16rem;
+  font-size: 14rem;
   font-family: "Roboto", sans-serif;
   font-weight: 600;
   cursor: pointer;
@@ -562,39 +656,39 @@ onMounted(async () => {
 }
 .download-btn:hover:not(:disabled) {
   background-color: #008c9a;
-  transform: translateY(-1px);
+  transform: translateY(-1rem);
 }
 .download-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Sidebar */
 .side-card {
   background-color: #f2f1f2;
-  border-radius: 14px;
+  border-radius: 14rem;
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
-.side-icon { width: 26px; height: 34px; }
-.side-header { display: flex; align-items: center; gap: 10px; margin: 16px 20px 0 20px; }
-.side-title { font-size: 20px; font-weight: 700; color: #034750; }
-.side-body { display: flex; flex-direction: column; gap: 14px; margin: 0 20px; }
+.side-icon { width: 26rem; height: 34rem; }
+.side-header { display: flex; align-items: center; gap: 10rem; margin: 16rem 20rem 0 20rem; }
+.side-title { font-size: 20rem; font-weight: 700; color: #034750; }
+.side-body { width: 100%; height: 172rem; display: flex; flex-direction: column;}
 .side-link {
-  font-size: 16px;
+  padding-left: 20rem;
+  padding-right: 20rem;
+  font-size: 16rem;
   color: #007c8a;
   cursor: pointer;
   text-decoration: underline;
-  padding: 5px 0;
   transition: background-color 0.2s ease;
 }
 .side-link:hover { background-color: #d9d9d9; }
 .side-footer {
-  height: 32px;
+  height: 32rem;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 400;
-  margin: 0 20px 20px 20px;
+  margin: 0 20rem 20rem 20rem;
   cursor: pointer;
   color: #034750;
   text-decoration: none;

@@ -247,15 +247,15 @@ export function getFromSession(key) {
   }
 }
 
-export function loadFromSession(key, array) {
+export function loadFromSession(key) {
   try {
     console.log('Checking sessionStorage for cached details...')
       console.log('Attempting to load from sessionStorage...')
       const data = getFromSession(key)
-      if (data.response) { 
+      if (data.response) {
         return data.response;
       }
-      else { 
+      else {
         console.log('No cached details found in sessionStorage.')
         return null;
       }

@@ -338,7 +338,7 @@ onMounted(async () => {
                   <div class="course-info">
                       <div class="course-title">{{ course.title }}</div>
 
-                      <div class="info-subrow"> 
+                      <div class="info-subrow">
                         <div class="completion-label">Completion</div>
                         <div class="expires-text">Expires: {{ course.expires }}</div>
                       </div>
@@ -570,14 +570,9 @@ onMounted(async () => {
             </div>
 
             <template v-else>
-              <div
-                v-for="invoice in invoices"
-                :key="invoice.invoicenum"
-                class="side-link"
-              >
-                Invoice: {{ invoice.invoicenum || "Unavailable" }} -
-                {{ getInvoiceName(invoice.invoicenum) }}
-              </div>
+              <router-link class="side-link" v-for="v in invoices.slice(0, 3)" :key="v.invoicenum" :to="`/purchase-history/${v.invoicenum}`">
+                Invoice: {{ v.invoicenum }} - {{ getInvoiceName(v.invoicenum) }}
+            </router-link>
             </template>
 
           </div>
@@ -684,7 +679,7 @@ onMounted(async () => {
   grid-template-columns: 70rem 1fr auto;
   align-items: center;
   gap: 4rem;
-  border-radius: 0rem; 
+  border-radius: 0rem;
   padding: 8rem 12rem;
   margin: 0 -20rem;
   width: calc(100% + 17rem);
@@ -791,7 +786,7 @@ onMounted(async () => {
 .progress-fill {
   background-color: #00A5B5;
   height: 100%;
-  border-radius: 0; 
+  border-radius: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -933,14 +928,14 @@ onMounted(async () => {
   cursor: pointer;
   text-decoration: underline;
   padding: 5rem 16rem;
-  margin: 0 -20rem; 
+  margin: 0 -20rem;
   width: calc(100% + 7rem);
   transition: background-color 0.2s ease;
 }
 
 .side-link:hover {
   background-color: #D9D9D9;
-  color: #007c8a; 
+  color: #007c8a;
 }
 
 .side-footer {

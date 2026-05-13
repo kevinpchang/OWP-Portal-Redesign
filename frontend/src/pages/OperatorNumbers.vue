@@ -1,12 +1,23 @@
 <script setup>
   import { ref, computed, onMounted, onUnmounted } from 'vue'
-
-  //API Integrations
   import * as api from "@/services/owpAPI"
-
   import mail from '@/assets/icons/owp-2color/mail-icon.svg'
   import certificate from '@/assets/icons/owp-2color/certificate-icon.svg'
 
+  // Messages
+  const MESSAGING_API_BASE = "https://owp-portal-redesign-db.onrender.com";
+  const messagingUserId = 1;
+
+  function formatInboxDate(dt) {
+    if (!dt) return "";
+    return new Date(dt).toLocaleDateString(undefined, {
+      month: "numeric",
+      day: "numeric",
+      year: "numeric",
+    });
+  }
+
+  //API Integrations
   const pid = 458860;
   const error = ref("");
   const opNum = ref("");
@@ -31,14 +42,14 @@
   const addOpNum = ref("")
 
   //const addState = ref("")
-  const states = {"AL": "Alabama", "AK": "Alaska", "AS":"American Samoa", "AZ": "Arizona", "AR": "Arkansas", "CA": "California", "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", 
-                  "DC":"District of Columbia", "FL": "Florida", "GA": "Georgia","GU":"Guam", "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa", "KS": "Kansas", "KY": "Kentucky", 
-                  "LA": "Louisiana", "ME": "Maine", "MH":"Marshall Islands", "MD": "Maryland","MA": "Massachusetts", "MI": "Michigan", "FM":"Micronesia", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri", 
-                  "MT": "Montana", "MP":"N. Mariana Islands", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey","NM": "New Mexico", "NY": "New York", "NC": "North Carolina", 
+  const states = {"AL": "Alabama", "AK": "Alaska", "AS":"American Samoa", "AZ": "Arizona", "AR": "Arkansas", "CA": "California", "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware",
+                  "DC":"District of Columbia", "FL": "Florida", "GA": "Georgia","GU":"Guam", "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa", "KS": "Kansas", "KY": "Kentucky",
+                  "LA": "Louisiana", "ME": "Maine", "MH":"Marshall Islands", "MD": "Maryland","MA": "Massachusetts", "MI": "Michigan", "FM":"Micronesia", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
+                  "MT": "Montana", "MP":"N. Mariana Islands", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey","NM": "New Mexico", "NY": "New York", "NC": "North Carolina",
                   "ND": "North Dakota", "OH": "Ohio", "OK": "Oklahoma", "OR": "Oregon", "PW":"Palau", "PA": "Pennsylvania", "PR":"Puerto Rico", "RI": "Rhode Island", "SC": "South Carolina",
-                  "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont", "VI":"Virgin Islands", "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", 
+                  "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont", "VI":"Virgin Islands", "VA": "Virginia", "WA": "Washington", "WV": "West Virginia",
                   "WI": "Wisconsin","WY":"Wyoming"}
-  const territories = {"AB": "Alberta", "BC": "British Columbia", "MB": "Manitoba", "NB": "New Brunswick", "NL": "Newfound & Labrador", "NT": "Northwest Territories", 
+  const territories = {"AB": "Alberta", "BC": "British Columbia", "MB": "Manitoba", "NB": "New Brunswick", "NL": "Newfound & Labrador", "NT": "Northwest Territories",
                       "NS": "Nova Scotia", "NU": "Nunavut", "ON": "Ontario", "PE": "Prince Edward Island", "QC": "Quebec", "SK": "Saskatchewan", "YT": "Yukon"}
 
   async function loadTable() {
@@ -57,7 +68,7 @@
         hadFailure.value = true;
         nums.value = api.loadFromSession("getOperatorList") ?? [];
       }
-      
+
       //console.log("Operator Numbers JSON:", nums.value);
 
       opNum.value = nums.value?.oprlicid ?? ""
@@ -152,9 +163,9 @@
     )
 
     if (!original) return
-    
+
     try{
-    
+
       await api.deleteOperator("localhost", original.oprlicid, pid);
       //console.log("deleteNumber called with ip:", "localhost", "and id:", original.oprlicid);
     } catch (e) {
@@ -168,24 +179,36 @@
   }
 
   async function loadMessages() {
-    loadingMessages.value = true;
-    messagesError.value = "";
+  loadingMessages.value = true;
+  messagesError.value = "";
 
-    try {
-      messages.value = [];
-    } catch (e) {
-      console.error("Failed to load messages:", e);
-      messagesError.value = "load-failed";
-      messages.value = [];
-    } finally {
-      loadingMessages.value = false;
-    }
+  try {
+    const url = new URL(`${MESSAGING_API_BASE}/api/messaging/threads`);
+    url.searchParams.set("userId", String(messagingUserId));
+
+    const res = await fetch(url.toString());
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+
+    messages.value = (data.threads || []).slice(0, 3).map((row) => ({
+      id: Number(row.ThreadId),
+      sender: row.LastSenderName || row.LastSenderEmail || "Unknown",
+      date: formatInboxDate(row.LastSentAt || row.LastMessageAt || row.CreatedAt),
+    }));
+  } catch (e) {
+    console.error("Failed to load messages:", e);
+    messagesError.value = e?.message ?? "load-failed";
+    messages.value = [];
+  } finally {
+    loadingMessages.value = false;
   }
+}
 
   async function loadCertificates() {
     loadingCertificates.value = true;
     certificatesError.value = "";
-    
+
     try {
       const enr = await api.getActiveEnrollment(pid);
       enrollments.value = enr.response ?? [];
@@ -274,7 +297,7 @@
     await loadTable();
     if (hadFailure.value) { alert('Some data could not be refreshed. Showing saved session data where available which may be old. Refresh the page to attempt to fetch new data.'); }
   });
-  
+
 
 </script>
 
@@ -282,7 +305,7 @@
   <div class="operator-numbers-page">
     <div class="left-column">
       <div class="header-container">
-        <div class="title">Operator Numbers</div> 
+        <div class="title">Operator Numbers</div>
         <p class="description">View and edit your Operator Numbers</p>
         <button class = add-button @click.left="openAdd">Add Operator Number</button>
       </div>
@@ -363,14 +386,9 @@
           </div>
 
           <template v-else>
-            <div
-              v-for="message in messages"
-              :key="message.id"
-              class="object text"
-            >
-              {{ message.subject || "Message unavailable" }}
-              <span v-if="message.date">({{ message.date }})</span>
-            </div>
+            <router-link :to="`/messages?threadId=${message.id}`" class="object" v-for="message in messages.slice(0, 3)" :key="message.id">
+              <div class="text">Email Message from: {{ message.sender }} {{ message.date }}</div>
+            </router-link>
           </template>
         </div>
         <router-link to="/messages" class="view-all">

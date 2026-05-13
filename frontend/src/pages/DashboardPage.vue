@@ -2,8 +2,6 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 
-import clarifier from '@/assets/artwork/clarifier.jpg'
-
 //import icons
 import book from '@/assets/icons/owp-2color/book-icon.svg'
 import slide from '@/assets/icons/owp-2color/slides-icon.svg'
@@ -328,9 +326,11 @@ function scheduleNextUpdate() {
           </div>
           <div class="divider"></div>
           <div class="body">
-            <router-link :to="`/messages?threadId=${message.id}`" class="object" v-for="message in messages.slice(0, 3)" :key="message.id"><div class="text">Email Message from: {{ message.sender }} {{ message.date }}</div></router-link>
+            <router-link :to="`/messages?threadId=${message.id}`" class="object" v-for="message in messages.slice(0, 3)" :key="message.id">
+              <div class="text">Email Message from: {{ message.sender }} {{ message.date }}</div>
+            </router-link>
           </div>
-          <div class="view-all"> 
+          <div class="view-all">
             <router-link to="/messages">
               <div class="text">(View all messages)</div>
             </router-link>
@@ -751,7 +751,8 @@ function scheduleNextUpdate() {
 
 .messages .body .object .text {
   height: 14rem;
-  margin-left: 24rem;
+  padding-left: 24rem;
+  padding-right: 24rem;
   font-size: 16rem;
   font-weight: 400;
   text-decoration: underline;
