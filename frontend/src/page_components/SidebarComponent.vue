@@ -25,7 +25,7 @@ const route = useRoute()
         class="dashboard-button"
         :class="{ active: route.name === 'DashboardPage' }"
       >
-        <LayoutGrid class="button-icon" color="#034750" :size="20" />
+        <LayoutGrid class="button-icon" color="#034750"  />
         <div class="button-text">Dashboard</div>
       </router-link>
 
@@ -35,7 +35,7 @@ const route = useRoute()
         class="my-account-button"
         :class="{ active: route.name === 'MyAccountPage' }"
       >
-        <SquareUserRound class="button-icon" color="#034750" :size="20" />
+        <SquareUserRound class="button-icon" color="#034750"  />
         <div class="button-text">My Account</div>
       </router-link>
 
@@ -45,7 +45,7 @@ const route = useRoute()
         class="my-tasks-button"
         :class="{ active: route.name === 'MyTasksPage' }"
       >
-        <ListTodo class="button-icon" color="#034750" :size="20" />
+        <ListTodo class="button-icon" color="#034750"  />
         <div class="button-text">My Tasks</div>
       </router-link>
 
@@ -55,13 +55,13 @@ const route = useRoute()
         class="slides-button"
         :class="{ active: route.name === 'SlidesPage' }"
       >
-        <BookOpen class="button-icon" color="#034750" :size="20" />
+        <BookOpen class="button-icon" color="#034750"  />
         <div class="button-text">Slides</div>
       </router-link>
 
       <!-- Media -->
       <router-link to="/media" class="media-button" :class="{ active: route.name === 'MediaPage' }">
-        <Images class="button-icon" color="#034750" :size="20" />
+        <Images class="button-icon" color="#034750"  />
         <div class="button-text">Media</div>
       </router-link>
 
@@ -71,7 +71,7 @@ const route = useRoute()
         class="courses-button"
         :class="{ active: route.name === 'CoursesPage' }"
       >
-        <List class="button-icon" color="#034750" :size="20" />
+        <List class="button-icon" color="#034750"  />
         <div class="button-text">Courses</div>
       </router-link>
 
@@ -81,7 +81,7 @@ const route = useRoute()
         class="operator-numbers-button"
         :class="{ active: route.name === 'OperatorNumbers' }"
       >
-        <Hash class="button-icon" color="#034750" :size="20" />
+        <Hash class="button-icon" color="#034750"  />
         <div class="button-text">Operator Numbers</div>
       </router-link>
 
@@ -91,7 +91,7 @@ const route = useRoute()
         class="certificates-button"
         :class="{ active: route.name === 'CertificatesPage' }"
       >
-        <ReceiptText class="button-icon" color="#034750" :size="20" />
+        <ReceiptText class="button-icon" color="#034750"  />
         <div class="button-text">Certificates</div>
       </router-link>
 
@@ -101,7 +101,7 @@ const route = useRoute()
         class="purchase-history-button"
         :class="{ active: route.name === 'PurchaseHistory' }"
       >
-        <History class="button-icon" color="#034750" :size="20" />
+        <History class="button-icon" color="#034750"  />
         <div class="button-text">Purchase History</div>
       </router-link>
     </nav>
@@ -112,7 +112,7 @@ const route = useRoute()
       class="logout-button"
       :class="{ active: route.name === 'LogoutPage' }"
     >
-      <LogOut class="button-icon" color="#034750" :size="20" />
+      <LogOut class="button-icon" color="#034750"  />
       <div class="button-text">Logout</div>
     </router-link>
 
@@ -124,6 +124,11 @@ const route = useRoute()
 </template>
 
 <style scoped>
+.lucide {
+  width: 30rem;
+  height: 30rem;
+}
+
 .shell {
   display: flex;
 }
@@ -134,7 +139,7 @@ const route = useRoute()
   left: 295rem;
   top: 0;
   height: 100vh; /* full viewport height */
-  border-left: 1px solid #d9d9d9;
+  border-left: 1rem solid #d9d9d9;
   z-index: 0; /* below header and logout */
 }
 
@@ -144,7 +149,7 @@ const route = useRoute()
   bottom: 80rem; /* sits above logout button */
   left: 0;
   width: 295rem; /* match sidebar width */
-  border-top: 1px solid #d9d9d9;
+  border-top: 1rem solid #d9d9d9;
   z-index: 2;
 }
 
@@ -213,8 +218,8 @@ const route = useRoute()
 .dashboard-button {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding-left: 5px;
+  gap: 4rem;
+  padding-left: 5rem;
   text-decoration: none;
   color: inherit;
 }
@@ -250,8 +255,8 @@ const route = useRoute()
 /* Icon spacing */
 .sidebar .button-icon,
 .logout-button .button-icon {
-  margin-left: 20px;
-  margin-right: 10px;
+  margin-left: 20rem;
+  margin-right: 10rem;
 }
 
 /* Text alignment adjustments per button */
